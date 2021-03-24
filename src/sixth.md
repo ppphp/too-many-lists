@@ -1,9 +1,8 @@
-# An Ok Unsafe Doubly-Linked Deque
+# 一个好的不安全的双链双向队列
 
-Nope, still haven't written this one! It's really just not that much more instructive.
+不，还是没有写这篇! 它真的只是没有那么多的指导意义。
 
-Read [The Rustonomicon][] and the source for [std::collections::LinkedList][linked-list] if you
-really want more!
+如果你真的想了解更多，请阅读[Rustonomicon][]和[std::collections::LinkedList][linked-list]的源代码！
 
 
 

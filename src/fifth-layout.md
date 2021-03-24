@@ -1,9 +1,8 @@
-# Layout
+# 布局
 
-So what's a singly-linked queue like? Well, when we had a singly-linked stack
-we pushed onto one end of the list, and then popped off the same end. The only
-difference between a stack and a queue is that a queue pops off the *other*
-end. So from our stack implementation we have:
+那么，单链队列是什么样的呢？好吧，当我们有一个单链接的堆栈时，我们推到列表的一端，
+然后从同一端弹出。栈和队列的唯一区别是，队列会从*另*一端弹出。所以从我们的堆栈实现
+来看，我们有：
 
 ```text
 input list:
@@ -16,12 +15,10 @@ stack pop:
 [Some(ptr)] -> (A, Some(ptr)) -> (B, None)
 ```
 
-To make a queue, we just need to decide which operation to move to the
-end of the list: push, or pop? Since our list is singly-linked, we can
-actually move *either* operation to the end with the same amount of effort.
+要制作一个队列，我们只需要决定将哪个操作移到列表的末尾：推，还是弹？由于我们的列表
+是单链的，我们实际上可以用同样的努力把*任何一个*操作移到最后。
 
-To move `push` to the end, we just walk all the way to the `None` and set it
-to Some with the new element.
+要把`push`移到最后，我们只需一路走到`None`，并把它和新元素一起设置为Some。
 
 ```text
 input list:
@@ -31,8 +28,7 @@ flipped push X:
 [Some(ptr)] -> (A, Some(ptr)) -> (B, Some(ptr)) -> (X, None)
 ```
 
-To move `pop` to the end, we just walk all the way to the node *before* the
-None, and `take` it:
+要把`pop`移到最后，我们只需一路走到None*之前*的节点，然后`take`它：
 
 ```text
 input list:
@@ -42,25 +38,19 @@ flipped pop:
 [Some(ptr)] -> (A, Some(ptr)) -> (B, None)
 ```
 
-We could do this today and call it quits, but that would stink! Both of these
-operations walk over the *entire* list. Some would argue that such a queue
-implementation is indeed a queue because it exposes the right interface. However
-I believe that performance guarantees are part of the interface. I don't care
-about precise asymptotic bounds, just "fast" vs "slow". Queues guarantee
-that push and pop are fast, and walking over the whole list is definitely *not*
-fast.
+我们今天可以做这个，然后就不干了，但那会很臭！。这两种操作都是在*整个*列表上行走。有
+些人认为，这样的队列实现确实是一个队列，因为它暴露了正确的接口。然而我认为性能保证是
+接口的一部分。我不关心精确的渐近界线，只关心“快”与“慢”。队列保证推送和弹出是快速的，
+而在整个列表上行走肯定是*不*快的。
 
-One key observation is that we're wasting a ton of work doing *the same thing*
-over and over. Can we memoize this work? Why, yes! We can store a pointer to
-the end of the list, and just jump straight to there!
+一个关键的观察是，我们在重复做*同样的事情*，浪费了大量的工作。我们能不能把这项工作记
+忆化？为什么，是的？我们可以存储一个指向列表末尾的指针，然后直接跳到那里去！
 
-It turns out that only one inversion of `push` and `pop` works with this.
-To invert `pop` we would have to move the "tail" pointer backwards, but
-because our list is singly-linked, we can't do that efficiently.
-If we instead invert `push` we only have to move the "head" pointer
-forwards, which is easy.
+事实证明，只有一种反转的`push`和`pop`方式可以使用。要反转`pop`，我们必须将“尾部”指针
+向后移动，但由于我们的列表是单链的，我们无法有效地做到这一点。如果我们反转`push`，我
+们只需要将“头部”指针向前移动，这很容易。
 
-Let's try that:
+让我们试试吧：
 
 ```rust ,ignore
 use std::mem;
@@ -106,13 +96,10 @@ impl<T> List<T> {
 }
 ```
 
-I'm going a bit faster with the impl details now since we should be pretty
-comfortable with this sort of thing. Not that you should necessarily expect
-to produce this code on the first try. I'm just skipping over some of the
-trial-and-error we've had to deal with before. I actually made a ton of mistakes
-writing this code that I'm not showing. You can only see me leave off a `mut` or
-`;` so many times before it stops being instructive. Don't worry, we'll see
-plenty of *other* error messages!
+由于我们对这种事情应该很熟悉，所以我现在在实现细节方面走得快一点。并不是说你应该期望
+在第一次尝试时就能产生这样的代码。我只是跳过了一些我们以前不得不处理的试验和错误。实
+际上，我在写这段代码时犯了很多错误，我没有显示出来。你只能看到我漏掉了`mut`或`;`这么
+多次，然后它就不再具有指导意义了。别担心，我们会看到很多*其他的*错误信息的！
 
 ```text
 > cargo build
@@ -130,17 +117,15 @@ error[E0382]: use of moved value: `new_tail`
    |                                      ^^^^^^^^ value used here after move
 ```
 
-Shoot!
+发现了！
 
-> use of moved value: `new_tail`
+> 使用了移动过的值： `new_tail`
 
-Box doesn't implement Copy, so we can't just assign it to two locations. More
-importantly, Box *owns* the thing it points to, and will try to free it when
-it's dropped. If our `push` implementation compiled, we'd double-free the tail
-of our list! Actually, as written, our code would free the old_tail on every
-push. Yikes! 🙀
+盒子没有实现复制，所以我们不能直接把它分配到两个位置。更重要的是，Box*拥有*它所指向
+的东西，当它被丢弃时，会尝试释放它。如果我们的`push`实现被编译了，我们就会把列表的
+尾部释放出来。实际上，按照写法，我们的代码会在每次推送时释放 old_tail。呀! 🙀
 
-Alright, well we know how to make a non-owning pointer. That's just a reference!
+好了，我们知道如何制作一个不能拥有的指针。这只是一个引用！
 
 ```rust ,ignore
 pub struct List<T> {
@@ -186,9 +171,8 @@ impl<T> List<T> {
 }
 ```
 
-Nothing too tricky here. Same basic idea as the previous code, except we're
-using some of that implicit return goodness to extract the tail reference from
-wherever we stuff the actual Box.
+这里没有什么太棘手的问题。与前面的代码的基本思路相同，只是我们使用了一些隐含返回的
+好处，从我们放置实际Box的地方提取尾部引用。
 
 ```text
 > cargo build
@@ -200,9 +184,8 @@ error[E0106]: missing lifetime specifier
   |                  ^ expected lifetime parameter
 ```
 
-Oh right, we need to give references in types lifetimes. Hmm... what's the
-lifetime of this reference? Well, this seems like IterMut, right? Let's try
-what we did for IterMut, and just add a generic `'a`:
+哦，对了，我们需要在类型的生命期中给出参考。嗯......这个引用的生命期是多少？嗯，
+这好像是IterMut，对吗？让我们试试我们为IterMut所做的，只是添加一个通用的`'a`：
 
 ```rust ,ignore
 pub struct List<'a, T> {
@@ -285,13 +268,13 @@ note: but, the lifetime must be valid for the lifetime 'a as defined on the impl
 
 ```
 
-Woah, that's a really detailed error message. That's a bit concerning, because it
-suggests we're doing something really messed up. Here's an interesting part:
+哇，这是一个非常详细的错误信息。这有点令人担忧，因为它表明我们正在做一些非常混乱的事
+情。这里有一个有趣的部分：
 
-> the lifetime must be valid for the lifetime `'a` as defined on the impl
+> 生命期必须对内联中定义的 "a "的生命期有效。
 
-We're borrowing from `self`, but the compiler wants us to last as long as `'a`,
-what if we tell it `self` *does* last that long..?
+我们借用了`self`，但编译器希望我们的生命期和`'a`一样长，如果我们告诉它`self`*确实*
+能持续那么久呢……？
 
 ```rust ,ignore
     pub fn push(&'a mut self, elem: T) {
@@ -309,9 +292,9 @@ warning: field is never used: `elem`
   = note: #[warn(dead_code)] on by default
 ```
 
-Oh, hey, that worked! Great!
+哦，嘿，成功了! 很好!
 
-Let's just do `pop` too:
+我们也来做`pop`吧：
 
 ```rust ,ignore
 pub fn pop(&'a mut self) -> Option<T> {
@@ -330,7 +313,7 @@ pub fn pop(&'a mut self) -> Option<T> {
 }
 ```
 
-And write a quick test for that:
+并为此写一个快速测试：
 
 ```rust ,ignore
 mod test {
@@ -417,21 +400,18 @@ error: aborting due to 11 previous errors
 
 🙀🙀🙀🙀🙀🙀🙀🙀🙀🙀🙀🙀🙀🙀🙀🙀🙀🙀🙀🙀🙀🙀🙀
 
-Oh my goodness.
+哦，我的天哪。
 
-The compiler's not wrong for vomiting all over us. We just committed a
-cardinal Rust sin: we stored a reference to ourselves *inside ourselves*.
-Somehow, we managed to convince Rust that this totally made sense in our
-`push` and `pop` implementations (I was legitimately shocked we did). I believe
-the reason is that Rust can't yet tell that the reference is into ourselves
-from just `push` and `pop` -- or rather, Rust doesn't really have that notion
-at all. Reference-into-yourself failing to work is just an emergent behaviour.
+编译器在我们身上呕吐是没有错的。我们刚刚犯了一个Rust的大罪：我们在*自己内部*存储了
+一个对自己的引用。不知何故，我们成功地说服了Rust，在我们的`push`和`pop`实现中，这
+完全是有意义的（我真的很震惊，我们做到了）。我相信原因是Rust还不能从`push`和`pop`
+中分辨出引用是进入自己的--或者说，Rust根本就没有这个概念。引用到自己身上不能生效只
+是一种突发行为。
 
-As soon as we tried to *use* our list, everything quickly fell apart.
-When we call `push` or `pop`, we promptly store a reference to ourselves in
-ourselves and become *trapped*. We are literally borrowing ourselves.
+当我们试图*使用*我们的列表时，一切都迅速崩溃了。当我们调用`push`或`pop`时，我们立
+即在自己身上存储了一个对自己的引用，并被*困住*。我们实际上是在借用我们自己。
 
-Our `pop` implementation hints at why this could be really dangerous:
+我们的`pop`实现暗示了为什么这可能是非常危险的：
 
 ```rust ,ignore
 // ...
@@ -440,19 +420,16 @@ if self.head.is_none() {
 }
 ```
 
-What if we forgot to do this? Then our tail would point to some node *that
-had been removed from the list*. Such a node would be instantly freed, and we'd
-have a dangling pointer which Rust was supposed to protect us from!
+如果我们忘记这样做呢？那么我们的尾巴就会指向*某个已经从列表中删除的节点*。这样的节
+点会立即被释放，我们就会有一个悬空的指针，而Rust应该保护我们免受其害！
 
-And indeed Rust is protecting us from that kind of danger. Just in a very...
-**roundabout** way.
+事实上，Rust正在保护我们远离这种危险。只是以一种非常...**迂回**的方式。
 
-So what can we do? Go back to `Rc<RefCell>>` hell?
+那么我们能做什么呢？回到`Rc<RefCell>>`地狱？
 
-Please. No.
+拜托了。不，不。
 
-No instead we're going to go off the rails and use *raw pointers*.
-Our layout is going to look like this:
+不，我们要离开轨道，使用*原始指针*。我们的布局将看起来像这样：
 
 ```rust ,ignore
 pub struct List<T> {
@@ -467,13 +444,12 @@ struct Node<T> {
     next: Link<T>,
 }
 ```
+就这样了。没有这种懦弱的参考-计算-动态-借贷-检查的废话! 真实。硬的。未经检查的。
+指针。
 
-And that's that. None of this wimpy reference-counted-dynamic-borrow-checking
-nonsense! Real. Hard. Unchecked. Pointers.
+让我们都成为C语言。让我们整天都是C。
 
-Let's be C everyone. Let's be C all day.
+我回来了。我准备好了。
 
-I'm home. I'm ready.
-
-Hello `unsafe`.
+你好，`unsafe`。
 

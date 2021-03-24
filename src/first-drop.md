@@ -1,13 +1,11 @@
-# Drop
+# 丢弃
 
-We can make a stack, push on to, pop off it, and we've even tested that it all
-works right!
+我们可以做一个堆栈，对它推入，弹出，我们甚至已经测试过，这一切都正确！
 
-Do we need to worry about cleaning up our list? Technically, no, not at all!
-Like C++, Rust uses destructors to automatically clean up resources when they're
-done with. A type has a destructor if it implements a *trait* called Drop.
-Traits are Rust's fancy term for interfaces. The Drop trait has the following
-interface:
+我们需要担心清理我们的列表吗？从技术上讲，不，完全不需要！Rust和C++一样，使用
+destructors来自动清理列表。像C++一样，Rust使用析构器来自动清理资源。如果一个
+类型实现了一个叫做Drop的*特质*，它就有一个析构器。特质是Rust对接口的花哨称呼。
+Drop特质有以下接口：
 
 ```rust ,ignore
 pub trait Drop {
@@ -15,32 +13,27 @@ pub trait Drop {
 }
 ```
 
-Basically, "when you go out of scope, I'll give you a second to clean up your
-affairs".
+基本上就是，“当你离开作用域时，我会给你一点时间来清理你的事务”。
 
-You don't actually need to implement Drop if you contain types that implement
-Drop, and all you'd want to do is call *their* destructors. In the case of
-List, all it would want to do is drop its head, which in turn would *maybe*
-try to drop a `Box<Node>`. All that's handled for us automatically... with one
-hitch.
+如果你包含了实现Drop的类型，你其实并不需要实现Drop，你要做的只是调用*它们*的析构函
+数。在List的情况下，它所要做的就是丢弃它的头部，而头部又*可能*会尝试丢弃一个
+`Box<Node>`。所有这些都会自动为我们处理......但有一个问题。
 
-The automatic handling is going to be bad.
+自动处理的效果会很差。
 
-Let's consider a simple list:
+让我们考虑一个简单的列表：
 
 
 ```text
 list -> A -> B -> C
 ```
 
-When `list` gets dropped, it will try to drop A, which will try to drop B,
-which will try to drop C. Some of you might rightly be getting nervous. This is
-recursive code, and recursive code can blow the stack!
+当`list`被丢弃时，它会尝试丢弃A，会尝试丢弃B，会尝试丢弃C，你们中的一些人可能会正确
+地开始紧张。这是递归代码，而递归代码会炸掉堆栈!
 
-Some of you might be thinking "this is clearly tail recursive, and any decent
-language would ensure that such code wouldn't blow the stack". This is, in fact,
-incorrect! To see why, let's try to write what the compiler has to do, by
-manually implementing Drop for our List as the compiler would:
+你们中的一些人可能会想："这显然是尾部递归，任何体面的语言都会确保这种代码不会炸堆"。
+事实上，这是不正确的! 为了了解原因，让我们试着写出编译器要做的事情，为我们的List手动
+实现Drop，就像编译器一样：
 
 
 ```rust ,ignore
@@ -77,9 +70,8 @@ impl Drop for Node {
 }
 ```
 
-We *can't* drop the contents of the Box *after* deallocating, so there's no
-way to drop in a tail-recursive manner! Instead we're going to have to manually
-write an iterative drop for `List` that hoists nodes out of their boxes.
+我们*不能*在回收内存*之后*丢弃Box的内容，所以没有办法以尾部递归的方式丢弃！而我们要
+手动为`List`写一个迭代丢弃，将节点从它们的盒子里吊出来。
 
 
 ```rust ,ignore
@@ -109,25 +101,22 @@ test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured
 
 ```
 
-Great!
+棒！
 
 ----------------------
 
 <span style="float:left">![Bonus](img/profbee.gif)</span>
 
-## Bonus Section For Premature Optimization!
+## 提前优化的奖励部分！
 
-Our implementation of drop is actually *very* similar to
-`while let Some(_) = self.pop() { }`, which is certainly simpler. How is
-it different, and what performance issues could result from it once we start
-generalizing our list to store things other than integers?
+我们对drop的实现其实和`while let Some(_) = self.pop() { }`*很*相似，当然更简单。
+它有什么不同，一旦我们开始泛化我们的列表来存储整数以外的东西，会导致什么性能问题？
 
 <details>
   <summary>Click to expand for answer</summary>
 
-Pop returns `Option<i32>`, while our implementation only manipulates Links (`Box<Node>`). So our implementation only moves around pointers to nodes, while the pop-based one will move around the values we stored in nodes. This could be very expensive if we generalize our list and someone uses it to store instances of VeryBigThingWithADropImpl (VBTWADI). Box is able to run the drop implementation of its contents in-place, so it doesn't suffer from this issue. Since VBTWADI is *exactly* the kind of thing that actually makes using a linked-list desirable over an array, behaving poorly on this case would be a bit of a disappointment.
+Pop返回`Option<i32>`，而我们的实现只操作Links（`Box<Node>`）。所以我们的实现只移动节点的指针，而基于pop的实现将移动我们存储在节点中的值。如果我们通用我们的列表，有人用它来存储很大的有丢弃实现的东西(VBTWADI)的实例，这可能会非常昂贵。Box能够在原地运行其内容的drop实现，所以它不会受到这个问题的影响。由于VBTWADI正是实际上使用链表比使用数组更可取，所以在这种情况下表现不佳会让人有点失望。
 
-If you wish to have the best of both implementations, you could add a new method,
-`fn pop_node(&mut self) -> Link`, from-which `pop` and `drop` can both be cleanly derived.
+如果你希望同时拥有两种实现的优点，你可以添加一个新的方法，`fn pop_node(&mut self) -> Link`，`pop`和`drop`都可以干净利落地从它派生出来。
 
 </details>

@@ -1,6 +1,6 @@
-# New
+# 新建
 
-To associate actual code with a type, we use `impl` blocks:
+我们使用了`impl`块，将实际的代码与类型联系起来：
 
 ```rust ,ignore
 impl List {
@@ -8,8 +8,7 @@ impl List {
 }
 ```
 
-Now we just need to figure out how to actually write code. In Rust we declare
-a function like so:
+现在我们只需要弄清楚如何实际编写代码。在Rust中，我们这么声明一个函数：
 
 ```rust ,ignore
 fn foo(arg1: Type1, arg2: Type2) -> ReturnType {
@@ -17,10 +16,9 @@ fn foo(arg1: Type1, arg2: Type2) -> ReturnType {
 }
 ```
 
-The first thing we want is a way to *construct* a list. Since we hide the
-implementation details, we need to provide that as a function. The usual way
-to do that in Rust is to provide a static method, which is just a
-normal function inside an `impl`:
+我们首先需要的是一种*构造*列表的方式。由于我们隐藏了实现细节，我们需要以函数的形
+式来提供。在Rust中，通常的方法是提供一个静态方法，也就是在`impl`中提供一个普通的
+函数：
 
 ```rust ,ignore
 impl List {
@@ -30,36 +28,10 @@ impl List {
 }
 ```
 
-A few notes on this:
-
-* Self is an alias for "that type I wrote at the top next to `impl`". Great for
-  not repeating yourself!
-* We create an instance of a struct in much the same way we declare it, except
-  instead of providing the types of its fields, we initialize them with values.
-* We refer to variants of an enum using `::`, which is the namespacing operator.
-* The last expression of a function is implicitly returned.
-  This makes simple functions a little neater. You can still use `return`
-  to return early like other C-like languages.
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+有几点说明：
+* Self是“我写在最上面的那个在`impl`旁边的类型”的别名。很好的避免了自己的重复。
+* 我们创建一个结构体的实例的方式与我们声明它的方式很相似，只是我们没有提供它的字
+  段类型，而是用值来初始化它们
+* 我们使用`::`来引用一个枚举的变体，这是命名间隔操作符。
+* 一个函数的最后一个表达式是隐式返回的。这使得简单的函数变得更加整洁。你仍然可以
+  像其他类C语言一样，使用return来提前返回。

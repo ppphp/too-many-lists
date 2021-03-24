@@ -1,307 +1,246 @@
-# Learn Rust With Entirely Too Many Linked Lists
+# 用太多链表写法学习Rust
 
-> Got any issues or want to check out all the final code at once?
-> [Everything's on Github!][github]
+> 有任何问题或想一次性查看所有最终代码吗？
+> [所有代码都在Github上！][github]
 
-> **NOTE**: The current edition of this book is written against Rust 2018,
-> which was first released with rustc 1.31 (Dec 8, 2018). If your rust toolchain
-> is new enough, the Cargo.toml file that `cargo new` creates should contain the
-> line `edition = "2018"` (or if you're reading this in the far future, perhaps
-> some even larger number!). Using an older toolchain is possible, but unlocks
-> a secret **hardmode**, where you get extra compiler errors that go completely
-> unmentioned in the text of this book. Wow, sounds like fun!
+> **说明**: 本书当前版本是针对Rust 2018编写的，第一次发布是rustc 1.31 (2018-12-08)
+> 如果你的rust工具链足够新，`cargo new`创造的Cargo.toml文件应该包含一行
+> `edition = "2018"`（如果你在很久以后读到这篇文章，可能看到更大的数字！）。你可以
+> 用旧版工具链，但是会解锁一个隐藏的**困难模式**，你会得到书里没有提到的额外的编译器
+> 报错。哇哦，有意思！
 
-I fairly frequently get asked how to implement a linked list in Rust. The
-answer honestly depends on what your requirements are, and it's obviously not
-super easy to answer the question on the spot. As such I've decided to write
-this book to comprehensively answer the question once and for all.
+我经常被问到如何在Rust中实现链表。老实说，答案取决于你的需求是什么，要当场回答这个问
+题显然不是超级容易。因此，我决定写这本书来一劳永逸地全面回答这个问题。
 
-In this series I will teach you basic and advanced Rust programming
-entirely by having you implement 6 linked lists. In doing so, you should
-learn:
+在这个系列中，我将通过让你实现6个链表来教你基本和高级的Rust编程。在这样做的过程中，你
+应该学会：
 
-* The following pointer types: `&`, `&mut`, `Box`, `Rc`, `Arc`, `*const`, `*mut`
-* Ownership, borrowing, inherited mutability, interior mutability, Copy
-* All The Keywords: struct, enum, fn, pub, impl, use, ...
-* Pattern matching, generics, destructors
-* Testing
-* Basic Unsafe Rust
+* 下列指针类型： `&`, `&mut`, `Box`, `Rc`, `Arc`, `*const`, `*mut`
+* 所有权、借用、继承可变性、内部可变性、Copy复制性
+* 所有的关键词： struct, enum, fn, pub, impl, use, ...
+* 模式匹配、泛型、析构器
+* 测试
+* 基本不安全Rust
 
-Yes, linked lists are so truly awful that you deal with all of these concepts in
-making them real.
+是的，链表真是如此的可怕，以至于你在制作它们时要处理所有这些概念。
 
-Everything's in the sidebar (may be collapsed on mobile), but for quick
-reference, here's what we're going to be making:
+一切都在侧边栏中（在移动端可能会被折叠），但为了快速参考，这里是我们要做的：
 
-1. [A Bad Singly-Linked Stack](first.md)
-2. [An Ok Singly-Linked Stack](second.md)
-3. [A Persistent Singly-Linked Stack](third.md)
-4. [A Bad But Safe Doubly-Linked Deque](fourth.md)
-5. [An Unsafe Singly-Linked Queue](fifth.md)
-6. [TODO: An Ok Unsafe Doubly-Linked Deque](sixth.md)
-7. [Bonus: A Bunch of Silly Lists](infinity.md)
+1. [一个不好的单链栈](first.md)
+2. [一个可以的单链栈](second.md)
+3. [一个持久的单链栈](third.md)
+4. [一个不好的但安全的双端队列](fourth.md)
+5. [一个不安全的单链队列](fifth.md)
+6. [TODO：一个好的不安全的双端队列](sixth.md)
+7. [Bonus: 一大堆愚蠢的链表](infinity.md)
 
-Just so we're all the same page, I'll be writing out all the commands that I
-feed into my terminal. I'll also be using Rust's standard package manager, Cargo,
-to develop the project. Cargo isn't necessary to write a Rust program, but it's
-*so much* better than using rustc directly. If you just want to futz around you
-can also run some simple programs in the browser via [play.rust-lang.org][play].
+为了使我们的得到的结果一致，我将写出所有输入终端的命令。我还将使用Rust的标准
+包管理器Cargo来开发这个项目。Cargo并不是写Rust程序所必需的，但它比直接使用
+rustc要好*得多*。如果你只是想玩玩，你也可以通过[play.rust-lang.org][play]
+在浏览器中运行一些简单的程序。
 
-Let's get started and make our project:
+让我们开始做我们的项目吧：
 
 ```text
 > cargo new --lib lists
 > cd lists
 ```
 
-We'll put each list in a separate file so that we don't lose any of our work.
+我们会把每个列表放在一个单独的文件中，这样我们就不会失去任何工作。
 
-It should be noted that the *authentic* Rust learning experience involves
-writing code, having the compiler scream at you, and trying to figure out
-what the heck that means. I will be carefully ensuring that this occurs as
-frequently as possible. Learning to read and understand Rust's generally
-excellent compiler errors and documentation is *incredibly* important to
-being a productive Rust programmer.
+需要注意的是，*真实的*Rust学习经历包括写代码，让编译器对你咆哮，并试图弄清楚
+这些咆哮到底是什么意思。我将仔细确保这种情况尽可能频繁地发生。学会阅读和理解
+Rust普遍优秀的编译器错误和文档，这对于成为一个高效的Rust程序员来说*非常*重要。
 
-Although actually that's a lie. In writing this I encountered *way* more
-compiler errors than I show. In particular, in the later chapters I won't be
-showing a lot of the random "I typed (copy-pasted) bad" errors that you
-expect to encounter in every language. This is a *guided tour* of having the
-compiler scream at us.
+虽然实际上这是一个谎言。在写这本书的过程中，我遇到的编译器错误*远远*多于我展示
+的。特别是，在后面的章节中，我不会展示很多随机的"打错字（复制粘贴）"的错误，就
+是你会在每一种语言中都能遇到的错误。这是一次让编译器向我们尖叫的*导游之旅*。
 
-We're going to be going pretty slow, and I'm honestly not going to be very
-serious pretty much the entire time. I think programming should be fun, dang it!
-If you're the type of person who wants maximally information-dense, serious, and
-formal content, this book is not for you. Nothing I will ever make is for you.
-You are wrong.
+我们的进度会很慢，而且老实说，整个过程中我不会很认真。我认为编程应该是有趣的，
+哇哈哈! 如果你是那种想要最大化信息密集、严肃、正式内容的人，这本书不适合你。我
+所做的一切都不适合你。你错了。
 
 
 
 
-# An Obligatory Public Service Announcement
+# 义务公益广告
 
-Just so we're totally 100% clear: I hate linked lists. With
-a passion. Linked lists are terrible data structures. Now of course there's
-several great use cases for a linked list:
+我们会完全100％清楚一件事：我就是讨厌链表。恨之入骨。链表是可怕的数据结构。
+当然，链表有几个很好的使用案例。
 
-* You want to do *a lot* of splitting or merging of big lists. *A lot*.
-* You're doing some awesome lock-free concurrent thing.
-* You're writing a kernel/embedded thing and want to use an intrusive list.
-* You're using a pure functional language and the limited semantics and absence
-  of mutation makes linked lists easier to work with.
-* ... and more!
+* 你想做*很多*大列表的拆分或合并。*很多*。
+* 你正在做一些很棒的无锁并发的事情。
+* 你在写一个内核/嵌入式的东西，想使用一个侵入式列表。
+* 你正在使用纯函数式语言，有限的语义和不能修改东西使得链表比较好用。
+* ......还有更多!
 
-But all of these cases are *super rare* for anyone writing a Rust program. 99%
-of the time you should just use a Vec (array stack), and 99% of the other 1%
-of the time you should be using a VecDeque (array deque). These are blatantly
-superior data structures for most workloads due to less frequent allocation,
-lower memory overhead, true random access, and cache locality.
+但所有这些情况对于任何编写Rust程序的人来说都是*超级罕见*的。99%的时间你应该只
+使用Vec（数组栈），另外1%的时间你应该使用VecDeque（数组双端队列）。由于较少的
+内存分配频率、较低的内存开销、真正的随机访问和缓存定位，这些对于大多数工作负载
+来说都是公然优越的数据结构。
 
-Linked lists are as *niche* and *vague* of a data structure as a trie. Few would
-balk at me claiming a trie is a niche structure that your average programmer
-could happily never learn in an entire productive career -- and yet linked lists
-have some bizarre celebrity status. We teach every undergrad how to write a
-linked list. It's the only niche collection
-[I couldn't kill from std::collections][rust-std-list]. It's
+链表和Trie一样是*小众*而*模糊*的数据结构。很少有人会反驳我说Trie是一种小众结
+构，你们平均水平程序员在整个生产生涯中很可能永远也不用学会--然而链表却有一些奇
+怪的名人地位。我们教每个本科生如何写一个链表。这是唯一的小众集合
+[I couldn't kill from std::collections][rust-std-list]。它是
 [*the* list in C++][cpp-std-list]!
 
-We should all as a community say *no* to linked lists as a "standard" data
-structure. It's a fine data structure with several great use cases, but those
-use cases are *exceptional*, not common.
+作为一个社区，我们都应该对链表作为"标准"数据结构说不。它是一个很好的数据结构，
+有几个很好的用例，但这些用例是*特殊的*，而不是常见的。
 
-Several people apparently read the first paragraph of this PSA and then stop
-reading. Like, literally they'll try to rebut my argument by listing one of the
-things in my list of *great use cases*. The thing right after the first
-paragraph!
+有几个人显然读了这个PSA的第一段，然后就不读了。比如，他们会试图通过列举我的*伟大用
+例列表*中的一件事来反驳我的论点。就在第一段之后的那件事!
 
-Just so I can link directly to a detailed argument, here are several attempts
-at counter-arguments I have seen, and my response to them. Feel free to skip
-to [the first chapter](first.md) if you just want to learn some Rust!
+为了让我可以直接链接到详细的论点，下面是我看到的几种反驳的尝试，以及我对它们的回应。
+如果你只是想学习一些Rust，欢迎跳到第一章!
 
 
 
 
-## Performance doesn't always matter
+## 性能并不总是重要的
 
-Yes! Maybe your application is I/O-bound or the code in question is in some
-cold case that just doesn't matter. But this isn't even an argument for using
-a linked list. This is an argument for using *whatever at all*. Why settle for
-a linked list? Use a linked hash map!
+是的! 也许你的应用程序是I/O瓶颈的，或者相关代码是在一些不重要的冷门的情况下。但这
+甚至不是一个使用链表的论点。这是一个使用*任何东西*的论点。为什么要使用链表呢？使用
+链接的哈希图吧!
 
-If performance doesn't matter, then it's *surely* fine to apply the natural
-default of an array.
+如果性能不重要，那么应用数组的自然默认值*肯定*是可以的。
 
 
 
 
+## 如果你有一个指针，那么他们会有O(1)的分割-追加-插入-删除
 
-## They have O(1) split-append-insert-remove if you have a pointer there
+没错! 不过正如[Bjarne Stroustrup][bjarne]所指出的，如果获取指针所花费的时间与复制
+一个数组中所有元素所花费的时间完全相差无几的话，*这实际上并不重要*（这确实相当快）。
 
-Yep! Although as [Bjarne Stroustrup notes][bjarne] *this doesn't actually
-matter* if the time it takes to get that pointer completely dwarfs the
-time it would take to just copy over all the elements in an array (which is
-really quite fast).
+除非你的工作负载是以拆分和合并成本为主要开销，否则其他每个操作由于缓存效应和代码复杂
+度所需要的惩罚会消除任何理论上的收益。
 
-Unless you have a workload that is heavily dominated by splitting and merging
-costs, the penalty *every other* operation takes due to caching effects and code
-complexity will eliminate any theoretical gains.
+*但是是的，如果你剖析发现你的应用要花大量的时间在拆分和合并上，你可能从链表中获益。*
 
-*But yes, if you're profiling your application to spend a lot of time in
-splitting and merging, you may have gains in a linked list*.
 
 
 
+## 我负担不起摊销
 
+你已经进入了一个相当小众的领域--大多数人都能承受摊销。不过，数组*在最坏的情况下*也是
+要摊销的。仅仅因为你使用的是一个数组，并不意味着你有摊销的成本。如果你能预测你要存储
+多少元素（甚至有一个上限），你就可以预留所有你需要的空间。根据我的经验，能够预测你需
+要多少元素是很常见的。特别是在Rust中，所有的迭代器都会提供一个`size_hint`，正是针对
+这种情况。
 
-## I can't afford amortization
+那么`push`和`pop`将是真正的O(1)操作。而且它们会比链表上的`push`和`pop`快得多。你做
+一个指针偏移，写入字节，然后递增一个整数。不需要使用任何类型的分配器。
 
-You've already entered a pretty niche space -- most can afford amortization.
-Still, arrays are amortized *in the worst case*. Just because you're using an
-array, doesn't mean you have amortized costs. If you can predict how many
-elements you're going to store (or even have an upper-bound), you can
-pre-reserve all the space you need. In my experience it's *very* common to be
-able to predict how many elements you'll need. In Rust in particular, all
-iterators provide a `size_hint` for exactly this case.
+这对低延迟来说如何？
 
-Then `push` and `pop` will be truly O(1) operations. And they're going to be
-*considerably* faster than `push` and `pop` on linked list. You do a pointer
-offset, write the bytes, and increment an integer. No need to go to any kind of
-allocator.
+*但是，是的，如果你不能预测你的负载，那么可以节省在最坏的情况下的延迟!*
 
-How's that for low latency?
 
-*But yes, if you can't predict your load, there are worst-case
-latency savings to be had!*
 
 
+## 链表浪费的空间更少
 
+嗯，这很复杂。一个“标准”的数组大小调整策略是增长或缩小，使最多一半的数组为空。这确实
+浪费了很多空间。特别是在Rust中，我们不会自动收缩集合（如果你只是要把它重新填满，那就
+太浪费了），所以浪费的空间可能会接近无穷大!
 
+但这是最坏的情况。在最好的情况下，一个数组栈对整个数组只有三个指针的开销。基本上没有
+开销。
 
-## Linked lists waste less space
+而链表则是无条件的浪费每个元素的空间。一个单链列表浪费一个指针，而一个双链列表则浪费
+两个指针。与数组不同，相对的浪费与元素的大小成正比。如果你有巨大的元素，这接近于0浪费
+。如果你有微小的元素（比如说，字节），那么这可能是高达16倍的内存开销（32位上是8倍）!
 
-Well, this is complicated. A "standard" array resizing strategy is to grow
-or shrink so that at most half the array is empty. This is indeed a lot of
-wasted space. Especially in Rust, we don't automatically shrink collections
-(it's a waste if you're just going to fill it back up again), so the wastage
-can approach infinity!
+实际上，这更像是23倍（32位上是11倍），因为会在字节上添加填充，将整个节点的大小对齐到
+指针上。
 
-But this is a worst-case scenario. In the best-case, an array stack only has
-three pointers of overhead for the entire array. Basically no overhead.
+这也是假设你的分配器的最佳情况：分配和取消分配节点是在密集地进行的，你不会因为碎片化
+而损失内存。
 
-Linked lists on the other hand unconditionally waste space per element.
-A singly-linked lists wastes one pointer while a doubly-linked list wastes
-two. Unlike an array, the relative wasteage is proportional to the size of
-the element. If you have *huge* elements this approaches 0 waste. If you have
-tiny elements (say, bytes), then this can be as much as 16x memory overhead
-(8x on 32-bit)!
+*但是是的，如果你有巨大的元素，不能预测你的负载，并且有一个像样的分配器，就可以节省内
+存。*
 
-Actually, it's more like 23x (11x on 32-bit) because padding will be added
-to the byte to align the whole node's size to a pointer.
 
-This is also assuming the best-case for your allocator: that allocating and
-deallocating nodes is being done densely and you're not losing memory to
-fragmentation.
 
-*But yes, if you have huge elements, can't predict your load, and have a
-decent allocator, there are memory savings to be had!*
 
+## 我在<函数式语言>中一直使用链表。
 
+很好! 在函数式语言中使用链表是超级优雅的，因为你可以在没有任何改变的情况下对它们进行
+操作，可以递归地描述它们，而且由于惰性的魔力，还可以使用无限列表。
 
+具体来说，链表是不错的，因为它们代表了一个迭代，而不需要任何可变的状态。下一步只是访
+问下一个子列表。
 
+然而需要注意的是，Rust可以在数组上进行模式匹配，并且[用slices][slices]来谈论子数组
+! 实际上，它在某些方面甚至比函数式链表更有表现力，因为你可以谈论最后一个元素，甚至“
+没有第一和最后两个元素的数组”或其他任何你想要的疯狂的东西。
 
-## I use linked lists all the time in &lt;functional language&gt;
+的确，你不能用分片来*构建*一个列表。你只能把它们拆开。
 
-Great! Linked lists are super elegant to use in functional languages
-because you can manipulate them without any mutation, can describe them
-recursively, and also work with infinite lists due to the magic of laziness.
+为了偷懒，我们改用[iterators][]。这些可以是无限的，你可以像函数式列表一样对它们进行
+映射、过滤、反转和连接，而且这一切都会同样惰性地完成。这里不奇怪：切片也可以被转换成
+迭代器。
 
-Specifically, linked lists are nice because they represent an iteration without
-the need for any mutable state. The next step is just visiting the next sublist.
+*但是是的，如果你限于不可变的语义，链表可以非常好。*
 
-However it should be noted that Rust can pattern match on arrays and talk
-about sub-arrays [using slices][slices]! It's actually even more expressive
-than a functional list in some regards because you can talk about the last
-element or even "the array without the first and last two elements" or
-whatever other crazy thing you want.
+请注意，我并不是说函数式编程一定很弱或不好。然而它从根本上讲*是*有语义限制的：你基本
+上只允许谈论事情是*怎样的*，而不允许谈论它们应该*怎样做*。这实际上是一个*特点*，因为
+它使编译器能够进行大量的[怪异变换][ghc]，并有可能找出*最好*的方法来做事情，而不用你
+担心。然而这是以*能够*担心为代价的。通常有逃生舱口，但在某些限制下，你又只是在写过程
+式代码。
 
-It is true that you can't *build* a list using slices. You can only tear
-them apart.
+即使是在函数式语言中，当你真正需要数据结构时，你也应该努力为任务使用合适的数据结构。
+是的，单链表是你控制数据流的主要工具，但它们对于实际存储一堆数据和查询数据来说是一种
+非常糟糕的方式。
 
-For laziness we instead have [iterators][]. These can be infinite and you
-can map, filter, reverse, and concatenate them just like a functional list,
-and it will all be done just as lazily. No surprise here: slices can also be
-coerced to an iterator.
 
-*But yes, if you're limited to immutable semantics, linked lists can be very
-nice*.
+## 链表是构建并发数据结构的好方法!
 
-Note that I'm not saying that functional programming is necessarily weak or
-bad. However it *is* fundamentally semantically limited: you're largely only
-allowed to talk about how things *are*, and not how they should be *done*. This
-is actually a *feature*, because it enables the compiler to do tons of [exotic
-transformations][ghc] and potentially figure out the *best* way to do things
-without you having to worry about it. However this comes at the cost of being
-*able* to worry about it. There are usually escape hatches, but at some limit
-you're just writing procedural code again.
+是的! 虽然编写一个并发数据结构真的是一个完全不同的野兽，而且不是一件值得轻视的事情。
+当然也不是很多人都会考虑去做的事情。一旦写好了一个，你也不是真的选择使用链表。你是选
+择使用MPSC队列什么的。在这种情况下，实现策略是相当遥远的!
 
-Even in functional languages, you should endeavour to use the appropriate data
-structure for the job when you actually need a data structure. Yes,
-singly-linked lists are your primary tool for control flow, but they're a
-really poor way to actually store a bunch of data and query it.
+*但没错，链表是无锁并发的黑暗世界中的不折不扣的英雄。*
 
 
-## Linked lists are great for building concurrent data structures!
 
-Yes! Although writing a concurrent data structure is really a whole different
-beast, and isn't something that should be taken lightly. Certainly not something
-many people will even *consider* doing. Once one's been written, you're also not
-really choosing to use a linked list. You're choosing to use an MPSC queue or
-whatever. The implementation strategy is pretty far removed in this case!
 
-*But yes, linked lists are the defacto heroes of the dark world of lock-free
-concurrency.*
+## 咕哝咕哝的内核嵌入了一些干扰性的东西。
 
+这很小众。你说的是一种情况，你甚至没有使用你的语言的*运行时*。这难道不是一个危险的
+信号，你在做一些奇怪的事情吗？
 
+这也是非常不安全的。
 
+*但是肯定的。要在栈上构建你那令人敬畏的零分配列表。*
 
-## Mumble mumble kernel embedded something something intrusive.
 
-It's niche. You're talking about a situation where you're not even using
-your language's *runtime*. Is that not a red flag that you're doing something
-strange?
 
-It's also wildly unsafe.
 
-*But sure. Build your awesome zero-allocation lists on the stack.*
+## 迭代器不会因为无关的插入/删除而失效。
 
+你这舞跳得可真微妙。特别是当你没有垃圾回收器的时候。我可能会说，你的控制流和所有
+权模式可能有点太纠结了，这取决于细节。
 
+*但是是的，你可以用光标做一些非常酷的疯狂的事情。*
 
 
 
-## Iterators don't get invalidated by unrelated insertions/removals
 
-That's a delicate dance you're playing. Especially if you don't have
-a garbage collector. I might argue that your control flow and ownership
-patterns are probably a bit too tangled, depending on the details.
+## 它们很简单，而且很适合教学
 
-*But yes, you can do some really cool crazy stuff with cursors.*
+嗯，是的。你正在读一本专门针对这个前提的书。好吧，单链表是非常简单的。双链表可能会
+变得有点粗糙，我们会看到。
 
 
 
 
+# 深呼吸
 
-## They're simple and great for teaching!
+好吧，那就不说了。让我们写一个亿万个链表。
 
-Well, yeah. You're reading a book dedicated to that premise.
-Well, singly-linked lists are pretty simple. Doubly-linked lists
-can get kinda gnarly, as we'll see.
-
-
-
-
-# Take a Breath
-
-Ok. That's out of the way. Let's write a bajillion linked lists.
+现在开始第一章！
 
 [On to the first chapter!](first.md)
 

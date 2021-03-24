@@ -1,12 +1,10 @@
-# A Bad Singly-Linked Stack
+# 一个不好的单链栈
 
-This one's gonna be *by far* the longest, as we need to introduce basically
-all of Rust, and are gonna build up some things "the hard way" to better
-understand the language.
+这章将是*至今*最长的一章，因为我们需要介绍所有Rust的基础知识，而且将以“艰难的方式”构建一些东西来
+更好地理解这门语言。
 
-We'll put our first list in `src/first.rs`. We need to tell Rust that `first.rs` is
-something that our lib uses. All that requires is that we put this at the top of
-`src/lib.rs` (which Cargo made for us):
+我们将把我们的第一个链表放在`src/first.rs`。我们需要告诉Rust`first.rs`是我们的库用的东西。需
+要做的事是我们把它放在`src/lib.rs`（Cargo已经给我们创建了）最上面：
 
 ```rust ,ignore
 // in lib.rs

@@ -1,14 +1,14 @@
-# Peeking
+# 选择
 
-Alright, we made it through `push` and `pop`. I'm not gonna lie, it got a
-bit emotional there. Compile-time correctness is a hell of a drug.
+好了，我们用`push`和`pop`做。不瞒你说，我在那里有点情绪化了。编译时的正确性是
+一种可怕的毒药。
 
-Let's cool off by doing something simple: let's just implement `peek_front`.
-That was always really easy before. Gotta still be easy, right?
+让我们做一些简单的事情来冷静一下：让我们实现`peek_front`。这在以前是非常容易
+的。应该还是很容易的，对吗？
 
-Right?
+对吗？
 
-In fact, I think I can just copy-paste it!
+事实上，我想我可以直接复制粘贴它！"。
 
 ```rust ,ignore
 pub fn peek_front(&self) -> Option<&T> {
@@ -18,7 +18,7 @@ pub fn peek_front(&self) -> Option<&T> {
 }
 ```
 
-Wait. Not this time.
+等等。不是这时候。
 
 ```rust ,ignore
 pub fn peek_front(&self) -> Option<&T> {
@@ -29,7 +29,7 @@ pub fn peek_front(&self) -> Option<&T> {
 }
 ```
 
-HAH.
+哈。
 
 ```text
 cargo build
@@ -45,55 +45,46 @@ error[E0515]: cannot return value referencing temporary value
    |             returns a value referencing data owned by the current function
 ```
 
-Ok I'm just burning my computer.
+好吧，我只是在烧我的电脑。
 
-This is exactly the same logic as our singly-linked stack. Why are things
-different. WHY.
+这与我们的单链栈的逻辑完全相同。为什么事情会不同。为什么。
 
-The answer is really the whole moral of this chapter: RefCells make everything
-sadness. Up until now, RefCells have just been a nuisance. Now they're going to
-become a nightmare.
+答案其实就是本章的全部寓意。RefCells使一切变得悲伤。到现在为止，RefCells只是一个讨
+厌的东西。现在它们将成为一场噩梦。
 
-So what's going on? To understand that, we need to go back to the definition of
-`borrow`:
+那么发生了什么？为了理解这一点，我们需要回到`borrow`的定义上：
 
 ```rust ,ignore
 fn borrow<'a>(&'a self) -> Ref<'a, T>
 fn borrow_mut<'a>(&'a self) -> RefMut<'a, T>
 ```
 
-In the layout section we said:
+在布局部分，我们说：
 
-> Rather than enforcing this statically, RefCell enforces them at runtime.
-> If you break the rules, RefCell will just panic and crash the program.
-> Why does it return these Ref and RefMut things? Well, they basically behave
-> like `Rc`s but for borrowing. Also they keep the RefCell borrowed until they go out
-> of scope. **We'll get to that later.**
+> RefCell不是静态地执行这些规则，而是在运行时执行它们。
+> 如果你违反了这些规则，RefCell就会惊慌失措，使程序崩溃。
+> 为什么它会返回这些Ref和RefMut的东西？好吧，它们的行为基本上和`Rc`s一样，只是用于借用。
+> 另外，它们保持RefCell的借用，直到它们超出范围。**我们稍后会讨论这个问题。**
 
-It's later.
+现在就是那个稍后。
 
-`Ref` and `RefMut` implement `Deref` and `DerefMut` respectively. So for most
-intents and purposes they behave *exactly* like `&T` and `&mut T`. However,
-because of how those traits work, the reference that's returned is connected
-to the lifetime of the Ref, and not the actual RefCell. This means that the Ref
-has to be sitting around as long as we keep the reference around.
+`Ref`和`RefMut`分别实现了`Deref`和`DerefMut`。因此，就大多数意图和目的而言，它们
+的行为与`&T`和`&mut T`*完全*一样。然而，由于这些特性的工作方式，被返回的引用与引用
+的生命周期有关，而不是与实际的RefCell有关。这意味着，只要我们保留引用，Ref就必须一直
+存在。
 
-This is in fact necessary for correctness. When a Ref gets dropped, it tells
-the RefCell that it's not borrowed anymore. So if we *did* manage to hold onto our
-reference longer than the Ref existed, we could get a RefMut while a reference
-was kicking around and totally break Rust's type system in half.
+事实上，这对于正确性是必要的。当一个Ref被放弃时，它告诉RefCell它不再被借用。因此，如
+果我们*确实*设法保持我们的引用比引用存在的时间长，我们就可以在引用四处游荡时得到一个
+RefMut，并完全破坏Rust的类型系统的一半。
 
-So where does that leave us? We only want to return a reference, but we need
-to keep this Ref thing around. But as soon as we return the reference from
-`peek`, the function is over and the `Ref` goes out of scope.
+那么，这让我们怎么办呢？我们只想返回一个引用，但我们需要保持这个引用的存在。但是一旦
+我们从`peek`中返回引用，函数就结束了，而`Ref`就出了范围。
 
 😖
 
-As far as I know, we're actually totally dead in the water here. You can't
-totally encapsulate the use of RefCells like that.
+据我所知，我们在这里实际上已经完全陷入了困境。你不能像这样把RefCells的使用完全封装起来。
 
-But... what if we just give up on totally hiding our implementation details?
-What if we returns Refs?
+但是......如果我们放弃了完全隐藏我们的实现细节呢？如果我们返回Refs呢？
 
 ```rust ,ignore
 pub fn peek_front(&self) -> Option<Ref<T>> {
@@ -119,7 +110,7 @@ help: possible candidates are found in other modules, you can import them into s
    |
 ```
 
-Blurp. Gotta import some stuff.
+啊这。要导入一些东西。
 
 
 ```rust ,ignore
@@ -141,15 +132,13 @@ error[E0308]: mismatched types
               found type `std::option::Option<std::cell::Ref<'_, fourth::Node<T>>>`
 ```
 
-Hmm... that's right. We have a `Ref<Node<T>>`, but we want a `Ref<T>`. We could
-abandon all hope of encapsulation and just return that. We could also make
-things even more complicated and wrap `Ref<Node<T>>` in a new type to only
-expose access to an `&T`.
+嗯...这就对了。我们有一个`Ref<Node<T>>`，但是我们想要一个`Ref<T>`。我们可以放弃所
+有封装的希望，直接返回它。我们也可以把事情搞得更复杂，把`Ref<Node<T>>`包装成一个新
+的类型，只暴露对`&T`的访问。
 
-Both of those options are *kinda* lame.
+这两种方法都*有点*蹩脚。
 
-Instead, we're going to go deeper down. Let's
-have some *fun*. Our source of fun is *this beast*:
+相反，我们要更深入地去做。让我们找点*乐子*。我们的乐趣之源是这只*野兽*：
 
 ```rust ,ignore
 map<U, F>(orig: Ref<'b, T>, f: F) -> Ref<'b, U>
@@ -157,15 +146,14 @@ map<U, F>(orig: Ref<'b, T>, f: F) -> Ref<'b, U>
           U: ?Sized
 ```
 
-> Make a new Ref for a component of the borrowed data.
+> 为借来的数据的一个组成部分做一个新的参考。
 
-Yes: just like you can map over an Option, you can map over a Ref.
+是的：就像你可以映射一个Option，你也可以映射一个Ref。
 
-I'm sure someone somewhere is really excited because *monads* or whatever but
-I don't care about any of that. Also I don't think it's a proper monad since
-there's no None-like case, but I digress.
+我相信某些人真的很兴奋，因为*单体*或其他什么，但我并不关心这些。我也不认为这是一个合
+适的单体，因为没有None-like的情况，但我离题了。
 
-It's cool and that's all that matters to me. *I need this*.
+它很酷，这对我来说才是最重要的。*我需要这个*。
 
 ```rust ,ignore
 pub fn peek_front(&self) -> Option<Ref<T>> {
@@ -179,10 +167,10 @@ pub fn peek_front(&self) -> Option<Ref<T>> {
 > cargo build
 ```
 
-Awww yissss
+啊耶。
 
-Let's make sure this is working by munging up the test from our stack. We need
-to do some munging to deal with the fact that Refs don't implement comparisons.
+让我们通过从我们的堆栈中插入测试来确保它的工作。我们需要做一些处理，以应对Refs不实
+现比较的事实。
 
 ```rust ,ignore
 #[test]
@@ -217,4 +205,4 @@ test result: ok. 10 passed; 0 failed; 0 ignored; 0 measured
 
 ```
 
-Great!
+棒！

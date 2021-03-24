@@ -1,9 +1,7 @@
-# Ownership 101
+# 所有权101
 
-Now that we can construct a list, it'd be nice to be able to *do* something
-with it. We do that with "normal" (non-static) methods. Methods are a special
-case of function in Rust because of  the `self` argument, which doesn't have
-a declared type:
+现在我们可以构造一个列表，如果能用它`做`一些事情就更好了。我们用“普通”(非静态)方
+法来做这些事情。在Rust中，方法是函数的一种特殊情况，因为`self`参数没有声明类型：
 
 ```rust ,ignore
 fn foo(self, arg2: Type2) -> ReturnType {
@@ -11,35 +9,28 @@ fn foo(self, arg2: Type2) -> ReturnType {
 }
 ```
 
-There are 3 primary forms that self can take: `self`, `&mut self`, and `&self`.
-These 3 forms represent the three primary forms of ownership in Rust:
+self可以有3种主要形式：`self`、`&mut self`和`&self`。这3种形式代表了Rust中所有权
+的三种主要形式：
 
-* `self` - Value
-* `&mut self` - mutable reference
-* `&self` - shared reference
+* `self` - 值
+* `&mut self` - 可变引用
+* `&self` - 共享引用
 
-A value represents *true* ownership. You can do whatever you want with a value:
-move it, destroy it, mutate it, or loan it out via a reference. When you pass
-something by value, it's *moved* to the new location. The new location now
-owns the value, and the old location can no longer access it. For this reason
-most methods don't want `self` -- it would be pretty lame if trying to work with
-a list made it go away!
+一个值代表了*真正*的所有权。你可以对一个值做任何你想做的事情：移动它，销毁它，改变
+它，或者通过引用把它借出去。当你用值传递某物时，它就会被*移动*到新的位置。新的位置
+现在拥有这个值，而旧的位置不能再访问它。出于这个原因，大多数方法都不想要`self`--如
+果试图与一个链表一起工作，让它消失，那将是非常蹩脚的!
 
-A mutable reference represents temporary *exclusive access* to a value that you
-don't own. You're allowed to do absolutely anything you want to a value you
-have a mutable reference to as long you leave it in a valid state when you're
-done (it would be rude to the owner otherwise!). This means you can actually completely
-overwrite the value. A really useful special case of this is *swapping* a value
-out for another, which we'll be using a lot. The only thing you can't do with an
-`&mut` is move the value out with no replacement. `&mut self` is great for
-methods that want to mutate `self`.
+一个可变引用代表了对一个你不拥有的值的临时*独占访问*。你可以对一个有可变引用的值做
+任何你想做的事情，只要你做完后让它处于有效状态（否则会对所有者不礼貌！）。这意味着
+你实际上可以完全覆盖这个值。一个非常有用的特殊情况是将一个值*交换*另一个值，我们会
+经常使用。你唯一不能用`&mut`做的事情就是把值移出，而不进行替换。对于想要改变`self`
+的方法来说，`&mut self`是很好的选择。
 
-A shared reference represents temporary *shared access* to a value that you
-don't own. Because you have shared access, you're generally not allowed to
-mutate anything. Think of `&` as putting the value out on display in a museum.
-`&` is great for methods that only want to observe `self`.
+共享引用代表了对一个你不拥有的值的临时*共享访问*。因为你有共享访问权，所以一般不允许
+你改变任何东西。把`&`想象成把值放在博物馆里展示。`&`对于那些只想观察`self`的方法来
+说，是非常好的。
 
-Later we'll see that the rule about mutation can be bypassed in certain cases.
-This is why shared references aren't called *immutable* references. Really,
-mutable references could be called *unique* references, but we've found that
-relating ownership to mutability gives the right intuition 99% of the time.
+后面我们会看到，在某些情况下，关于改变的规则是可以绕过的。这就是为什么共享引用不叫
+*不可变引用*的原因。真的，可改变的引用可以被称为*唯一*引用，但我们发现，将所有权与
+可改变性联系起来，99%的时候都能给出正确的直觉。

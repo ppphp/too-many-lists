@@ -1,6 +1,6 @@
 # The Final Code
 
-Alright, 6000 words later, here's all the code we managed to actually write:
+好吧，6000字后，这里是我们写下的所有代码：
 
 ```rust
 use std::mem;
@@ -89,5 +89,4 @@ mod test {
 }
 ```
 
-Geez. 80 lines, and half of it was tests! Well, I did say this first one was
-going to take a while!
+天啊，80行，一半是测试！80行，其中一半是测试! 好吧，我说过这第一篇要花点时间的!

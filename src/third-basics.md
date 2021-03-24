@@ -1,9 +1,8 @@
-# Basics
+# 基本
 
-We already know a lot of the basics of Rust now, so we can do a lot of the
-simple stuff again.
+我们现在已经知道了很多Rust的基础知识，所以我们可以再次做很多简单的事情。
 
-For the constructor, we can again just copy-paste:
+对于构造函数，我们又可以直接复制粘贴：
 
 ```rust ,ignore
 impl<T> List<T> {
@@ -13,25 +12,22 @@ impl<T> List<T> {
 }
 ```
 
-`push` and `pop` don't really make sense anymore. Instead we can provide
-`append` and `tail`, which provide approximately the same thing.
+`push`和`pop`已经不太能表达含义了。我们可以提供`append`和`tail`来代替它们，它们提
+供的东西大致相同。
 
-Let's start with appending. It takes a list and an element, and returns a
-List. Like the mutable list case, we want to make a new node, that has the old
-list as its `next` value. The only novel thing is how to *get* that next value,
-because we're not allowed to mutate anything.
+让我们从append开始。它接受一个列表和一个元素，并返回一个列表。就像可变列表的情况一样，
+我们要做一个新的节点，它的`next`值是旧列表。唯一新奇的是如何获得下一个值，因为我们不
+允许改变任何东西。
 
-The answer to our prayers is the Clone trait. Clone is implemented by almost
-every type, and provides a generic way to get "another one like this one" that
-is logically disjoint given only a shared reference. It's like a copy
-constructor in C++, but it's never implicitly invoked.
+我们祈祷的答案就是Clone特性。几乎所有的类型都实现了克隆，它提供了一种通用的方法来获得
+"像这样的另一个"，而这个逻辑上是不相干的，只给了一个共享的引用。它就像C++中的复制构造
+函数，但它不会被隐式调用。
 
-Rc in particular uses Clone as the way to increment the reference count. So
-rather than moving a Box to be in the sublist, we just clone the head of the
-old list. We don't even need to match on the head, because Option exposes a
-Clone implementation that does exactly the thing we want.
+特别地，Rc使用Clone作为增加引用计数的方法。因此，与其移动一个Box到子列表中，不如直接
+克隆旧列表的头部。我们甚至不需要在头部进行匹配，因为Option暴露了一个Clone的实现，它所
+做的正是我们想要的事情。
 
-Alright, let's give it a shot:
+好了，让我们试一试吧：
 
 ```rust ,ignore
 pub fn append(&self, elem: T) -> List<T> {
@@ -60,13 +56,11 @@ warning: field is never used: `next`
    |     ^^^^^^^^^^^^^
 ```
 
-Wow, Rust is really hard-nosed about actually using fields. It can tell no
-consumer can ever actually observe the use of these fields! Still, we seem good
-so far.
+哇，Rust对实际使用字段真的很苛刻。它可以告诉没有消费者可以真正观察到这些字段的使用情
+况! 不过，到目前为止，我们似乎还不错。
 
-`tail` is the logical inverse of this operation. It takes a list and returns the
-whole list with the first element removed. All that is is cloning the *second*
-element in the list (if it exists). Let's try this:
+`tail`是这个操作的逻辑逆运算。它接收一个列表并返回除去第一个元素的整个列表。所有这些
+都是克隆列表中的*第二个*元素（如果它存在的话）。我们来试试这个：
 
 ```rust ,ignore
 pub fn tail(&self) -> List<T> {
@@ -87,9 +81,8 @@ error[E0308]: mismatched types
               found type `std::option::Option<std::option::Option<std::rc::Rc<_>>>`
 ```
 
-Hrm, we messed up. `map` expects us to return a Y, but here we're returning an
-`Option<Y>`. Thankfully, this is another common Option pattern, and we can just
-use `and_then` to let us return an Option.
+嗯，我们搞砸了。`map`希望我们返回一个Y，但是在这里我们要返回一个`Option<Y>`。值得庆
+幸的是，这是另一个常见的Option模式，我们可以直接使用`and_then`来让我们返回一个Option。
 
 ```rust ,ignore
 pub fn tail(&self) -> List<T> {
@@ -102,10 +95,10 @@ pub fn tail(&self) -> List<T> {
 
 ```
 
-Great.
+很好。
 
-Now that we have `tail`, we should probably provide `head`, which returns a
-reference to the first element. That's just `peek` from the mutable list:
+现在我们有了`tail`，我们也许应该提供`head`，它返回对第一个元素的引用。这只是从可
+变列表中`peek`：
 
 ```rust ,ignore
 pub fn head(&self) -> Option<&T> {
@@ -118,9 +111,9 @@ pub fn head(&self) -> Option<&T> {
 
 ```
 
-Nice.
+很好。
 
-That's enough functionality that we can test it:
+这已经有足够的功能，我们可以测试它：
 
 
 ```rust ,ignore
@@ -169,9 +162,9 @@ test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured
 
 ```
 
-Perfect!
+很完美!
 
-Iter is also identical to how it was for our mutable list:
+Iter也与我们的可变链表的情况相同：
 
 ```rust ,ignore
 pub struct Iter<'a, T> {
@@ -226,9 +219,8 @@ test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured
 
 ```
 
-Who ever said dynamic typing was easier?
+谁曾说过动态类型更容易？
 
-(chumps did)
+(笨蛋说的)
 
-Note that we can't implement IntoIter or IterMut for this type. We only have
-shared access to elements.
+注意，我们不能为这个类型实现IntoIter或IterMut。我们只有对元素的共享访问。

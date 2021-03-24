@@ -1,11 +1,9 @@
-# Extra Junk
+# 额外的废品
 
-Now that `push` and `pop` are written, everything else is exactly the same
-as the stack case. Only operations that change the length of the list need
-to actually worry about the tail pointer.
+现在`push`和`pop`已经写好了，其他的都和栈的情况完全一样。只有那些改变列表长度
+的操作才需要真正担心尾部指针的问题。
 
-So let's just steal all that from our second list (be sure to reverse the
-expected test output):
+所以让我们从我们的第二个列表中窃取所有的东西（一定要把预期的测试输出倒过来）：
 
 ```rust ,ignore
 // ...
@@ -161,8 +159,6 @@ test third::test::iter ... ok
 test result: ok. 11 passed; 0 failed; 0 ignored; 0 measured
 ```
 
+向复制-粘贴编程致敬。
 
-Shout-outs to copy-paste programming.
-
-At first I thought we'd have to mess around with IntoIter, but we still
-conveniently pop in iteration order!
+起初我以为我们要用IntoIter来捣乱，但我们还是很方便地按迭代顺序弹出了！

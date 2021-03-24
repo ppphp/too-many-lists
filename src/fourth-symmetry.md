@@ -1,8 +1,8 @@
-# Symmetric Junk
+# 对称的垃圾
 
-Alright let's get all that combinatoric symmetry over with.
+好了，让我们把所有的组合对称性问题都解决了。
 
-All we have to do is some basic text replacement:
+我们所要做的就是一些基本的文本替换：
 
 ```text
 tail <-> head
@@ -10,7 +10,7 @@ next <-> prev
 front -> back
 ```
 
-Oh, also we need to add `_mut` variants for peeking.
+哦，我们还需要为选取增加`_mut`的变体。
 
 ```rust ,ignore
 pub fn push_back(&mut self, elem: T) {
@@ -62,7 +62,7 @@ pub fn peek_front_mut(&mut self) -> Option<RefMut<T>> {
 }
 ```
 
-And massively flesh out our tests:
+并大规模地充实我们的测试：
 
 
 ```rust ,ignore
@@ -138,8 +138,8 @@ fn peek() {
 }
 ```
 
-Are there some cases we're not testing? Probably. The combinatoric space
-has really blown up here. Our code is at very least not *obviously wrong*.
+是否有一些情况我们没有测试？可能吧。组合空间在这里真的炸开了锅。我们的代码至少
+没有*明显的错误*。
 
 ```text
 > cargo test
@@ -162,4 +162,4 @@ test result: ok. 10 passed; 0 failed; 0 ignored; 0 measured
 
 ```
 
-Nice. Copy-pasting is the best kind of programming.
+不错。复制-粘贴是最好的编程方式。

@@ -1,10 +1,9 @@
-# Final Code
+# 最终代码
 
-Alright, so with a teeny-tiny dash of unsafety we managed to get a linear
-time improvement over the naive safe queue, and we managed to reuse almost
-all of the logic from the safe stack!
+好了，通过一个小小的不安全因素，我们成功地在时间上比简单的安全队列有了线性的改
+善，而且我们成功地重用了安全堆栈中几乎所有的逻辑！
 
-We also notably *didn't* have to write any crazy Rc or RefCell stuff.
+我们也*没有*写任何疯狂的Rc或RefCell的东西。
 
 ```rust
 use std::ptr;

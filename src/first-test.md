@@ -1,15 +1,12 @@
-# Testing
+# 测试
 
-Alright, so we've got `push` and `pop` written, now we can actually test out
-our stack! Rust and cargo support testing as a first-class feature, so this
-will be super easy. All we have to do is write a function, and annotate it with
-`#[test]`.
+好了，我们已经写好了`push`和`pop`，现在我们可以真正测试我们的堆栈了!Rust和cargo支
+持测试作为一级功能，所以这将是超级简单的。我们要做的就是写一个函数，然后用`#[test]`
+来对它注解。
 
-Generally, we try to keep our tests next to the code that it's testing in the
-Rust community. However we usually make a new namespace for the tests, to
-avoid conflicting with the "real" code. Just as we used `mod` to specify that
-`first.rs` should be included in `lib.rs`, we can use `mod` to basically
-create a whole new file *inline*:
+一般来说，在Rust社区中，我们尽量把测试放在它测试的代码旁边。然而我们通常会为测试做
+一个新的命名空间，以避免与"真正的"代码冲突。就像我们使用`mod`来指定`first.rs`应该
+包含在`lib.rs`中一样，我们可以使用`mod`来简单地创建一个全新的*内联*文件：
 
 
 ```rust ,ignore
@@ -23,7 +20,7 @@ mod test {
 }
 ```
 
-And we invoke it with `cargo test`.
+我们用`cargo test`调用它。
 
 ```text
 > cargo test
@@ -38,10 +35,9 @@ test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out
 ; 0 filtered out
 ```
 
-Yay our do-nothing test passed! Let's make it not-do-nothing. We'll do that
-with the `assert_eq!` macro. This isn't some special testing magic. All it
-does is compare the two things you give it, and panic the program if they don't
-match. Yep, you indicate failure to the test harness by freaking out!
+耶，我们的什么都没做的测试通过了! 让我们把它变得做一些事情。我们将通过`assert_eq!`
+宏来实现。这不是什么特殊的测试魔法。它所做的就是比较你给它的两个东西，如果它们不匹配
+，程序就会惊慌失措。是的，你通过惊慌失措向测试套装表示失败!
 
 ```rust ,ignore
 mod test {
@@ -88,8 +84,7 @@ error[E0433]: failed to resolve: use of undeclared type or module `List`
 
 ```
 
-Oops! Because we made a new module, we need to pull in List explicitly to use
-it.
+糟糕！因为我们做了一个新的模块，所以我们需要明确地拉入List来使用。
 
 ```rust ,ignore
 mod test {
@@ -118,14 +113,12 @@ test first::test::basics ... ok
 test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out
 ; 0 filtered out
 ```
+耶！
 
-Yay!
+不过那个警告是怎么回事...? 我们在测试中明明用的是List!
 
-What's up with that warning though...? We clearly use List in our test!
-
-...but only when testing! To appease the compiler (and to be friendly to our
-consumers), we should indicate that the whole `test` module should only be
-compiled if we're running tests.
+...但只在测试时使用! 为了安抚编译器(并对我们的消费者友好)，我们应该说明整个测试模块只有
+在运行测试时才应该被编译。
 
 
 ```rust ,ignore
@@ -136,4 +129,4 @@ mod test {
 }
 ```
 
-And that's everything for testing!
+这就是测试的一切!

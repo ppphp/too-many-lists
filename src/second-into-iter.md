@@ -1,7 +1,6 @@
-# IntoIter
+# 进入遍历
 
-Collections are iterated in Rust using the *Iterator* trait. It's a bit more
-complicated than `Drop`:
+在Rust中使用*Iterator*特性对集合进行迭代。这比`Drop`要复杂一点：
 
 ```rust ,ignore
 pub trait Iterator {
@@ -10,28 +9,23 @@ pub trait Iterator {
 }
 ```
 
-The new kid on the block here is `type Item`. This is declaring that every
-implementation of Iterator has an *associated type* called Item. In this case,
-this is the type that it can spit out when you call `next`.
+块里的新东西是`type Item`。这声明了每个迭代器的实现都有一个*关联类型*，叫做Item。在
+这种情况下，当你调用`next`时，它可以吐出这个类型。
 
-The reason Iterator yields `Option<Self::Item>` is because the interface
-coalesces the `has_next` and `get_next` concepts. When you have the next value,
-you yield
-`Some(value)`, and when you don't you yield `None`. This makes the
-API generally more ergonomic and safe to use and implement, while avoiding
-redundant checks and logic between `has_next` and `get_next`. Nice!
+Iterator产生`Option<Self::Item>`的原因是该接口集成了`has_next`和`get_next`的概念。
+当你有下一个值时，你产生`Some(value)`，而当你没有时，你产生`None`。这使得API在使用
+和实现上更加符合人体工程学和安全，同时避免了`has_next`和`get_next`之间多余的检查和
+逻辑。很好!
 
-Sadly, Rust has nothing like a `yield` statement (yet), so we're going to have to
-implement the logic ourselves. Also, there's actually 3 different kinds of
-iterator each collection should endeavour to implement:
+遗憾的是，Rust（现在还）没有类似`yield`语句的东西，所以我们必须自己实现这个逻辑。另
+外，每个集合应该努力实现3种不同的迭代器：
 
 * IntoIter - `T`
 * IterMut - `&mut T`
 * Iter - `&T`
 
-We actually already have all the tools to implement
-IntoIter using List's interface: just call `pop` over and over. As such, we'll
-just implement IntoIter as a newtype wrapper around List:
+实际上，我们已经有了使用List接口实现IntoIter的所有工具：只需不断地调用`pop`。因此，
+我们只需将IntoIter作为List的一个新类型包装器来实现：
 
 
 ```rust ,ignore
@@ -54,7 +48,7 @@ impl<T> Iterator for IntoIter<T> {
 }
 ```
 
-And let's write a test:
+然后让我们写一个测试：
 
 ```rust ,ignore
 #[test]
@@ -85,4 +79,4 @@ test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured
 
 ```
 
-Nice!
+棒！

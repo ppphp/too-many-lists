@@ -1,11 +1,9 @@
-# Making it all Generic
+# 让他全变成泛型
 
-We've already touched a bit on generics with Option and Box. However so
-far we've managed to avoid declaring any new type that is actually generic
-over arbitrary elements.
+我们已经用 Option 和 Box 触及了一些泛型。然而到目前为止，我们一直设法避免声明任
+何新的类型，这些类型实际上是对任意元素的泛型。
 
-It turns out that's actually really easy. Let's make all of our types generic
-right now:
+事实证明，这其实很容易。让我们现在就把我们所有的类型都变成泛型：
 
 ```rust ,ignore
 pub struct List<T> {
@@ -20,9 +18,8 @@ struct Node<T> {
 }
 ```
 
-You just make everything a little more pointy, and suddenly your code is
-generic. Of course, we can't *just* do this, or else the compiler's going
-to be Super Mad.
+你只要把所有的东西都加上两个尖角，你的代码就会突然间变得很通用。当然，我们不能
+*仅仅*这样做，否则编译器就会变得超级疯狂。
 
 
 ```text
@@ -42,13 +39,11 @@ error[E0107]: wrong number of type arguments: expected 1, found 0
 
 ```
 
-The problem is pretty clear: we're talking about this `List` thing but that's not
-real anymore. Like Option and Box, we now always have to talk about
-`List<Something>`.
+问题很明显：我们一直在谈论这个`List`的事情，但那已经不是真的了。像 Option 和 Box 
+一样，我们现在必须要谈论 `List<Something>`。
 
-But what's the Something we use in all these impls? Just like List, we want our
-implementations to work with *all* the T's. So, just like List, let's make our
-`impl`s pointy:
+但是我们在所有这些impl中使用的Something是什么？就像List一样，我们希望我们的实现能与
+*所有*的T一起工作。所以，就像List一样，让我们的`impl`变得尖尖的：
 
 
 ```rust ,ignore
@@ -84,8 +79,7 @@ impl<T> Drop for List<T> {
 }
 ```
 
-...and that's it!
-
+......就这样了!
 
 ```
 > cargo test
@@ -100,9 +94,8 @@ test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured
 
 ```
 
-All of our code is now completely generic over arbitrary values of T. Dang,
-Rust is *easy*. I'd like to make a particular shout-out to `new` which didn't
-even change:
+我们所有的代码现在在任意的T值上都是完全通用的，铛，Rust很*容易*。我想对甚至没有改
+变的`new`做一个特别的叫喊：
 
 ```rust ,ignore
 pub fn new() -> Self {
@@ -110,9 +103,8 @@ pub fn new() -> Self {
 }
 ```
 
-Bask in the Glory that is Self, guardian of refactoring and copy-pasta coding.
-Also of interest, we don't write `List<T>` when we construct an instance of
-list. That part's inferred for us based on the fact that we're returning it
-from a function that expects a `List<T>`.
+沐浴在Self的光辉中，它是重构和复制粘贴编码的守护者。同样有趣的是，当我们构造一个
+链表的实例时，我们并没有写 `List<T>`。这一部分是根据我们从一个期望有 `List<T>`
+的函数中返回的事实来推断的。
 
-Alright, let's move on to totally new *behaviour*!
+好了，让我们继续讨论全新的*行为*吧！

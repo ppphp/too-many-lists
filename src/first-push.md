@@ -1,7 +1,7 @@
-# Push
+# 推入
 
-So let's write pushing a value onto a list. `push` *mutates* the list,
-so we'll want to take `&mut self`. We also need to take an i32 to push:
+`push`会使链表发生*改变*，所以我们需要使用`&mut self`。我们还需要取一个i32
+来推入：
 
 ```rust ,ignore
 impl List {
@@ -11,7 +11,7 @@ impl List {
 }
 ```
 
-First thing's first, we need to make a node to store our element in:
+首先，我们需要做一个节点来存储我们的元素：
 
 ```rust ,ignore
     pub fn push(&mut self, elem: i32) {
@@ -22,7 +22,7 @@ First thing's first, we need to make a node to store our element in:
     }
 ```
 
-What goes `next`? Well, the entire old list! Can we... just do that?
+`next`是什么？嗯，整个旧链表！我们能不能... ... 就这么做？
 
 ```rust ,ignore
 impl List {
@@ -44,19 +44,16 @@ error[E0507]: cannot move out of borrowed content
    |                   ^^^^^^^^^ cannot move out of borrowed content
 ```
 
-Nooooope. Rust is telling us the right thing, but it's certainly not obvious
-what exactly it means, or what to do about it:
+不——。Rust正告诉我们正确的事情，但它到底是什么意思，或者对它该怎么做，肯定不太显然：
 
-> cannot move out of borrowed content
+> 不能移出借用的上下文
 
-We're trying to move the `self.head` field out to `next`, but Rust doesn't want
-us doing that. This would leave `self` only partially initialized when we end
-the borrow and "give it back" to its rightful owner. As we said before, that's
-the *one* thing you can't do with an `&mut`: It would be super rude,
-and Rust is very polite (it would also be incredibly dangerous, but surely
-*that* isn't why it cares).
+我们想把`self.head`字段移到`next`，但Rust不希望我们这么做。这将使`self`在我们结束
+借用并将其“还给”它的合法所有者时，只被部分初始化。正如我们之前说过的，这是你不能用
+`&mut`做的*一件*事：这将是超级无礼的，而Rust是非常有礼貌的（这也将是难以置信的危险
+，但*这*肯定不是它关心的原因）。
 
-What if we put something back? Namely, the node that we're creating:
+如果我们把东西放回去呢？也就是我们正在创建的节点：
 
 
 ```rust ,ignore
@@ -79,23 +76,20 @@ error[E0507]: cannot move out of borrowed content
    |                   ^^^^^^^^^ cannot move out of borrowed content
 ```
 
-No dice. In principle, this is something Rust could actually accept, but it
-won't (for various reasons -- the most serious being [exception safety][]). We need
-some way to get the head without Rust noticing that it's gone. For advice, we
-turn to infamous Rust Hacker Indiana Jones:
+没办法。原则上，这是Rust可以接受的，但它不会接受（出于各种原因--最严重的是[例外安全][]）
+。我们需要一些方法在Rust没有注意到它消失的情况下得到头。为了寻求建议，我们求助于臭名昭著
+的Rust黑客Indiana Jones：
 
 ![Indy Prepares to mem::replace](img/indy.gif)
 
-Ah yes, Indy suggests the `mem::replace` maneuver. This incredibly useful
-function lets us steal a value out of a borrow by *replacing* it with another
-value. Let's just pull in `std::mem` at the top of the file, so that `mem` is in
-local scope:
+啊，对了，Indy建议使用`mem::replace`手法。这个非常有用的函数可以让我们通过用另一个值*替
+换*来从一个借用中偷取出来一个值。我们在文件的顶部拉入`std::mem`，让`mem`在本地作用域内：
 
 ```rust ,ignore
 use std::mem;
 ```
 
-and use it appropriately:
+并适当地使用它：
 
 ```rust ,ignore
 pub fn push(&mut self, elem: i32) {
@@ -108,16 +102,14 @@ pub fn push(&mut self, elem: i32) {
 }
 ```
 
-Here we `replace` self.head temporarily with Link::Empty before replacing it
-with the new head of the list. I'm not gonna lie: this is a pretty unfortunate
-thing to have to do. Sadly, we must (for now).
+在这里，我们用Link::Empty暂时`replace`到self.head，然后再把self.head换成列表的新头。
+我不会撒谎：这是一件非常不幸的事情。很遗憾，我们必须这么做（目前）。
 
-But hey, that's `push` all done! Probably. We should probably test it, honestly.
-Right now the easiest way to do that is probably to write `pop`, and make sure
-that it produces the right results.
+但是，嘿，`push`全部完成! 可能吧。我们也许应该测试一下，说实话。现在，最简单的方法
+可能是写`pop`，并确保它产生正确的结果。
 
 
 
 
 
-[exception safety]: https://doc.rust-lang.org/nightly/nomicon/exception-safety.html
+[例外安全]: https://doc.rust-lang.org/nightly/nomicon/exception-safety.html

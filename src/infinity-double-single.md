@@ -1,12 +1,10 @@
-# The Double Singly-Linked List
+# 双重单链表
 
-We struggled with doubly-linked lists because they have tangled ownership
-semantics: no node strictly owns any other node. However we struggled
-with this because we brought in our preconceived notions of what a linked
-list *is*. Namely, we assumed that all the links go in the same direction.
+我们在处理双链表时很纠结，因为它们有纠结的所有权语义：没有一个节点严格地拥有任
+何其他节点。然而，我们对此感到挣扎，因为我们带来了我们对什么*是*链表的先入为主
+的概念。也就是说，我们假设所有的链接都在同一个方向。
 
-Instead, we can smash our list into two halves: one going to the left,
-and one going to the right:
+相反，我们可以把我们的列表分成两半：一个向左走，一个向右走：
 
 ```rust ,ignore
 // lib.rs
@@ -24,11 +22,9 @@ struct List<T> {
 }
 ```
 
-Now, rather than having a mere safe stack, we have a general purpose list.
-We can grow the list leftwards or rightwards by pushing onto either stack.
-We can also "walk" along the list by popping values off one end and onto the
-other. To avoid needless allocations, we're going to copy the source of
-our safe Stack to get access to its private details:
+现在，我们不再有一个单纯的安全堆栈，而是有一个通用的列表。我们可以通过推送到任何
+一个堆栈来向左或向右增长这个列表。我们还可以通过从一端弹出数值到另一端来沿着列表
+“行走”。为了避免不必要的分配，我们将复制我们的安全堆栈的源码，以获得它的私有细节：
 
 ```rust ,ignore
 pub struct Stack<T> {
@@ -87,7 +83,7 @@ impl<T> Drop for Stack<T> {
 }
 ```
 
-And just rework `push` and `pop` a bit:
+然后只是重新设计一下`push`和`pop`：
 
 ```rust ,ignore
 pub fn push(&mut self, elem: T) {
@@ -118,7 +114,7 @@ fn pop_node(&mut self) -> Option<Box<Node<T>>> {
 }
 ```
 
-Now we can make our List:
+现在我们可以做我们自己的链表：
 
 ```rust ,ignore
 pub struct List<T> {
@@ -133,7 +129,7 @@ impl<T> List<T> {
 }
 ```
 
-And we can do the usual stuff:
+我们还可以做一些常规的事情：
 
 
 ```rust ,ignore
@@ -147,7 +143,7 @@ pub fn peek_left_mut(&mut self) -> Option<&mut T> { self.left.peek_mut() }
 pub fn peek_right_mut(&mut self) -> Option<&mut T> { self.right.peek_mut() }
 ```
 
-But most interestingly, we can walk around!
+但最有趣的是，我们可以走来走去！
 
 
 ```rust ,ignore
@@ -164,8 +160,8 @@ pub fn go_right(&mut self) -> bool {
 }
 ```
 
-We return booleans here as just a convenience to indicate whether we actually
-managed to move. Now let's test this baby out:
+我们在这里返回布尔值，只是为了方便表明我们是否真的成功移动了。现在让我们测试一下
+这个宝贝：
 
 ```rust ,ignore
 #[cfg(test)]
@@ -230,14 +226,11 @@ test silly1::test::walk_aboot ... ok
 test result: ok. 16 passed; 0 failed; 0 ignored; 0 measured
 ```
 
-This is an extreme example of a *finger* data structure, where we maintain
-some kind of finger into the structure, and as a consequence can support
-operations on locations in time proportional to the distance from the finger.
+这是一个*手指*数据结构的极端例子，我们将某种手指维护到结构中，结果是可以支持对位
+置的操作，时间与手指的距离成正比。
 
-We can make very fast changes to the list around our finger, but if we want
-to make changes far away from our finger we have to walk all the way over there.
-We can permanently walk over there by shifting the elements from one stack to
-the other, or we could just walk along the links with an `&mut`
-temporarily to do the changes. However the `&mut` can never go back up the
-list, while our finger can!
+我们可以对手指周围的列表进行非常快速的修改，但是如果我们想在离手指很远的地方进行修
+改，我们就必须一直走到那里。我们可以通过将元素从一个堆栈转移到另一个堆栈来永久地走
+过去，或者我们可以用一个`&mut`临时沿着链接走过去做改变。然而，`&mut`永远不能回到
+列表中去，而我们的手指却可以！
 
