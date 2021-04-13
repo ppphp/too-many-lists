@@ -145,44 +145,35 @@
 
                 <div id="content" class="content">
                     <main>
-                        <h1><a class="header" href="#ownership-101" id="ownership-101">Ownership 101</a></h1>
-<p>Now that we can construct a list, it'd be nice to be able to <em>do</em> something
-with it. We do that with &quot;normal&quot; (non-static) methods. Methods are a special
-case of function in Rust because of  the <code>self</code> argument, which doesn't have
-a declared type:</p>
+                        <h1><a class="header" href="#所有权101" id="所有权101">所有权101</a></h1>
+<p>现在我们可以构造一个列表，如果能用它<code>做</code>一些事情就更好了。我们用 &quot;普通&quot;(非静态)方
+法来做这些事情。在Rust中，方法是函数的一种特殊情况，因为<code>self</code>参数没有声明类型：</p>
 <pre><code class="language-rust ignore">fn foo(self, arg2: Type2) -&gt; ReturnType {
     // body
 }
 </code></pre>
-<p>There are 3 primary forms that self can take: <code>self</code>, <code>&amp;mut self</code>, and <code>&amp;self</code>.
-These 3 forms represent the three primary forms of ownership in Rust:</p>
+<p>self可以有3种主要形式：<code>self</code>、<code>&amp;mut self</code>和<code>&amp;self</code>。这3种形式代表了Rust中所有权
+的三种主要形式：</p>
 <ul>
-<li><code>self</code> - Value</li>
-<li><code>&amp;mut self</code> - mutable reference</li>
-<li><code>&amp;self</code> - shared reference</li>
+<li><code>self</code> - 值</li>
+<li><code>&amp;mut self</code> - 可变引用</li>
+<li><code>&amp;self</code> - 共享引用</li>
 </ul>
-<p>A value represents <em>true</em> ownership. You can do whatever you want with a value:
-move it, destroy it, mutate it, or loan it out via a reference. When you pass
-something by value, it's <em>moved</em> to the new location. The new location now
-owns the value, and the old location can no longer access it. For this reason
-most methods don't want <code>self</code> -- it would be pretty lame if trying to work with
-a list made it go away!</p>
-<p>A mutable reference represents temporary <em>exclusive access</em> to a value that you
-don't own. You're allowed to do absolutely anything you want to a value you
-have a mutable reference to as long you leave it in a valid state when you're
-done (it would be rude to the owner otherwise!). This means you can actually completely
-overwrite the value. A really useful special case of this is <em>swapping</em> a value
-out for another, which we'll be using a lot. The only thing you can't do with an
-<code>&amp;mut</code> is move the value out with no replacement. <code>&amp;mut self</code> is great for
-methods that want to mutate <code>self</code>.</p>
-<p>A shared reference represents temporary <em>shared access</em> to a value that you
-don't own. Because you have shared access, you're generally not allowed to
-mutate anything. Think of <code>&amp;</code> as putting the value out on display in a museum.
-<code>&amp;</code> is great for methods that only want to observe <code>self</code>.</p>
-<p>Later we'll see that the rule about mutation can be bypassed in certain cases.
-This is why shared references aren't called <em>immutable</em> references. Really,
-mutable references could be called <em>unique</em> references, but we've found that
-relating ownership to mutability gives the right intuition 99% of the time.</p>
+<p>一个值代表了<em>真正</em>的所有权。你可以对一个值做任何你想做的事情：移动它，销毁它，改变
+它，或者通过引用把它借出去。当你用值传递某物时，它就会被<em>移动</em>到新的位置。新的位置
+现在拥有这个值，而旧的位置不能再访问它。出于这个原因，大多数方法都不想要<code>self</code>--如
+果试图与一个列表一起工作，让它消失，那将是非常蹩脚的!</p>
+<p>一个可变引用代表了对一个你不拥有的值的临时<em>独占访问</em>。你可以对一个有可变引用的值做
+任何你想做的事情，只要你做完后让它处于有效状态（否则会对所有者不礼貌！）。这意味着
+你实际上可以完全覆盖这个值。一个非常有用的特殊情况是将一个值<em>交换</em>另一个值，我们会
+经常使用。你唯一不能用<code>&amp;mut</code>做的事情就是把值移出，而不进行替换。对于想要改变<code>self</code>
+的方法来说，<code>&amp;mut self</code>是很好的选择。</p>
+<p>共享引用代表了对一个你不拥有的值的临时共享访问。因为你有共享访问权，所以一般不允许
+你改变任何东西。把<code>&amp;</code>想象成把值放在博物馆里展示。<code>&amp;</code>对于那些只想观察<code>self</code>的方法来
+说，是非常好的。</p>
+<p>后面我们会看到，在某些情况下，关于改变的规则是可以绕过的。这就是为什么共享引用不叫
+<em>不可变引用</em>的原因。真的，可改变的引用可以被称为<em>唯一</em>引用，但我们发现，将所有权与
+可改变性联系起来，99%的时候都能给出正确的直觉。</p>
 
                     </main>
 

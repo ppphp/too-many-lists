@@ -145,38 +145,34 @@
 
                 <div id="content" class="content">
                     <main>
-                        <h1><a class="header" href="#new" id="new">New</a></h1>
-<p>To associate actual code with a type, we use <code>impl</code> blocks:</p>
+                        <h1><a class="header" href="#新建" id="新建">新建</a></h1>
+<p>我们使用了<code>impl</code>块，将实际的代码与类型联系起来：</p>
 <pre><code class="language-rust ignore">impl List {
     // TODO, make code happen
 }
 </code></pre>
-<p>Now we just need to figure out how to actually write code. In Rust we declare
-a function like so:</p>
+<p>现在我们只需要弄清楚如何实际编写代码。在Rust中，我们这么声明一个函数：</p>
 <pre><code class="language-rust ignore">fn foo(arg1: Type1, arg2: Type2) -&gt; ReturnType {
     // body
 }
 </code></pre>
-<p>The first thing we want is a way to <em>construct</em> a list. Since we hide the
-implementation details, we need to provide that as a function. The usual way
-to do that in Rust is to provide a static method, which is just a
-normal function inside an <code>impl</code>:</p>
+<p>我们首先需要的是一种<em>构造</em>列表的方式。由于我们隐藏了实现细节，我们需要以函数的形
+式来提供。在Rust中，通常的方法是提供一个静态方法，也就是在<code>impl</code>中提供一个普通的
+函数：</p>
 <pre><code class="language-rust ignore">impl List {
     pub fn new() -&gt; Self {
         List { head: Link::Empty }
     }
 }
 </code></pre>
-<p>A few notes on this:</p>
+<p>有几点说明：</p>
 <ul>
-<li>Self is an alias for &quot;that type I wrote at the top next to <code>impl</code>&quot;. Great for
-not repeating yourself!</li>
-<li>We create an instance of a struct in much the same way we declare it, except
-instead of providing the types of its fields, we initialize them with values.</li>
-<li>We refer to variants of an enum using <code>::</code>, which is the namespacing operator.</li>
-<li>The last expression of a function is implicitly returned.
-This makes simple functions a little neater. You can still use <code>return</code>
-to return early like other C-like languages.</li>
+<li>Self是&quot;我写在最上面的那个在<code>impl</code>旁边的类型&quot;的别名。很好的避免了自己的重复。</li>
+<li>我们创建一个结构体的实例的方式与我们声明它的方式很相似，只是我们没有提供它的字
+段类型，而是用值来初始化它们</li>
+<li>我们使用<code>::</code>来引用一个枚举的变体，这是命名间隔操作符。</li>
+<li>一个函数的最后一个表达式是隐式返回的。这使得简单的函数变得更加整洁。你仍然可以
+像其他类似于C语言的语言一样，使用return来提前返回。</li>
 </ul>
 
                     </main>

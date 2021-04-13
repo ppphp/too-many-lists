@@ -583,87 +583,74 @@ warning: field is never used: `next`
 <p>好了，这下编译好了！Rust很生气，因为据它所知，我们写的所有东西都是完全无用的：我们从
 来没有用过<code>head</code>，使用我们库的人也不能用，因为它是私有的。反过来说，这意味着<code>Link</code>和
 <code>Node</code>也是无用的。所以我们来解决这个问题吧! 让我们为我们的List实现一些代码吧!</p>
-<h1><a class="header" href="#new" id="new">New</a></h1>
-<p>To associate actual code with a type, we use <code>impl</code> blocks:</p>
+<h1><a class="header" href="#新建" id="新建">新建</a></h1>
+<p>我们使用了<code>impl</code>块，将实际的代码与类型联系起来：</p>
 <pre><code class="language-rust ignore">impl List {
     // TODO, make code happen
 }
 </code></pre>
-<p>Now we just need to figure out how to actually write code. In Rust we declare
-a function like so:</p>
+<p>现在我们只需要弄清楚如何实际编写代码。在Rust中，我们这么声明一个函数：</p>
 <pre><code class="language-rust ignore">fn foo(arg1: Type1, arg2: Type2) -&gt; ReturnType {
     // body
 }
 </code></pre>
-<p>The first thing we want is a way to <em>construct</em> a list. Since we hide the
-implementation details, we need to provide that as a function. The usual way
-to do that in Rust is to provide a static method, which is just a
-normal function inside an <code>impl</code>:</p>
+<p>我们首先需要的是一种<em>构造</em>列表的方式。由于我们隐藏了实现细节，我们需要以函数的形
+式来提供。在Rust中，通常的方法是提供一个静态方法，也就是在<code>impl</code>中提供一个普通的
+函数：</p>
 <pre><code class="language-rust ignore">impl List {
     pub fn new() -&gt; Self {
         List { head: Link::Empty }
     }
 }
 </code></pre>
-<p>A few notes on this:</p>
+<p>有几点说明：</p>
 <ul>
-<li>Self is an alias for &quot;that type I wrote at the top next to <code>impl</code>&quot;. Great for
-not repeating yourself!</li>
-<li>We create an instance of a struct in much the same way we declare it, except
-instead of providing the types of its fields, we initialize them with values.</li>
-<li>We refer to variants of an enum using <code>::</code>, which is the namespacing operator.</li>
-<li>The last expression of a function is implicitly returned.
-This makes simple functions a little neater. You can still use <code>return</code>
-to return early like other C-like languages.</li>
+<li>Self是&quot;我写在最上面的那个在<code>impl</code>旁边的类型&quot;的别名。很好的避免了自己的重复。</li>
+<li>我们创建一个结构体的实例的方式与我们声明它的方式很相似，只是我们没有提供它的字
+段类型，而是用值来初始化它们</li>
+<li>我们使用<code>::</code>来引用一个枚举的变体，这是命名间隔操作符。</li>
+<li>一个函数的最后一个表达式是隐式返回的。这使得简单的函数变得更加整洁。你仍然可以
+像其他类似于C语言的语言一样，使用return来提前返回。</li>
 </ul>
-<h1><a class="header" href="#ownership-101" id="ownership-101">Ownership 101</a></h1>
-<p>Now that we can construct a list, it'd be nice to be able to <em>do</em> something
-with it. We do that with &quot;normal&quot; (non-static) methods. Methods are a special
-case of function in Rust because of  the <code>self</code> argument, which doesn't have
-a declared type:</p>
+<h1><a class="header" href="#所有权101" id="所有权101">所有权101</a></h1>
+<p>现在我们可以构造一个列表，如果能用它<code>做</code>一些事情就更好了。我们用 &quot;普通&quot;(非静态)方
+法来做这些事情。在Rust中，方法是函数的一种特殊情况，因为<code>self</code>参数没有声明类型：</p>
 <pre><code class="language-rust ignore">fn foo(self, arg2: Type2) -&gt; ReturnType {
     // body
 }
 </code></pre>
-<p>There are 3 primary forms that self can take: <code>self</code>, <code>&amp;mut self</code>, and <code>&amp;self</code>.
-These 3 forms represent the three primary forms of ownership in Rust:</p>
+<p>self可以有3种主要形式：<code>self</code>、<code>&amp;mut self</code>和<code>&amp;self</code>。这3种形式代表了Rust中所有权
+的三种主要形式：</p>
 <ul>
-<li><code>self</code> - Value</li>
-<li><code>&amp;mut self</code> - mutable reference</li>
-<li><code>&amp;self</code> - shared reference</li>
+<li><code>self</code> - 值</li>
+<li><code>&amp;mut self</code> - 可变引用</li>
+<li><code>&amp;self</code> - 共享引用</li>
 </ul>
-<p>A value represents <em>true</em> ownership. You can do whatever you want with a value:
-move it, destroy it, mutate it, or loan it out via a reference. When you pass
-something by value, it's <em>moved</em> to the new location. The new location now
-owns the value, and the old location can no longer access it. For this reason
-most methods don't want <code>self</code> -- it would be pretty lame if trying to work with
-a list made it go away!</p>
-<p>A mutable reference represents temporary <em>exclusive access</em> to a value that you
-don't own. You're allowed to do absolutely anything you want to a value you
-have a mutable reference to as long you leave it in a valid state when you're
-done (it would be rude to the owner otherwise!). This means you can actually completely
-overwrite the value. A really useful special case of this is <em>swapping</em> a value
-out for another, which we'll be using a lot. The only thing you can't do with an
-<code>&amp;mut</code> is move the value out with no replacement. <code>&amp;mut self</code> is great for
-methods that want to mutate <code>self</code>.</p>
-<p>A shared reference represents temporary <em>shared access</em> to a value that you
-don't own. Because you have shared access, you're generally not allowed to
-mutate anything. Think of <code>&amp;</code> as putting the value out on display in a museum.
-<code>&amp;</code> is great for methods that only want to observe <code>self</code>.</p>
-<p>Later we'll see that the rule about mutation can be bypassed in certain cases.
-This is why shared references aren't called <em>immutable</em> references. Really,
-mutable references could be called <em>unique</em> references, but we've found that
-relating ownership to mutability gives the right intuition 99% of the time.</p>
-<h1><a class="header" href="#push" id="push">Push</a></h1>
-<p>So let's write pushing a value onto a list. <code>push</code> <em>mutates</em> the list,
-so we'll want to take <code>&amp;mut self</code>. We also need to take an i32 to push:</p>
+<p>一个值代表了<em>真正</em>的所有权。你可以对一个值做任何你想做的事情：移动它，销毁它，改变
+它，或者通过引用把它借出去。当你用值传递某物时，它就会被<em>移动</em>到新的位置。新的位置
+现在拥有这个值，而旧的位置不能再访问它。出于这个原因，大多数方法都不想要<code>self</code>--如
+果试图与一个列表一起工作，让它消失，那将是非常蹩脚的!</p>
+<p>一个可变引用代表了对一个你不拥有的值的临时<em>独占访问</em>。你可以对一个有可变引用的值做
+任何你想做的事情，只要你做完后让它处于有效状态（否则会对所有者不礼貌！）。这意味着
+你实际上可以完全覆盖这个值。一个非常有用的特殊情况是将一个值<em>交换</em>另一个值，我们会
+经常使用。你唯一不能用<code>&amp;mut</code>做的事情就是把值移出，而不进行替换。对于想要改变<code>self</code>
+的方法来说，<code>&amp;mut self</code>是很好的选择。</p>
+<p>共享引用代表了对一个你不拥有的值的临时共享访问。因为你有共享访问权，所以一般不允许
+你改变任何东西。把<code>&amp;</code>想象成把值放在博物馆里展示。<code>&amp;</code>对于那些只想观察<code>self</code>的方法来
+说，是非常好的。</p>
+<p>后面我们会看到，在某些情况下，关于改变的规则是可以绕过的。这就是为什么共享引用不叫
+<em>不可变引用</em>的原因。真的，可改变的引用可以被称为<em>唯一</em>引用，但我们发现，将所有权与
+可改变性联系起来，99%的时候都能给出正确的直觉。</p>
+<h1><a class="header" href="#推入" id="推入">推入</a></h1>
+<p><code>push</code>会使列表发生<em>突变</em>，所以我们需要使用<code>&amp;mut self</code>。我们还需要取一个i32
+来推送：</p>
 <pre><code class="language-rust ignore">impl List {
     pub fn push(&amp;mut self, elem: i32) {
         // TODO
     }
 }
 </code></pre>
-<p>First thing's first, we need to make a node to store our element in:</p>
+<p>首先，我们需要做一个节点来存储我们的元素：</p>
 <pre><code class="language-rust ignore">    pub fn push(&amp;mut self, elem: i32) {
         let new_node = Node {
             elem: elem,
@@ -671,7 +658,7 @@ so we'll want to take <code>&amp;mut self</code>. We also need to take an i32 to
         };
     }
 </code></pre>
-<p>What goes <code>next</code>? Well, the entire old list! Can we... just do that?</p>
+<p><code>next</code>是什么？嗯，整个旧列表！我们能不能... ... 就这么做？</p>
 <pre><code class="language-rust ignore">impl List {
     pub fn push(&amp;mut self, elem: i32) {
         let new_node = Node {
@@ -688,18 +675,15 @@ error[E0507]: cannot move out of borrowed content
 19 |             next: self.head,
    |                   ^^^^^^^^^ cannot move out of borrowed content
 </code></pre>
-<p>Nooooope. Rust is telling us the right thing, but it's certainly not obvious
-what exactly it means, or what to do about it:</p>
+<p>不——。Rust正告诉我们正确的事情，但它到底意味着什么，或者该怎么做，肯定不太显然：</p>
 <blockquote>
 <p>cannot move out of borrowed content</p>
 </blockquote>
-<p>We're trying to move the <code>self.head</code> field out to <code>next</code>, but Rust doesn't want
-us doing that. This would leave <code>self</code> only partially initialized when we end
-the borrow and &quot;give it back&quot; to its rightful owner. As we said before, that's
-the <em>one</em> thing you can't do with an <code>&amp;mut</code>: It would be super rude,
-and Rust is very polite (it would also be incredibly dangerous, but surely
-<em>that</em> isn't why it cares).</p>
-<p>What if we put something back? Namely, the node that we're creating:</p>
+<p>我们想把<code>self.head</code>字段移到<code>next</code>，但Rust不希望我们这么做。这将使<code>self</code>在我们结束
+借用并将其&quot;还给&quot;它的合法所有者时，只被部分初始化。正如我们之前说过的，这是你不能用
+<code>&amp;mut</code>做的<em>一件</em>事：这将是超级无礼的，而Rust是非常有礼貌的（这也将是难以置信的危险
+，但<em>这</em>肯定不是它关心的原因）。</p>
+<p>如果我们把东西放回去呢？也就是我们正在创建的节点：</p>
 <pre><code class="language-rust ignore">pub fn push(&amp;mut self, elem: i32) {
     let new_node = Box::new(Node {
         elem: elem,
@@ -716,18 +700,15 @@ error[E0507]: cannot move out of borrowed content
 19 |             next: self.head,
    |                   ^^^^^^^^^ cannot move out of borrowed content
 </code></pre>
-<p>No dice. In principle, this is something Rust could actually accept, but it
-won't (for various reasons -- the most serious being <a href="https://doc.rust-lang.org/nightly/nomicon/exception-safety.html">exception safety</a>). We need
-some way to get the head without Rust noticing that it's gone. For advice, we
-turn to infamous Rust Hacker Indiana Jones:</p>
+<p>没办法。原则上，这是Rust可以接受的，但它不会接受（出于各种原因--最严重的是<a href="https://doc.rust-lang.org/nightly/nomicon/exception-safety.html">例外安全</a>）
+。我们需要一些方法在Rust没有注意到它消失的情况下得到头。为了寻求建议，我们求助于臭名昭著
+的Rust黑客Indiana Jones：</p>
 <p><img src="img/indy.gif" alt="Indy Prepares to mem::replace" /></p>
-<p>Ah yes, Indy suggests the <code>mem::replace</code> maneuver. This incredibly useful
-function lets us steal a value out of a borrow by <em>replacing</em> it with another
-value. Let's just pull in <code>std::mem</code> at the top of the file, so that <code>mem</code> is in
-local scope:</p>
+<p>啊，对了，Indy建议使用<code>mem::replace</code>手法。这个非常有用的函数可以让我们通过用另一个值<em>替
+换</em>来偷取一个借入的值。让我们在文件的顶部拉入<code>std::mem</code>，这样<code>mem</code>就在本地范围内：</p>
 <pre><code class="language-rust ignore">use std::mem;
 </code></pre>
-<p>and use it appropriately:</p>
+<p>并适当地使用它：</p>
 <pre><code class="language-rust ignore">pub fn push(&amp;mut self, elem: i32) {
     let new_node = Box::new(Node {
         elem: elem,
@@ -737,12 +718,10 @@ local scope:</p>
     self.head = Link::More(new_node);
 }
 </code></pre>
-<p>Here we <code>replace</code> self.head temporarily with Link::Empty before replacing it
-with the new head of the list. I'm not gonna lie: this is a pretty unfortunate
-thing to have to do. Sadly, we must (for now).</p>
-<p>But hey, that's <code>push</code> all done! Probably. We should probably test it, honestly.
-Right now the easiest way to do that is probably to write <code>pop</code>, and make sure
-that it produces the right results.</p>
+<p>在这里，我们用Link::Empty暂时<code>替换</code>self.head，然后再替换成列表的新头。我不会撒谎：
+这是一件非常不幸的事情。很遗憾，我们必须这么做（目前）。</p>
+<p>但是，嘿，<code>push</code>全部完成! 可能吧。我们也许应该测试一下，说实话。现在，最简单的方法
+可能是写<code>pop</code>，并确保它产生正确的结果。</p>
 <h1><a class="header" href="#pop" id="pop">Pop</a></h1>
 <p>Like <code>push</code>, <code>pop</code> wants to mutate the list. Unlike <code>push</code>, we actually
 want to return something. But <code>pop</code> also has to deal with a tricky corner
