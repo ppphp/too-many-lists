@@ -146,8 +146,8 @@
                 <div id="content" class="content">
                     <main>
                         <h1><a class="header" href="#推入" id="推入">推入</a></h1>
-<p><code>push</code>会使列表发生<em>突变</em>，所以我们需要使用<code>&amp;mut self</code>。我们还需要取一个i32
-来推送：</p>
+<p><code>push</code>会使链表发生<em>改变</em>，所以我们需要使用<code>&amp;mut self</code>。我们还需要取一个i32
+来推入：</p>
 <pre><code class="language-rust ignore">impl List {
     pub fn push(&amp;mut self, elem: i32) {
         // TODO
@@ -162,7 +162,7 @@
         };
     }
 </code></pre>
-<p><code>next</code>是什么？嗯，整个旧列表！我们能不能... ... 就这么做？</p>
+<p><code>next</code>是什么？嗯，整个旧链表！我们能不能... ... 就这么做？</p>
 <pre><code class="language-rust ignore">impl List {
     pub fn push(&amp;mut self, elem: i32) {
         let new_node = Node {

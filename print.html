@@ -642,8 +642,8 @@ warning: field is never used: `next`
 <em>不可变引用</em>的原因。真的，可改变的引用可以被称为<em>唯一</em>引用，但我们发现，将所有权与
 可改变性联系起来，99%的时候都能给出正确的直觉。</p>
 <h1><a class="header" href="#推入" id="推入">推入</a></h1>
-<p><code>push</code>会使列表发生<em>突变</em>，所以我们需要使用<code>&amp;mut self</code>。我们还需要取一个i32
-来推送：</p>
+<p><code>push</code>会使链表发生<em>改变</em>，所以我们需要使用<code>&amp;mut self</code>。我们还需要取一个i32
+来推入：</p>
 <pre><code class="language-rust ignore">impl List {
     pub fn push(&amp;mut self, elem: i32) {
         // TODO
@@ -658,7 +658,7 @@ warning: field is never used: `next`
         };
     }
 </code></pre>
-<p><code>next</code>是什么？嗯，整个旧列表！我们能不能... ... 就这么做？</p>
+<p><code>next</code>是什么？嗯，整个旧链表！我们能不能... ... 就这么做？</p>
 <pre><code class="language-rust ignore">impl List {
     pub fn push(&amp;mut self, elem: i32) {
         let new_node = Node {
@@ -722,25 +722,23 @@ error[E0507]: cannot move out of borrowed content
 这是一件非常不幸的事情。很遗憾，我们必须这么做（目前）。</p>
 <p>但是，嘿，<code>push</code>全部完成! 可能吧。我们也许应该测试一下，说实话。现在，最简单的方法
 可能是写<code>pop</code>，并确保它产生正确的结果。</p>
-<h1><a class="header" href="#pop" id="pop">Pop</a></h1>
-<p>Like <code>push</code>, <code>pop</code> wants to mutate the list. Unlike <code>push</code>, we actually
-want to return something. But <code>pop</code> also has to deal with a tricky corner
-case: what if the list is empty? To represent this case, we use the trusty
-<code>Option</code> type:</p>
+<h1><a class="header" href="#弹出" id="弹出">弹出</a></h1>
+<p>和<code>推入</code>一样，<code>弹出</code>想要改变列表。与<code>推入</code>不同的是，我们实际上想返回一些东西。
+但<code>弹出</code>还需要处理一个棘手的角落情况：如果链表是空的怎么办？为了表示这种情况，
+我们使用可靠的<code>Option</code>类型：</p>
 <pre><code class="language-rust ignore">pub fn pop(&amp;mut self) -&gt; Option&lt;i32&gt; {
     // TODO
 }
 </code></pre>
-<p><code>Option&lt;T&gt;</code> is an enum that represents a value that may exist. It can either be
-<code>Some(T)</code> or <code>None</code>. We could make our own enum for this like we did for
-Link, but we want our users to be able to understand what the heck our return
-type is, and Option is so ubiquitous that <em>everyone</em> knows it. In fact, it's so
-fundamental that it's implicitly imported into scope in every file, as well
-as its variants <code>Some</code> and <code>None</code> (so we don't have to say <code>Option::None</code>).</p>
-<p>The pointy bits on <code>Option&lt;T&gt;</code> indicate that Option is actually <em>generic</em> over
-T. That means that you can make an Option for <em>any</em> type!</p>
-<p>So uh, we have this <code>Link</code> thing, how do we figure out if it's Empty or has
-More? Pattern matching with <code>match</code>!</p>
+<p><code>Option&lt;T&gt;</code>是一个枚举，表示一个可能存在的值。它可以是<code>Some(T)</code>，也可以是<code>None</code>。
+我们可以像对待Link一样，自己做一个枚举，但是我们希望我们的用户能够理解我们的返回类
+型到底是什么，Option 是如此的无处不在，以至于<code>每个人</code>都知道它。事实上，它是如此的
+基本，以至于在每个文件中都会隐式地导入到scope中，还有它的变体<code>Some</code>和<code>None</code>（所以
+我们不必说<code>Option::None</code>）。</p>
+<p><code>Option&lt;T&gt;</code>上的尖头表示Option实际上是在T上<code>通用</code>的，这意味着你可以为<code>任何</code>类型制
+作一个Option!</p>
+<p>那么，呃，我们有这个<code>Link</code>的东西，我们怎么知道它是空的还是有More的？模式匹配与
+<code>match</code>!</p>
 <pre><code class="language-rust ignore">pub fn pop(&amp;mut self) -&gt; Option&lt;i32&gt; {
     match self.head {
         Link::Empty =&gt; {
@@ -765,11 +763,10 @@ error[E0308]: mismatched types
    = note: expected type `std::option::Option&lt;i32&gt;`
               found type `()`
 </code></pre>
-<p>Whoops, <code>pop</code> has to return a value, and we're not doing that yet. We <em>could</em>
-return <code>None</code>, but in this case it's probably a better idea to return
-<code>unimplemented!()</code>, to indicate that we aren't done implementing the function.
-<code>unimplemented!()</code> is a macro (<code>!</code> indicates a macro) that panics the program
-when we get to it (~crashes it in a controlled manner).</p>
+<p>糟糕，<code>pop</code>必须返回一个值，而我们还没有这样做。我们<em>可以</em>返回<code>None</code>，但在这种情况
+下，返回<code>unimplemented!()</code>可能是一个更好的主意，以表明我们还没有完成函数的实现。
+<code>unimplemented!()</code>是一个宏(<code>!</code>表示一个宏)，当我们到达它时，它会使程序惊慌失措(~
+以一种可控的方式使它崩溃)。</p>
 <pre><code class="language-rust ignore">pub fn pop(&amp;mut self) -&gt; Option&lt;i32&gt; {
     match self.head {
         Link::Empty =&gt; {
@@ -782,14 +779,12 @@ when we get to it (~crashes it in a controlled manner).</p>
     unimplemented!()
 }
 </code></pre>
-<p>Unconditional panics are an example of a <a href="https://doc.rust-lang.org/nightly/book/ch19-04-advanced-types.html#the-never-type-that-never-returns">diverging function</a>.
-Diverging functions never return to the caller, so they may be used in places
-where a value of any type is expected. Here, <code>unimplemented!()</code> is being
-used in place of a value of type <code>Option&lt;T&gt;</code>.</p>
-<p>Note also that we don't need to write <code>return</code> in our program. The last
-expression (basically line) in a function is implicitly its return value. This
-lets us express really simple things a bit more concisely. You can always
-explicitly return early with <code>return</code> like any other C-like language.</p>
+<p>无条件恐慌是<a href="https://doc.rust-lang.org/nightly/book/ch19-04-advanced-types.html#the-never-type-that-never-returns">分叉函数</a>的一个例子。分歧函数永远不会返回给调用者，所以它
+们可以用在期待任何类型的值的地方。这里，<code>unimplemented!()</code>被用来代替一个
+<code>Option&lt;T&gt;</code>类型的值。</p>
+<p>还要注意，我们的程序中不需要写<code>return</code>。一个函数中的最后一个表达式（基本上是行）隐
+含了它的返回值。这让我们可以更简洁地表达真正简单的东西。你总是可以像其他类似于C语言
+的语言一样，用<code>return</code>提前显式返回。</p>
 <pre><code class="language-text">&gt; cargo build
 
 error[E0507]: cannot move out of borrowed content
@@ -810,13 +805,12 @@ note: move occurs because `node` has type `std::boxed::Box&lt;first::Node&gt;`, 
 32 |             Link::More(node) =&gt; {
    |                        ^^^^
 </code></pre>
-<p>Come on Rust, get off our back! As always, Rust is hella mad at us. Thankfully,
-this time it's also giving us the full scoop! By default, a pattern match will
-try to move its contents into the new branch, but we can't do this because we
-don't own self by-value here.</p>
+<p>来吧Rust，别烦我们了。一如既往，Rust对我们很生气。值得庆幸的是，这次它也给了我们完
+整的信息! 默认情况下，模式匹配会尝试将其内容移动到新的分支中，但我们不能这样做，因
+为我们在这里没有拥有self的值。</p>
 <pre><code class="language-text">help: consider borrowing here: `&amp;self.head`
 </code></pre>
-<p>Rust says we should add a reference to our <code>match</code> to fix that. 🤷‍♀️ Let's try it:</p>
+<p>Rust说我们应该在<code>匹配</code>中添加一个引用来解决这个问题。🤷♀️让我们试试吧：</p>
 <pre><code class="language-rust ignore">pub fn pop(&amp;mut self) -&gt; Option&lt;i32&gt; {
     match &amp;self.head {
         Link::Empty =&gt; {
@@ -853,10 +847,9 @@ warning: field is never used: `next`
 14 |     next: Link,
    |     ^^^^^^^^^^
 </code></pre>
-<p>Hooray, compiling again! Now let's figure out that logic. We want to make an
-Option, so let's make a variable for that. In the Empty case we need to return
-None. In the More case we need to return <code>Some(i32)</code>, and change the head of
-the list. So, let's try to do basically that?</p>
+<p>万岁，又能编译了! 现在让我们弄清楚这个逻辑。我们想做一个Option，所以让我们为它做一
+个变量。在Empty的情况下，我们需要返回None。在More的情况下，我们需要返回<code>Some(i32)</code>
+，并改变列表的头。那么，让我们试着基本做到这一点？</p>
 <pre><code class="language-rust ignore">pub fn pop(&amp;mut self) -&gt; Option&lt;i32&gt; {
     let result;
     match &amp;self.head {
@@ -880,29 +873,26 @@ error[E0507]: cannot move out of borrowed content
    |                             ^^^^^^^^^ cannot move out of borrowed content
 
 </code></pre>
-<p><em>head</em></p>
-<p><em>desk</em></p>
-<p>We're trying to move out of <code>node</code> when all we have is a shared reference to it.</p>
-<p>We should probably step back and think about what we're trying to do. We want
-to:</p>
+<p><em>脑袋</em></p>
+<p><em>办公桌</em></p>
+<p>当我们只有一个共享引用的时候，我们正试图搬出<code>节点</code>。</p>
+<p>我们也许应该退一步，想想我们要做什么。我们想：</p>
 <ul>
-<li>Check if the list is empty.</li>
-<li>If it's empty, just return None</li>
-<li>If it's <em>not</em> empty
+<li>检查列表是否为空。</li>
+<li>如果是空的，就返回None</li>
+<li>如果它<em>不是</em>空的
 <ul>
-<li>remove the head of the list</li>
-<li>remove its <code>elem</code></li>
-<li>replace the list's head with its <code>next</code></li>
-<li>return <code>Some(elem)</code></li>
+<li>移除链表的头</li>
+<li>移除它的<code>elem</code></li>
+<li>用它的<code>next</code>代替列表的头</li>
+<li>返回<code>Some(elem)</code></li>
 </ul>
 </li>
 </ul>
-<p>The key insight is we want to <em>remove</em> things, which means we want to get the
-head of the list <em>by value</em>. We certainly can't do that through the shared
-reference we get through <code>&amp;self.head</code>. We also &quot;only&quot; have a mutable reference
-to <code>self</code>, so the only way we can move stuff is to <em>replace it</em>. Looks like we're doing
-the Empty dance again!</p>
-<p>Let's try that:</p>
+<p>关键的见解是我们要<em>删除</em>事物，这意味着我们要<em>通过值</em>来获得列表的头部。我们当然不能通过我们通过
+<code>&amp;self.head</code>得到的共享引用来做到这一点。我们也&quot;只&quot;有一个对<code>self</code>的可变引用，所以我们移动东西
+的唯一方法就是<em>替换它</em>。看来我们又在跳Empty舞了!</p>
+<p>让我们试试吧：</p>
 <pre><code class="language-rust ignore">pub fn pop(&amp;mut self) -&gt; Option&lt;i32&gt; {
     let result;
     match mem::replace(&amp;mut self.head, Link::Empty) {
@@ -922,15 +912,12 @@ the Empty dance again!</p>
    Finished dev [unoptimized + debuginfo] target(s) in 0.22s
 </code></pre>
 <p>O M G</p>
-<p>It compiled without <em>any</em> warnings!!!!!</p>
-<p>Actually I'm going to apply my own personal lint here: we made this <code>result</code>
-value to return, but actually we didn't need to do that at all! Just as a
-function evaluates to its last expression, every block also evaluates to
-its last expression. Normally we supress this behaviour with semi-colons,
-which instead makes the block evaluate to the empty tuple, <code>()</code>. This is
-actually the value that functions which don't declare a return value -- like
-<code>push</code> -- return.</p>
-<p>So instead, we can write <code>pop</code> as:</p>
+<p>它在编译时没有<em>任何</em>警告!!!!!</p>
+<p>其实我在这里要套用一下我个人的套路：我们把这个<code>result</code>做成了返回，但其实我们根本
+不需要这么做！就像一个函数运算结果是它的最后一个表达式一样，每个块的运算结果也是
+它的最后一个表达式。通常我们会用分号阻止这种行为，这样反而会使块评估为空元组，
+<code>（）</code>。这实际上是不声明返回值的函数--比如<code>push</code>--返回的值。</p>
+<p>因此，我们可以将<code>pop</code>写成：</p>
 <pre><code class="language-rust ignore">pub fn pop(&amp;mut self) -&gt; Option&lt;i32&gt; {
     match mem::replace(&amp;mut self.head, Link::Empty) {
         Link::Empty =&gt; None,
@@ -941,14 +928,13 @@ actually the value that functions which don't declare a return value -- like
     }
 }
 </code></pre>
-<p>Which is a bit more concise and idiomatic. Note that the Link::Empty branch
-completely lost its braces, because we only have one expression to
-evaluate. Just a nice shorthand for simple cases.</p>
+<p>这更简洁、更惯用。请注意，Link::Empty分支完全失去了括号，因为我们只有一个表达式
+需要运算。只是一个很好的简写，用于简单的情况。</p>
 <pre><code class="language-text">cargo build
 
    Finished dev [unoptimized + debuginfo] target(s) in 0.22s
 </code></pre>
-<p>Nice, still works!</p>
+<p>好，仍能运行！</p>
 <h1><a class="header" href="#testing" id="testing">Testing</a></h1>
 <p>Alright, so we've got <code>push</code> and <code>pop</code> written, now we can actually test out
 our stack! Rust and cargo support testing as a first-class feature, so this
