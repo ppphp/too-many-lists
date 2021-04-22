@@ -1226,44 +1226,40 @@ mod test {
 }
 #}</code></pre></pre>
 <p>天啊，80行，一半是测试！80行，其中一半是测试! 好吧，我说过这第一篇要花点时间的!</p>
-<h1><a class="header" href="#an-ok-singly-linked-stack" id="an-ok-singly-linked-stack">An Ok Singly-Linked Stack</a></h1>
-<p>In the previous chapter we wrote up a minimum viable singly-linked
-stack. However there's a few design decisions that make it kind of sucky.
-Let's make it less sucky. In doing so, we will:</p>
+<h1><a class="header" href="#一个好的单链栈" id="一个好的单链栈">一个好的单链栈</a></h1>
+<p>在上一章中，我们写了一个最小可行的单链栈。然而，有几个设计决定使它变得有点糟
+糕。让我们把它变得不那么糟糕。在这样做的时候，我们将：</p>
 <ul>
-<li>Deinvent the wheel</li>
-<li>Make our list able to handle any element type</li>
-<li>Add peeking</li>
-<li>Make our list iterable</li>
+<li>取消发明轮子</li>
+<li>使我们的列表能够处理任何元素类型</li>
+<li>增加选择功能</li>
+<li>使我们的列表可迭代</li>
 </ul>
-<p>And in the process we'll learn about</p>
+<p>在这个过程中，我们将了解到</p>
 <ul>
-<li>Advanced Option use</li>
-<li>Generics</li>
-<li>Lifetimes</li>
-<li>Iterators</li>
+<li>高级选项的使用</li>
+<li>泛型</li>
+<li>生命期</li>
+<li>迭代器</li>
 </ul>
-<p>Let's add a new file called <code>second.rs</code>:</p>
+<p>让我们添加一个名为<code>second.rs</code>的新文件：</p>
 <pre><code class="language-rust ignore">// in lib.rs
 
 pub mod first;
 pub mod second;
 </code></pre>
-<p>And copy everything from <code>first.rs</code> into it.</p>
-<h1><a class="header" href="#using-option" id="using-option">Using Option</a></h1>
-<p>Particularly observant readers may have noticed that we actually reinvented
-a really bad version of Option:</p>
+<p>并将<code>first.rs</code>中的所有内容复制到其中。</p>
+<h1><a class="header" href="#使用option" id="使用option">使用Option</a></h1>
+<p>特别细心的读者可能已经注意到，我们实际上重新发明了一个非常糟糕的Option版本：</p>
 <pre><code class="language-rust ignore">enum Link {
     Empty,
     More(Box&lt;Node&gt;),
 }
 </code></pre>
-<p>Link is just <code>Option&lt;Box&lt;Node&gt;&gt;</code>. Now, it's nice not to have to write
-<code>Option&lt;Box&lt;Node&gt;&gt;</code> everywhere, and unlike <code>pop</code>, we're not exposing this
-to the outside world, so maybe it's fine. However Option has some <em>really
-nice</em> methods that we've been manually implementing ourselves. Let's <em>not</em>
-do that, and replace everything with Options. First, we'll do it naively
-by just renaming everything to use Some and None:</p>
+<p>Link只是<code>Option&lt;Box&lt;Node&gt;&gt;</code>。现在，不用到处写<code>Option&lt;Box&lt;Node&gt;&gt;</code>已经很不错
+了，而且与<code>pop</code>不同的是，我们并没有把它暴露给外部世界，所以也许这很好。然而
+Option有一些<em>非常好</em>的方法，我们一直在手动实现。让我们<em>不要</em>这样做，用
+Options代替一切。首先，我们要做的是天真地重命名所有的东西，使用Some和None：</p>
 <pre><code class="language-rust ignore">use std::mem;
 
 pub struct List {
@@ -1312,9 +1308,9 @@ impl Drop for List {
     }
 }
 </code></pre>
-<p>This is marginally better, but the big wins will come from Option's methods.</p>
-<p>First, <code>mem::replace(&amp;mut option, None)</code> is such an incredibly
-common idiom that Option actually just went ahead and made it a method: <code>take</code>.</p>
+<p>这稍微好一点，但最大的胜利来自于 Option 的方法。</p>
+<p>首先，<code>mem::replace(&amp;mut option, None)</code>是一个非常常见的习语，Option实际上只是把它
+作为一个方法：<code>take</code>。</p>
 <pre><code class="language-rust ignore">pub struct List {
     head: Link,
 }
@@ -1360,15 +1356,13 @@ impl Drop for List {
     }
 }
 </code></pre>
-<p>Second, <code>match option { None =&gt; None, Some(x) =&gt; Some(y) }</code> is such an
-incredibly common idiom that it was called <code>map</code>. <code>map</code> takes a function to
-execute on the <code>x</code> in the <code>Some(x)</code> to produce the <code>y</code> in <code>Some(y)</code>. We could
-write a proper <code>fn</code> and pass it to <code>map</code>, but we'd much rather write what to
-do <em>inline</em>.</p>
-<p>The way to do this is with a <em>closure</em>. Closures are anonymous functions with
-an extra super-power: they can refer to local variables <em>outside</em> the closure!
-This makes them super useful for doing all sorts of conditional logic. The
-only place we do a <code>match</code> is in <code>pop</code>, so let's just rewrite that:</p>
+<p>第二，<code>match option { None =&gt; None, Some(x) =&gt; Some(y) }</code>是一个非常常见的成语，
+以至于它被称为<code>map</code>。<code>map</code>需要一个函数来对<code>Some(x)</code>中的<code>x</code>执行，以产生<code>Some(y)</code>
+中的<code>y</code>。我们可以写一个适当的<code>fn</code>并把它传递给<code>map</code>，但我们更愿意写出<em>内联</em>要做什
+么。</p>
+<p>做到这一点的方法是使用一个<em>闭包</em>。闭包是匿名函数，有一个额外的超级能力：它们可以
+引用闭包<em>之外</em>的局部变量。这使得它们在做各种条件逻辑时超级有用。我们唯一进行
+<code>match</code>的地方是在<code>pop</code>中，所以让我们重写一下：</p>
 <pre><code class="language-rust ignore">pub fn pop(&amp;mut self) -&gt; Option&lt;i32&gt; {
     self.head.take().map(|node| {
         self.head = node.next;
@@ -1376,7 +1370,7 @@ only place we do a <code>match</code> is in <code>pop</code>, so let's just rewr
     })
 }
 </code></pre>
-<p>Ah, much better. Let's make sure we didn't break anything:</p>
+<p>啊，好多了。让我们确保我们没有打破任何东西：</p>
 <pre><code class="language-text">&gt; cargo test
 
      Running target/debug/lists-5c71138492ad4b4a
@@ -1388,13 +1382,11 @@ test second::test::basics ... ok
 test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured
 
 </code></pre>
-<p>Great! Let's move on to actually improving the code's <em>behaviour</em>.</p>
-<h1><a class="header" href="#making-it-all-generic" id="making-it-all-generic">Making it all Generic</a></h1>
-<p>We've already touched a bit on generics with Option and Box. However so
-far we've managed to avoid declaring any new type that is actually generic
-over arbitrary elements.</p>
-<p>It turns out that's actually really easy. Let's make all of our types generic
-right now:</p>
+<p>很好! 让我们继续实际改进代码的<em>行为</em>。</p>
+<h1><a class="header" href="#让他全变成泛型" id="让他全变成泛型">让他全变成泛型</a></h1>
+<p>我们已经用 Option 和 Box 触及了一些泛型。然而到目前为止，我们一直设法避免声明任
+何新的类型，这些类型实际上是对任意元素的泛型。</p>
+<p>事实证明，这其实很容易。让我们现在就把我们所有的类型都变成泛型：</p>
 <pre><code class="language-rust ignore">pub struct List&lt;T&gt; {
     head: Link&lt;T&gt;,
 }
@@ -1406,9 +1398,8 @@ struct Node&lt;T&gt; {
     next: Link&lt;T&gt;,
 }
 </code></pre>
-<p>You just make everything a little more pointy, and suddenly your code is
-generic. Of course, we can't <em>just</em> do this, or else the compiler's going
-to be Super Mad.</p>
+<p>你只要把所有的东西都变得更尖角一点，突然间你的代码就会变得很通用。当然，我们不
+能<em>就</em>这样做，否则编译器就会变得超级疯狂。</p>
 <pre><code class="language-text">&gt; cargo test
 
 error[E0107]: wrong number of type arguments: expected 1, found 0
@@ -1424,12 +1415,10 @@ error[E0107]: wrong number of type arguments: expected 1, found 0
    |               ^^^^ expected 1 type argument
 
 </code></pre>
-<p>The problem is pretty clear: we're talking about this <code>List</code> thing but that's not
-real anymore. Like Option and Box, we now always have to talk about
-<code>List&lt;Something&gt;</code>.</p>
-<p>But what's the Something we use in all these impls? Just like List, we want our
-implementations to work with <em>all</em> the T's. So, just like List, let's make our
-<code>impl</code>s pointy:</p>
+<p>问题很明显：我们在谈论这个<code>List</code>的事情，但那已经不是真的了。像 Option 和 Box 一样，
+我们现在总是要谈论 <code>List&lt;Something&gt;</code>。</p>
+<p>但是我们在所有这些暗示中使用的Something是什么？就像List一样，我们希望我们的实现能与
+<em>所有</em>的T一起工作。所以，就像List一样，让我们的<code>impls</code>变得尖尖的：</p>
 <pre><code class="language-rust ignore">impl&lt;T&gt; List&lt;T&gt; {
     pub fn new() -&gt; Self {
         List { head: None }
@@ -1461,7 +1450,7 @@ impl&lt;T&gt; Drop for List&lt;T&gt; {
     }
 }
 </code></pre>
-<p>...and that's it!</p>
+<p>......就这样了!</p>
 <pre><code>&gt; cargo test
 
      Running target/debug/lists-5c71138492ad4b4a
@@ -1473,22 +1462,19 @@ test second::test::basics ... ok
 test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured
 
 </code></pre>
-<p>All of our code is now completely generic over arbitrary values of T. Dang,
-Rust is <em>easy</em>. I'd like to make a particular shout-out to <code>new</code> which didn't
-even change:</p>
+<p>我们所有的代码现在在任意的T值上都是完全通用的，铛，Rust很<em>容易</em>。我想对甚至没有改
+变的<code>new</code>做一个特别的叫喊：</p>
 <pre><code class="language-rust ignore">pub fn new() -&gt; Self {
     List { head: None }
 }
 </code></pre>
-<p>Bask in the Glory that is Self, guardian of refactoring and copy-pasta coding.
-Also of interest, we don't write <code>List&lt;T&gt;</code> when we construct an instance of
-list. That part's inferred for us based on the fact that we're returning it
-from a function that expects a <code>List&lt;T&gt;</code>.</p>
-<p>Alright, let's move on to totally new <em>behaviour</em>!</p>
-<h1><a class="header" href="#peek" id="peek">Peek</a></h1>
-<p>One thing we didn't even bother to implement last time was peeking. Let's go
-ahead and do that. All we need to do is return a reference to the element in
-the head of the list, if it exists. Sounds easy, let's try:</p>
+<p>沐浴在Self的光辉中，它是重构和复制粘贴编码的守护者。同样有趣的是，当我们构造一个
+链表的实例时，我们并没有写 <code>List&lt;T&gt;</code>。这一部分是根据我们从一个期望有 <code>List&lt;T&gt;</code>
+的函数中返回的事实来推断的。</p>
+<p>好了，让我们继续讨论全新的<em>行为</em>吧！</p>
+<h1><a class="header" href="#选择" id="选择">选择</a></h1>
+<p>有一件事我们上次甚至懒得实施，就是选择。让我们继续做这个。我们所要做的就是返回一
+个对列表头部元素的引用，如果它存在的话。听起来很简单，让我们试试吧：</p>
 <pre><code class="language-rust ignore">pub fn peek(&amp;self) -&gt; Option&lt;&amp;T&gt; {
     self.head.map(|node| {
         &amp;node.elem
@@ -1511,19 +1497,17 @@ error[E0507]: cannot move out of borrowed content
 
 
 </code></pre>
-<p><em>Sigh</em>. What now, Rust?</p>
-<p>Map takes <code>self</code> by value, which would move the Option out of the thing it's in.
-Previously this was fine because we had just <code>take</code>n it out, but now we actually
-want to leave it where it was. The <em>correct</em> way to handle this is with the
-<code>as_ref</code> method on Option, which has the following definition:</p>
+<p><em>叹息</em>。现在怎么办，Rust？</p>
+<p>地图通过值来获取<code>self</code>，这将会把Option移出它所在的地方。以前这很好，因为我们只是把它
+取出来，但是现在我们实际上想把它留在原处。处理这个问题的<em>正确</em>方法是使用Option的
+<code>as_ref</code>方法，它的定义如下：</p>
 <pre><code class="language-rust ignore">impl&lt;T&gt; Option&lt;T&gt; {
     pub fn as_ref(&amp;self) -&gt; Option&lt;&amp;T&gt;;
 }
 </code></pre>
-<p>It demotes the Option<T> to an Option to a reference to its internals. We could
-do this ourselves with an explicit match but <em>ugh no</em>. It does mean that we
-need to do an extra dereference to cut through the extra indirection, but
-thankfully the <code>.</code> operator handles that for us.</p>
+<p>它将 Option<T> 降级为对其内部的引用的 Option。我们可以通过显式匹配来实现这一点，但
+是<em>不行</em>。这确实意味着我们需要做一个额外的析构来切断额外的指示，但幸运的是<code>.</code>操作符
+为我们处理了这个问题。</p>
 <pre><code class="language-rust ignore">pub fn peek(&amp;self) -&gt; Option&lt;&amp;T&gt; {
     self.head.as_ref().map(|node| {
         &amp;node.elem
@@ -1534,8 +1518,8 @@ thankfully the <code>.</code> operator handles that for us.</p>
 
     Finished dev [unoptimized + debuginfo] target(s) in 0.32s
 </code></pre>
-<p>Nailed it.</p>
-<p>We can also make a <em>mutable</em> version of this method using <code>as_mut</code>:</p>
+<p>钉住了。</p>
+<p>我们也可以用<code>as_mut</code>制作这个方法的<em>可变</em>版本：</p>
 <pre><code class="language-rust ignore">pub fn peek_mut(&amp;mut self) -&gt; Option&lt;&amp;mut T&gt; {
     self.head.as_mut().map(|node| {
         &amp;mut node.elem
@@ -1546,7 +1530,7 @@ thankfully the <code>.</code> operator handles that for us.</p>
 
 </code></pre>
 <p>EZ</p>
-<p>Don't forget to test it:</p>
+<p>别忘了测试一下：</p>
 <pre><code class="language-rust ignore">#[test]
 fn peek() {
     let mut list = List::new();
@@ -1570,7 +1554,9 @@ test second::test::peek ... ok
 test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured
 
 </code></pre>
-<p>That's nice, but we didn't really test to see if we could mutate that <code>peek_mut</code> return value, did we?  If a reference is mutable but nobody mutates it, have we really tested the mutability?  Let's try using <code>map</code> on this <code>Option&lt;&amp;mut T&gt;</code> to put a profound value in:</p>
+<p>这很好，但我们并没有真正测试是否可以改变那个<code>peek_mut</code>的返回值，不是吗？如果一个引
+用是可变的，但是没有人改变它，我们真的测试了可变性吗？让我们试试在这个
+<code>Option&lt;&amp;mut T&gt;</code>上使用<code>map</code>，放一个奥妙的值：</p>
 <pre><code class="language-rust ignore">#[test]
 fn peek() {
     let mut list = List::new();
@@ -1601,7 +1587,11 @@ error[E0384]: cannot assign twice to immutable variable `value`
 100 |             value = 42
     |             ^^^^^^^^^^ cannot assign twice to immutable variable          ^~~~~
 </code></pre>
-<p>The compiler is complaining that <code>value</code> is immutable, but we pretty clearly wrote <code>&amp;mut value</code>; what gives? It turns out that writing the argument of the closure that way doesn't specify that <code>value</code> is a mutable reference. Instead, it creates a pattern that will be matched against the argument to the closure; <code>|&amp;mut value|</code> means &quot;the argument is a mutable reference, but just copy the value it points to into <code>value</code>, please.&quot;  If we just use <code>|value|</code>, the type of <code>value</code> will be <code>&amp;mut i32</code> and we can actually mutate the head:</p>
+<p>编译器抱怨说<code>value</code>是不可变的，但我们很清楚地写了<code>&amp;mut value</code>；这又是怎么回事呢？事
+实证明，这样写闭包的参数并没有说明<code>value</code>是一个可变的引用。相反，它创建了一个将与闭
+包的参数相匹配的模式；<code>|&amp;mut value|</code>意味着 &quot;参数是一个可变的引用，但是请将它指向的值
+复制到<code>value</code>中&quot;。如果我们只使用<code>|value|</code>，<code>value</code>的类型将是<code>&amp;mut i32</code>，我们就可以
+真正地对头部进行改变：</p>
 <pre><code class="language-rust ignore">    #[test]
     fn peek() {
         let mut list = List::new();
@@ -1632,7 +1622,7 @@ test second::test::peek ... ok
 test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured
 
 </code></pre>
-<p>Much better!</p>
+<p>好多了！</p>
 <h1><a class="header" href="#intoiter" id="intoiter">IntoIter</a></h1>
 <p>Collections are iterated in Rust using the <em>Iterator</em> trait. It's a bit more
 complicated than <code>Drop</code>:</p>

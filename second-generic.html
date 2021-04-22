@@ -145,12 +145,10 @@
 
                 <div id="content" class="content">
                     <main>
-                        <h1><a class="header" href="#making-it-all-generic" id="making-it-all-generic">Making it all Generic</a></h1>
-<p>We've already touched a bit on generics with Option and Box. However so
-far we've managed to avoid declaring any new type that is actually generic
-over arbitrary elements.</p>
-<p>It turns out that's actually really easy. Let's make all of our types generic
-right now:</p>
+                        <h1><a class="header" href="#让他全变成泛型" id="让他全变成泛型">让他全变成泛型</a></h1>
+<p>我们已经用 Option 和 Box 触及了一些泛型。然而到目前为止，我们一直设法避免声明任
+何新的类型，这些类型实际上是对任意元素的泛型。</p>
+<p>事实证明，这其实很容易。让我们现在就把我们所有的类型都变成泛型：</p>
 <pre><code class="language-rust ignore">pub struct List&lt;T&gt; {
     head: Link&lt;T&gt;,
 }
@@ -162,9 +160,8 @@ struct Node&lt;T&gt; {
     next: Link&lt;T&gt;,
 }
 </code></pre>
-<p>You just make everything a little more pointy, and suddenly your code is
-generic. Of course, we can't <em>just</em> do this, or else the compiler's going
-to be Super Mad.</p>
+<p>你只要把所有的东西都变得更尖角一点，突然间你的代码就会变得很通用。当然，我们不
+能<em>就</em>这样做，否则编译器就会变得超级疯狂。</p>
 <pre><code class="language-text">&gt; cargo test
 
 error[E0107]: wrong number of type arguments: expected 1, found 0
@@ -180,12 +177,10 @@ error[E0107]: wrong number of type arguments: expected 1, found 0
    |               ^^^^ expected 1 type argument
 
 </code></pre>
-<p>The problem is pretty clear: we're talking about this <code>List</code> thing but that's not
-real anymore. Like Option and Box, we now always have to talk about
-<code>List&lt;Something&gt;</code>.</p>
-<p>But what's the Something we use in all these impls? Just like List, we want our
-implementations to work with <em>all</em> the T's. So, just like List, let's make our
-<code>impl</code>s pointy:</p>
+<p>问题很明显：我们在谈论这个<code>List</code>的事情，但那已经不是真的了。像 Option 和 Box 一样，
+我们现在总是要谈论 <code>List&lt;Something&gt;</code>。</p>
+<p>但是我们在所有这些暗示中使用的Something是什么？就像List一样，我们希望我们的实现能与
+<em>所有</em>的T一起工作。所以，就像List一样，让我们的<code>impls</code>变得尖尖的：</p>
 <pre><code class="language-rust ignore">impl&lt;T&gt; List&lt;T&gt; {
     pub fn new() -&gt; Self {
         List { head: None }
@@ -217,7 +212,7 @@ impl&lt;T&gt; Drop for List&lt;T&gt; {
     }
 }
 </code></pre>
-<p>...and that's it!</p>
+<p>......就这样了!</p>
 <pre><code>&gt; cargo test
 
      Running target/debug/lists-5c71138492ad4b4a
@@ -229,18 +224,16 @@ test second::test::basics ... ok
 test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured
 
 </code></pre>
-<p>All of our code is now completely generic over arbitrary values of T. Dang,
-Rust is <em>easy</em>. I'd like to make a particular shout-out to <code>new</code> which didn't
-even change:</p>
+<p>我们所有的代码现在在任意的T值上都是完全通用的，铛，Rust很<em>容易</em>。我想对甚至没有改
+变的<code>new</code>做一个特别的叫喊：</p>
 <pre><code class="language-rust ignore">pub fn new() -&gt; Self {
     List { head: None }
 }
 </code></pre>
-<p>Bask in the Glory that is Self, guardian of refactoring and copy-pasta coding.
-Also of interest, we don't write <code>List&lt;T&gt;</code> when we construct an instance of
-list. That part's inferred for us based on the fact that we're returning it
-from a function that expects a <code>List&lt;T&gt;</code>.</p>
-<p>Alright, let's move on to totally new <em>behaviour</em>!</p>
+<p>沐浴在Self的光辉中，它是重构和复制粘贴编码的守护者。同样有趣的是，当我们构造一个
+链表的实例时，我们并没有写 <code>List&lt;T&gt;</code>。这一部分是根据我们从一个期望有 <code>List&lt;T&gt;</code>
+的函数中返回的事实来推断的。</p>
+<p>好了，让我们继续讨论全新的<em>行为</em>吧！</p>
 
                     </main>
 

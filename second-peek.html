@@ -145,10 +145,9 @@
 
                 <div id="content" class="content">
                     <main>
-                        <h1><a class="header" href="#peek" id="peek">Peek</a></h1>
-<p>One thing we didn't even bother to implement last time was peeking. Let's go
-ahead and do that. All we need to do is return a reference to the element in
-the head of the list, if it exists. Sounds easy, let's try:</p>
+                        <h1><a class="header" href="#选择" id="选择">选择</a></h1>
+<p>有一件事我们上次甚至懒得实施，就是选择。让我们继续做这个。我们所要做的就是返回一
+个对列表头部元素的引用，如果它存在的话。听起来很简单，让我们试试吧：</p>
 <pre><code class="language-rust ignore">pub fn peek(&amp;self) -&gt; Option&lt;&amp;T&gt; {
     self.head.map(|node| {
         &amp;node.elem
@@ -171,19 +170,17 @@ error[E0507]: cannot move out of borrowed content
 
 
 </code></pre>
-<p><em>Sigh</em>. What now, Rust?</p>
-<p>Map takes <code>self</code> by value, which would move the Option out of the thing it's in.
-Previously this was fine because we had just <code>take</code>n it out, but now we actually
-want to leave it where it was. The <em>correct</em> way to handle this is with the
-<code>as_ref</code> method on Option, which has the following definition:</p>
+<p><em>叹息</em>。现在怎么办，Rust？</p>
+<p>地图通过值来获取<code>self</code>，这将会把Option移出它所在的地方。以前这很好，因为我们只是把它
+取出来，但是现在我们实际上想把它留在原处。处理这个问题的<em>正确</em>方法是使用Option的
+<code>as_ref</code>方法，它的定义如下：</p>
 <pre><code class="language-rust ignore">impl&lt;T&gt; Option&lt;T&gt; {
     pub fn as_ref(&amp;self) -&gt; Option&lt;&amp;T&gt;;
 }
 </code></pre>
-<p>It demotes the Option<T> to an Option to a reference to its internals. We could
-do this ourselves with an explicit match but <em>ugh no</em>. It does mean that we
-need to do an extra dereference to cut through the extra indirection, but
-thankfully the <code>.</code> operator handles that for us.</p>
+<p>它将 Option<T> 降级为对其内部的引用的 Option。我们可以通过显式匹配来实现这一点，但
+是<em>不行</em>。这确实意味着我们需要做一个额外的析构来切断额外的指示，但幸运的是<code>.</code>操作符
+为我们处理了这个问题。</p>
 <pre><code class="language-rust ignore">pub fn peek(&amp;self) -&gt; Option&lt;&amp;T&gt; {
     self.head.as_ref().map(|node| {
         &amp;node.elem
@@ -194,8 +191,8 @@ thankfully the <code>.</code> operator handles that for us.</p>
 
     Finished dev [unoptimized + debuginfo] target(s) in 0.32s
 </code></pre>
-<p>Nailed it.</p>
-<p>We can also make a <em>mutable</em> version of this method using <code>as_mut</code>:</p>
+<p>钉住了。</p>
+<p>我们也可以用<code>as_mut</code>制作这个方法的<em>可变</em>版本：</p>
 <pre><code class="language-rust ignore">pub fn peek_mut(&amp;mut self) -&gt; Option&lt;&amp;mut T&gt; {
     self.head.as_mut().map(|node| {
         &amp;mut node.elem
@@ -206,7 +203,7 @@ thankfully the <code>.</code> operator handles that for us.</p>
 
 </code></pre>
 <p>EZ</p>
-<p>Don't forget to test it:</p>
+<p>别忘了测试一下：</p>
 <pre><code class="language-rust ignore">#[test]
 fn peek() {
     let mut list = List::new();
@@ -230,7 +227,9 @@ test second::test::peek ... ok
 test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured
 
 </code></pre>
-<p>That's nice, but we didn't really test to see if we could mutate that <code>peek_mut</code> return value, did we?  If a reference is mutable but nobody mutates it, have we really tested the mutability?  Let's try using <code>map</code> on this <code>Option&lt;&amp;mut T&gt;</code> to put a profound value in:</p>
+<p>这很好，但我们并没有真正测试是否可以改变那个<code>peek_mut</code>的返回值，不是吗？如果一个引
+用是可变的，但是没有人改变它，我们真的测试了可变性吗？让我们试试在这个
+<code>Option&lt;&amp;mut T&gt;</code>上使用<code>map</code>，放一个奥妙的值：</p>
 <pre><code class="language-rust ignore">#[test]
 fn peek() {
     let mut list = List::new();
@@ -261,7 +260,11 @@ error[E0384]: cannot assign twice to immutable variable `value`
 100 |             value = 42
     |             ^^^^^^^^^^ cannot assign twice to immutable variable          ^~~~~
 </code></pre>
-<p>The compiler is complaining that <code>value</code> is immutable, but we pretty clearly wrote <code>&amp;mut value</code>; what gives? It turns out that writing the argument of the closure that way doesn't specify that <code>value</code> is a mutable reference. Instead, it creates a pattern that will be matched against the argument to the closure; <code>|&amp;mut value|</code> means &quot;the argument is a mutable reference, but just copy the value it points to into <code>value</code>, please.&quot;  If we just use <code>|value|</code>, the type of <code>value</code> will be <code>&amp;mut i32</code> and we can actually mutate the head:</p>
+<p>编译器抱怨说<code>value</code>是不可变的，但我们很清楚地写了<code>&amp;mut value</code>；这又是怎么回事呢？事
+实证明，这样写闭包的参数并没有说明<code>value</code>是一个可变的引用。相反，它创建了一个将与闭
+包的参数相匹配的模式；<code>|&amp;mut value|</code>意味着 &quot;参数是一个可变的引用，但是请将它指向的值
+复制到<code>value</code>中&quot;。如果我们只使用<code>|value|</code>，<code>value</code>的类型将是<code>&amp;mut i32</code>，我们就可以
+真正地对头部进行改变：</p>
 <pre><code class="language-rust ignore">    #[test]
     fn peek() {
         let mut list = List::new();
@@ -292,7 +295,7 @@ test second::test::peek ... ok
 test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured
 
 </code></pre>
-<p>Much better!</p>
+<p>好多了！</p>
 
                     </main>
 

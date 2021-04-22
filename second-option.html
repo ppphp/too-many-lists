@@ -145,20 +145,17 @@
 
                 <div id="content" class="content">
                     <main>
-                        <h1><a class="header" href="#using-option" id="using-option">Using Option</a></h1>
-<p>Particularly observant readers may have noticed that we actually reinvented
-a really bad version of Option:</p>
+                        <h1><a class="header" href="#使用option" id="使用option">使用Option</a></h1>
+<p>特别细心的读者可能已经注意到，我们实际上重新发明了一个非常糟糕的Option版本：</p>
 <pre><code class="language-rust ignore">enum Link {
     Empty,
     More(Box&lt;Node&gt;),
 }
 </code></pre>
-<p>Link is just <code>Option&lt;Box&lt;Node&gt;&gt;</code>. Now, it's nice not to have to write
-<code>Option&lt;Box&lt;Node&gt;&gt;</code> everywhere, and unlike <code>pop</code>, we're not exposing this
-to the outside world, so maybe it's fine. However Option has some <em>really
-nice</em> methods that we've been manually implementing ourselves. Let's <em>not</em>
-do that, and replace everything with Options. First, we'll do it naively
-by just renaming everything to use Some and None:</p>
+<p>Link只是<code>Option&lt;Box&lt;Node&gt;&gt;</code>。现在，不用到处写<code>Option&lt;Box&lt;Node&gt;&gt;</code>已经很不错
+了，而且与<code>pop</code>不同的是，我们并没有把它暴露给外部世界，所以也许这很好。然而
+Option有一些<em>非常好</em>的方法，我们一直在手动实现。让我们<em>不要</em>这样做，用
+Options代替一切。首先，我们要做的是天真地重命名所有的东西，使用Some和None：</p>
 <pre><code class="language-rust ignore">use std::mem;
 
 pub struct List {
@@ -207,9 +204,9 @@ impl Drop for List {
     }
 }
 </code></pre>
-<p>This is marginally better, but the big wins will come from Option's methods.</p>
-<p>First, <code>mem::replace(&amp;mut option, None)</code> is such an incredibly
-common idiom that Option actually just went ahead and made it a method: <code>take</code>.</p>
+<p>这稍微好一点，但最大的胜利来自于 Option 的方法。</p>
+<p>首先，<code>mem::replace(&amp;mut option, None)</code>是一个非常常见的习语，Option实际上只是把它
+作为一个方法：<code>take</code>。</p>
 <pre><code class="language-rust ignore">pub struct List {
     head: Link,
 }
@@ -255,15 +252,13 @@ impl Drop for List {
     }
 }
 </code></pre>
-<p>Second, <code>match option { None =&gt; None, Some(x) =&gt; Some(y) }</code> is such an
-incredibly common idiom that it was called <code>map</code>. <code>map</code> takes a function to
-execute on the <code>x</code> in the <code>Some(x)</code> to produce the <code>y</code> in <code>Some(y)</code>. We could
-write a proper <code>fn</code> and pass it to <code>map</code>, but we'd much rather write what to
-do <em>inline</em>.</p>
-<p>The way to do this is with a <em>closure</em>. Closures are anonymous functions with
-an extra super-power: they can refer to local variables <em>outside</em> the closure!
-This makes them super useful for doing all sorts of conditional logic. The
-only place we do a <code>match</code> is in <code>pop</code>, so let's just rewrite that:</p>
+<p>第二，<code>match option { None =&gt; None, Some(x) =&gt; Some(y) }</code>是一个非常常见的成语，
+以至于它被称为<code>map</code>。<code>map</code>需要一个函数来对<code>Some(x)</code>中的<code>x</code>执行，以产生<code>Some(y)</code>
+中的<code>y</code>。我们可以写一个适当的<code>fn</code>并把它传递给<code>map</code>，但我们更愿意写出<em>内联</em>要做什
+么。</p>
+<p>做到这一点的方法是使用一个<em>闭包</em>。闭包是匿名函数，有一个额外的超级能力：它们可以
+引用闭包<em>之外</em>的局部变量。这使得它们在做各种条件逻辑时超级有用。我们唯一进行
+<code>match</code>的地方是在<code>pop</code>中，所以让我们重写一下：</p>
 <pre><code class="language-rust ignore">pub fn pop(&amp;mut self) -&gt; Option&lt;i32&gt; {
     self.head.take().map(|node| {
         self.head = node.next;
@@ -271,7 +266,7 @@ only place we do a <code>match</code> is in <code>pop</code>, so let's just rewr
     })
 }
 </code></pre>
-<p>Ah, much better. Let's make sure we didn't break anything:</p>
+<p>啊，好多了。让我们确保我们没有打破任何东西：</p>
 <pre><code class="language-text">&gt; cargo test
 
      Running target/debug/lists-5c71138492ad4b4a
@@ -283,7 +278,7 @@ test second::test::basics ... ok
 test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured
 
 </code></pre>
-<p>Great! Let's move on to actually improving the code's <em>behaviour</em>.</p>
+<p>很好! 让我们继续实际改进代码的<em>行为</em>。</p>
 
                     </main>
 

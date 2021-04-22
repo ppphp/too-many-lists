@@ -145,30 +145,29 @@
 
                 <div id="content" class="content">
                     <main>
-                        <h1><a class="header" href="#an-ok-singly-linked-stack" id="an-ok-singly-linked-stack">An Ok Singly-Linked Stack</a></h1>
-<p>In the previous chapter we wrote up a minimum viable singly-linked
-stack. However there's a few design decisions that make it kind of sucky.
-Let's make it less sucky. In doing so, we will:</p>
+                        <h1><a class="header" href="#一个好的单链栈" id="一个好的单链栈">一个好的单链栈</a></h1>
+<p>在上一章中，我们写了一个最小可行的单链栈。然而，有几个设计决定使它变得有点糟
+糕。让我们把它变得不那么糟糕。在这样做的时候，我们将：</p>
 <ul>
-<li>Deinvent the wheel</li>
-<li>Make our list able to handle any element type</li>
-<li>Add peeking</li>
-<li>Make our list iterable</li>
+<li>取消发明轮子</li>
+<li>使我们的列表能够处理任何元素类型</li>
+<li>增加选择功能</li>
+<li>使我们的列表可迭代</li>
 </ul>
-<p>And in the process we'll learn about</p>
+<p>在这个过程中，我们将了解到</p>
 <ul>
-<li>Advanced Option use</li>
-<li>Generics</li>
-<li>Lifetimes</li>
-<li>Iterators</li>
+<li>高级选项的使用</li>
+<li>泛型</li>
+<li>生命期</li>
+<li>迭代器</li>
 </ul>
-<p>Let's add a new file called <code>second.rs</code>:</p>
+<p>让我们添加一个名为<code>second.rs</code>的新文件：</p>
 <pre><code class="language-rust ignore">// in lib.rs
 
 pub mod first;
 pub mod second;
 </code></pre>
-<p>And copy everything from <code>first.rs</code> into it.</p>
+<p>并将<code>first.rs</code>中的所有内容复制到其中。</p>
 
                     </main>
 
