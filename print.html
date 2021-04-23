@@ -1250,16 +1250,16 @@ pub mod second;
 </code></pre>
 <p>并将<code>first.rs</code>中的所有内容复制到其中。</p>
 <h1><a class="header" href="#使用option" id="使用option">使用Option</a></h1>
-<p>特别细心的读者可能已经注意到，我们实际上重新发明了一个非常糟糕的Option版本：</p>
+<p>细心的读者可能已经注意到，我们实际上重新发明了一个非常糟糕的Option版本：</p>
 <pre><code class="language-rust ignore">enum Link {
     Empty,
     More(Box&lt;Node&gt;),
 }
 </code></pre>
-<p>Link只是<code>Option&lt;Box&lt;Node&gt;&gt;</code>。现在，不用到处写<code>Option&lt;Box&lt;Node&gt;&gt;</code>已经很不错
-了，而且与<code>pop</code>不同的是，我们并没有把它暴露给外部世界，所以也许这很好。然而
-Option有一些<em>非常好</em>的方法，我们一直在手动实现。让我们<em>不要</em>这样做，用
-Options代替一切。首先，我们要做的是天真地重命名所有的东西，使用Some和None：</p>
+<p>Link只是<code>Option&lt;Box&lt;Node&gt;&gt;</code>。现在，可以不用到处写<code>Option&lt;Box&lt;Node&gt;&gt;</code>了，
+真不错。而且与<code>pop</code>不同的是，我们并没有把它暴露给外部世界，所以也许这很好。
+然而Option有一些<em>非常好</em>的方法，我们一直在手动实现。我们<em>不要</em>这样做，用
+Options代替一切。首先，我们要做的是简单地使用Some和None重命名所有的东西：</p>
 <pre><code class="language-rust ignore">use std::mem;
 
 pub struct List {
@@ -1356,7 +1356,7 @@ impl Drop for List {
     }
 }
 </code></pre>
-<p>第二，<code>match option { None =&gt; None, Some(x) =&gt; Some(y) }</code>是一个非常常见的成语，
+<p>第二，<code>match option { None =&gt; None, Some(x) =&gt; Some(y) }</code>是一个非常惯用的写法，
 以至于它被称为<code>map</code>。<code>map</code>需要一个函数来对<code>Some(x)</code>中的<code>x</code>执行，以产生<code>Some(y)</code>
 中的<code>y</code>。我们可以写一个适当的<code>fn</code>并把它传递给<code>map</code>，但我们更愿意写出<em>内联</em>要做什
 么。</p>
@@ -1623,34 +1623,28 @@ test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured
 
 </code></pre>
 <p>好多了！</p>
-<h1><a class="header" href="#intoiter" id="intoiter">IntoIter</a></h1>
-<p>Collections are iterated in Rust using the <em>Iterator</em> trait. It's a bit more
-complicated than <code>Drop</code>:</p>
+<h1><a class="header" href="#进入遍历" id="进入遍历">进入遍历</a></h1>
+<p>在Rust中使用<em>Iterator</em>特性对集合进行迭代。这比<code>Drop</code>要复杂一点：</p>
 <pre><code class="language-rust ignore">pub trait Iterator {
     type Item;
     fn next(&amp;mut self) -&gt; Option&lt;Self::Item&gt;;
 }
 </code></pre>
-<p>The new kid on the block here is <code>type Item</code>. This is declaring that every
-implementation of Iterator has an <em>associated type</em> called Item. In this case,
-this is the type that it can spit out when you call <code>next</code>.</p>
-<p>The reason Iterator yields <code>Option&lt;Self::Item&gt;</code> is because the interface
-coalesces the <code>has_next</code> and <code>get_next</code> concepts. When you have the next value,
-you yield
-<code>Some(value)</code>, and when you don't you yield <code>None</code>. This makes the
-API generally more ergonomic and safe to use and implement, while avoiding
-redundant checks and logic between <code>has_next</code> and <code>get_next</code>. Nice!</p>
-<p>Sadly, Rust has nothing like a <code>yield</code> statement (yet), so we're going to have to
-implement the logic ourselves. Also, there's actually 3 different kinds of
-iterator each collection should endeavour to implement:</p>
+<p>块里的新东西是<code>type Item</code>。这宣告了每个迭代器的实现都有一个<em>相关的类型</em>，叫做Item。
+在这种情况下，当你调用<code>next</code>时，它可以吐出这个类型。</p>
+<p>Iterator产生<code>Option&lt;Self::Item&gt;</code>的原因是该接口集成了<code>has_next</code>和<code>get_next</code>的概念。
+当你有下一个值时，你产生<code>Some(value)</code>，而当你没有时，你产生<code>None</code>。这使得API在使用
+和实现上更加符合人体工程学和安全，同时避免了<code>has_next</code>和<code>get_next</code>之间多余的检查和
+逻辑。很好!</p>
+<p>遗憾的是，Rust（现在还）没有类似<code>yield</code>语句的东西，所以我们必须自己实现这个逻辑。另
+外，每个集合应该努力实现3种不同的迭代器：</p>
 <ul>
 <li>IntoIter - <code>T</code></li>
 <li>IterMut - <code>&amp;mut T</code></li>
 <li>Iter - <code>&amp;T</code></li>
 </ul>
-<p>We actually already have all the tools to implement
-IntoIter using List's interface: just call <code>pop</code> over and over. As such, we'll
-just implement IntoIter as a newtype wrapper around List:</p>
+<p>实际上，我们已经有了使用List接口实现IntoIter的所有工具：只需不断地调用<code>pop</code>。因此，
+我们只需将IntoIter作为List的一个新类型包装器来实现：</p>
 <pre><code class="language-rust ignore">// Tuple structs are an alternative form of struct,
 // useful for trivial wrappers around other types.
 pub struct IntoIter&lt;T&gt;(List&lt;T&gt;);
@@ -1669,7 +1663,7 @@ impl&lt;T&gt; Iterator for IntoIter&lt;T&gt; {
     }
 }
 </code></pre>
-<p>And let's write a test:</p>
+<p>然后让我们写一个测试：</p>
 <pre><code class="language-rust ignore">#[test]
 fn into_iter() {
     let mut list = List::new();
@@ -1695,15 +1689,14 @@ test second::test::peek ... ok
 test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured
 
 </code></pre>
-<p>Nice!</p>
-<h1><a class="header" href="#iter" id="iter">Iter</a></h1>
-<p>Alright, let's try to implement Iter. This time we won't be able to rely on
-List giving us all the features we want. We'll need to roll our own. The
-basic logic we want is to hold a pointer to the current node we want to yield
-next. Because that node may not exist (the list is empty or we're otherwise
-done iterating), we want that reference to be an Option. When we yield an
-element, we want to proceed to the current node's <code>next</code> node.</p>
-<p>Alright, let's try that:</p>
+<p>棒！</p>
+<h1><a class="header" href="#遍历" id="遍历">遍历</a></h1>
+<p>好吧，让我们试着实现Iter。这一次，我们将不能依靠List提供我们想要的所有功能。我
+们需要推出我们自己的。我们想要的基本逻辑是持有一个指向当前节点的指针，我们想要
+产生下一个节点。因为这个节点可能不存在（列表是空的或者我们已经完成了迭代），我
+们希望这个引用是一个 Option。当我们产生一个元素时，我们希望继续到当前节点的下一
+个节点。</p>
+<p>好吧，我们来试试：</p>
 <pre><code class="language-rust ignore">pub struct Iter&lt;T&gt; {
     next: Option&lt;&amp;Node&lt;T&gt;&gt;,
 }
@@ -1739,9 +1732,9 @@ error[E0106]: missing lifetime specifier
 82 |     type Item = &amp;T;
    |                 ^ expected lifetime parameter
 </code></pre>
-<p>Oh god. Lifetimes. I've heard of these things. I hear they're a nightmare.</p>
-<p>Let's try something new: see that <code>error[E0106]</code> thing? That's a compiler error
-code. We can ask rustc to explain those with, well, <code>--explain</code>:</p>
+<p>哦，上帝。生命周期。我听说过这些事情。我听说它们是一场恶梦。</p>
+<p>让我们试试新的东西：看到那个<code>error[E0106]</code>的东西吗？那是一个编译器错误代码。我们可
+以让rustc用<code>--explain</code>来解释这些：</p>
 <pre><code class="language-text">&gt; rustc --explain E0106
 This error indicates that a lifetime is missing from a type. If it is an error
 inside a function signature, the problem may be with failing to adhere to the
@@ -1760,9 +1753,8 @@ type MyStr&lt;'a&gt; = &amp;'a str; //correct
 ...
 
 </code></pre>
-<p>That uh... that didn't really clarify much (these docs assume we understand
-Rust better than we currently do). But it looks like we should add
-those <code>'a</code> things to our struct? Let's try that.</p>
+<p>这......这并没有真正说明什么（这些文档假设我们比现在更了解Rust）。但看起来我们应该把
+这些<code>'a</code>添加到我们的结构中去？让我们试试吧。</p>
 <pre><code>pub struct Iter&lt;'a, T&gt; {
     next: Option&lt;&amp;'a Node&lt;T&gt;&gt;,
 }
@@ -1783,8 +1775,7 @@ error[E0106]: missing lifetime specifier
 
 error: aborting due to 2 previous errors
 </code></pre>
-<p>Alright I'm starting to see a pattern here... let's just add these little guys
-to everything we can:</p>
+<p>好吧，我开始看到一个模式......让我们把这些小家伙添加到我们能做的所有事情中：</p>
 <pre><code class="language-rust ignore">pub struct Iter&lt;'a, T&gt; {
     next: Option&lt;&amp;'a Node&lt;T&gt;&gt;,
 }
@@ -1825,49 +1816,34 @@ error[E0063]: missing field `next` in initializer of `second::Iter&lt;'_, _&gt;`
 77 |         Iter { next: self.head.map(|node| &amp;'a node) }
    |         ^^^^ missing `next`
 </code></pre>
-<p>Oh god. We broke Rust.</p>
-<p>Maybe we should actually figure out what the heck this <code>'a</code> lifetime stuff
-even means.</p>
-<p>Lifetimes can scare off a lot of people because
-they're a change to something we've known and loved since the dawn of
-programming. We've actually managed to dodge lifetimes so far, even though
-they've been tangled throughout our programs this whole time.</p>
-<p>Lifetimes are unnecessary in garbage collected languages because the garbage
-collector ensures that everything magically lives as long as it needs to. Most
-data in Rust is <em>manually</em> managed, so that data needs another solution. C and
-C++ give us a clear example what happens if you just let people take pointers
-to random data on the stack: pervasive unmanageable unsafety. This can be
-roughly separated into two classes of error:</p>
+<p>哦，上帝。我们搞坏了Rust。</p>
+<p>也许我们应该搞清楚这个<code>'a</code>生命周期到底是什么意思。</p>
+<p>生命周期会吓跑很多人，因为它是对我们从编程之初就知道并喜爱的东西的改变。到目前为止
+，我们实际上已经成功地避开了生命周期，尽管它们一直在我们的程序中纠缠不清。</p>
+<p>生命周期在垃圾收集语言中是不必要的，因为垃圾收集器会确保所有的东西都能神奇地活到它
+需要的时间。Rust中的大多数数据都是<em>人工</em>管理的，所以这些数据需要另一种解决方案。C
+和C++给了我们一个清晰的例子，如果你只是让人们在堆栈上拿指针去随机数据会发生什么：
+普遍的不可管理的不安全。这可以粗略地分为两类错误：</p>
 <ul>
-<li>Holding a pointer to something that went out of scope</li>
-<li>Holding a pointer to something that got mutated away</li>
+<li>持有一个超出范围的东西的指针</li>
+<li>持有一个指向被改变的东西的指针</li>
 </ul>
-<p>Lifetimes solve both of these problems, and 99% of the time, they do this in
-a totally transparent way.</p>
-<p>So what's a lifetime?</p>
-<p>Quite simply, a lifetime is the name of a region (~block/scope) of code somewhere in a program.
-That's it. When a reference is tagged with a lifetime, we're saying that it
-has to be valid for that <em>entire</em> region. Different things place requirements on
-how long a reference must and can be valid for. The entire lifetime system is in
-turn just a constraint-solving system that tries to minimize the region of every
-reference. If it successfully finds a set of lifetimes that satisfies all the
-constraints, your program compiles! Otherwise you get an error back saying that
-something didn't live long enough.</p>
-<p>Within a function body you generally can't talk about lifetimes, and wouldn't
-want to <em>anyway</em>. The compiler has full information and can infer all the
-contraints to find the minimum lifetimes. However at the type and API-level,
-the compiler <em>doesn't</em> have all the information. It requires you to tell it
-about the relationship between different lifetimes so it can figure out what
-you're doing.</p>
-<p>In principle, those lifetimes <em>could</em> also be left out, but
-then checking all the borrows would be a huge whole-program analysis that would
-produce mind-bogglingly non-local errors. Rust's system means all borrow
-checking can be done in each function body independently, and all your errors
-should be fairly local (or your types have incorrect signatures).</p>
-<p>But we've written references in function signatures before, and it was fine!
-That's because there are certain cases that are so common that Rust will
-automatically pick the lifetimes for you. This is <em>lifetime elision</em>.</p>
-<p>In particular:</p>
+<p>生命周期可以解决这两个问题，而且99%的情况下，它们是以一种完全透明的方式进行的。</p>
+<p>那么什么是生命周期呢？</p>
+<p>很简单，生命周期是程序中某个区域（~块/范围）代码的名称。就是这样。当一个引用被标记
+为生命周期时，我们是说它必须对<em>整个</em>区域有效。不同的东西对一个引用必须和可以在多长时
+间内有效提出了要求。整个生命周期系统又只是一个约束解决系统，它试图最小化每个引用的区
+域。如果它成功地找到了一组满足所有约束条件的生命周期，你的程序就可以编译了！否则你就
+会得到一个错误反馈，说什么东西的生命周期不够长。</p>
+<p>在一个函数体中，你一般不能谈论生命周期，而且也不想谈论。编译器有完整的信息，可以推断
+出所有的限制条件来找到最小的生命周期。然而在类型和API层面，编译器<em>并没有</em>所有的信息。
+它需要你告诉它不同生命周期之间的关系，这样它才能弄清楚你在做什么。</p>
+<p>原则上说，这些生命周期也<em>可以</em>不写，但这样一来，检查所有的借用将是一个巨大的全程序分
+析，会产生令人难以置信的非本地错误。Rust的系统意味着所有的借用检查都可以在每个函数体
+中独立完成，你的所有错误都应该是相当局部的（或者你的类型有错误的签名）。</p>
+<p>但是我们以前也在函数签名中写过引用，而且很好！为什么？这是因为有一些情况非常普遍，
+Rust会自动为你挑选生命周期。这就是<em>寿命消除</em>。</p>
+<p>特别地：</p>
 <pre><code class="language-rust ignore">// Only one reference in input, so the output must be derived from that input
 fn foo(&amp;A) -&gt; &amp;B; // sugar for:
 fn foo&lt;'a&gt;(&amp;'a A) -&gt; &amp;'a B;
@@ -1880,16 +1856,13 @@ fn foo&lt;'a, 'b, 'c&gt;(&amp;'a A, &amp;'b B, &amp;'c C);
 fn foo(&amp;self, &amp;B, &amp;C) -&gt; &amp;D; // sugar for:
 fn foo&lt;'a, 'b, 'c&gt;(&amp;'a self, &amp;'b B, &amp;'c C) -&gt; &amp;'a D;
 </code></pre>
-<p>So what does <code>fn foo&lt;'a&gt;(&amp;'a A) -&gt; &amp;'a B</code> <em>mean</em>? In practical terms, all it
-means is that the input must live at least as long as the output. So if you keep
-the output around for a long time, this will expand the region that the input must
-be valid for. Once you stop using the output, the compiler will know it's ok for
-the input to become invalid too.</p>
-<p>With this system set up, Rust can ensure nothing is used after free, and nothing
-is mutated while outstanding references exist. It just makes sure the
-constraints all work out!</p>
-<p>Alright. So. Iter.</p>
-<p>Let's roll back to the no lifetimes state:</p>
+<p>那么，<code>fn foo&lt;'a&gt;(&amp;'a A)-&gt;&amp;'a B</code>是什么<em>意思</em>？在实践中，它的意思是，输入必须至少与输
+出一样长。因此，如果你把输出保留很长一段时间，这将扩大输入必须有效的区域。一旦你停止使
+用输出，编译器就会知道输入也可以变得无效了。</p>
+<p>有了这个系统的设置，Rust可以确保在free之后没有任何东西被使用，而且在未完成的引用存在时
+没有任何东西被改变。它只是确保这些约束条件都能得到解决。</p>
+<p>好的。那么。Iter。</p>
+<p>让我们回到没有生命周期的状态：</p>
 <pre><code class="language-rust ignore">pub struct Iter&lt;T&gt; {
     next: Option&lt;&amp;Node&lt;T&gt;&gt;,
 }
@@ -1910,7 +1883,7 @@ impl&lt;T&gt; Iterator for Iter&lt;T&gt; {
     }
 }
 </code></pre>
-<p>We need to add lifetimes only in function and type signatures:</p>
+<p>我们只需要在函数和类型签名中添加生命期：</p>
 <pre><code class="language-rust ignore">// Iter is generic over *some* lifetime, it doesn't care
 pub struct Iter&lt;'a, T&gt; {
     next: Option&lt;&amp;'a Node&lt;T&gt;&gt;,
@@ -1941,7 +1914,7 @@ impl&lt;'a, T&gt; Iterator for Iter&lt;'a, T&gt; {
     }
 }
 </code></pre>
-<p>Alright, I think we got it this time y'all.</p>
+<p>好吧，我想这次我们得到了它，你们都。</p>
 <pre><code class="language-text">cargo build
 
 error[E0308]: mismatched types
@@ -1963,9 +1936,9 @@ error[E0308]: mismatched types
               found type `std::option::Option&lt;&amp;std::boxed::Box&lt;second::Node&lt;T&gt;&gt;&gt;`
 </code></pre>
 <p>(╯°□°)╯︵ ┻━┻</p>
-<p>OK. SO. We fixed our lifetime errors but now we're getting some new type errors.</p>
-<p>We want to be storing <code>&amp;Node</code>'s, but we're getting <code>&amp;Box&lt;Node&gt;</code>s. Ok, that's easy
-enough, we just need to dereference the Box before we take our reference:</p>
+<p>好的。所以。我们修复了我们的生命周期错误，但现在我们得到了一些新的类型错误。</p>
+<p>我们想存储<code>&amp;Node</code>的，但我们得到的是<code>&amp;Box&lt;Node&gt;</code>的。好吧，这很容易，我们只需
+要在引用之前取消对Box的引用：</p>
 <pre><code class="language-rust ignore">impl&lt;T&gt; List&lt;T&gt; {
     pub fn iter&lt;'a&gt;(&amp;'a self) -&gt; Iter&lt;'a, T&gt; {
         Iter { next: self.head.map(|node| &amp;*node) }
@@ -2009,8 +1982,8 @@ error[E0507]: cannot move out of borrowed content
    |                         ^^^^^^^^^ cannot move out of borrowed content
 </code></pre>
 <p>(ﾉಥ益ಥ）ﾉ﻿ ┻━┻</p>
-<p>We forgot <code>as_ref</code>, so we're moving the box into <code>map</code>, which means it would
-be dropped, which means our references would be dangling:</p>
+<p>我们忘记了<code>as_ref</code>，所以我们要把盒子移到<code>map</code>里，这意味着它将被丢弃，这意味着我
+们的引用将被悬空：</p>
 <pre><code class="language-rust ignore">pub struct Iter&lt;'a, T&gt; {
     next: Option&lt;&amp;'a Node&lt;T&gt;&gt;,
 }
@@ -2054,7 +2027,7 @@ error[E0308]: mismatched types
 
 </code></pre>
 <p>😭</p>
-<p><code>as_ref</code> added another layer of indirection we need to remove:</p>
+<p><code>as_ref</code>又增加了一层我们需要去除的间接性：</p>
 <pre><code class="language-rust ignore">pub struct Iter&lt;'a, T&gt; {
     next: Option&lt;&amp;'a Node&lt;T&gt;&gt;,
 }
@@ -2080,31 +2053,26 @@ impl&lt;'a, T&gt; Iterator for Iter&lt;'a, T&gt; {
 
 </code></pre>
 <p>🎉 🎉 🎉</p>
-<p>The as_deref and as-derf_mut functions are stable as of Rust 1.40. Before that you
-would need to do <code>map(|node| &amp;**node)</code> and <code>map(|node| &amp;mut**node)</code>.
-You may be thinking &quot;wow that <code>&amp;**</code> thing is really janky&quot;, and you're not wrong,
-but like a fine wine rust gets better over time and we no longer need to do such.
-Normally Rust is very good at doing this kind of conversion implicitly, through
-a process called <em>deref coercion</em>, where basically it can insert *'s
-throughout your code to make it type-check. It can do this because we have the
-borrow checker to ensure we never mess up pointers!</p>
-<p>But in this case the closure in conjunction with the fact that we
-have an <code>Option&lt;&amp;T&gt;</code> instead of <code>&amp;T</code> is a bit too complicated for it to work
-out, so we need to help it by being explicit. Thankfully this is pretty rare, in my experience.</p>
-<p>Just for completeness' sake, we <em>could</em> give it a <em>different</em> hint with the <em>turbofish</em>:</p>
+<p>as_deref和as-derf_mut函数在Rust 1.40中已经稳定。在此之前，你需要做<code>map(|node| &amp;**node)</code>
+和<code>map(|node| &amp;mut**node)</code>。你可能会想&quot;哇，那个<code>&amp;**</code>的东西真的很古怪&quot;，你没有错，但就像美
+酒一样，Rust会随着时间的推移变得更好，我们不再需要这样做。通常情况下，Rust非常善于隐式地进
+行这种转换，通过一个叫做<em>deref coercion</em>的过程，基本上它可以在你的代码中插入*，使其进行类
+型检查。它可以做到这一点，因为我们有借贷检查器来确保我们不会弄乱指针！</p>
+<p>但是在这种情况下，闭合与我们有一个<code>Option&lt;&amp;T&gt;</code>而不是<code>&amp;T</code>的事实相结合，对它来说有点太复杂了，
+所以我们需要通过明确的方式来帮助它。值得庆幸的是，根据我的经验，这种情况相当少见。</p>
+<p>为了完整起见，我们<em>可以</em>用<em>Turbofish</em>给它一个<em>不同</em>的提示：</p>
 <pre><code class="language-rust ignore">    self.next = node.next.as_ref().map::&lt;&amp;Node&lt;T&gt;, _&gt;(|node| &amp;node);
 </code></pre>
-<p>See, map is a generic function:</p>
+<p>看，map是一个泛型函数：</p>
 <pre><code class="language-rust ignore">pub fn map&lt;U, F&gt;(self, f: F) -&gt; Option&lt;U&gt;
 </code></pre>
-<p>The turbofish, <code>::&lt;&gt;</code>, lets us tell the compiler what we think the types of those
-generics should be. In this case <code>::&lt;&amp;Node&lt;T&gt;, _&gt;</code> says &quot;it should return a
-<code>&amp;Node&lt;T&gt;</code>, and I don't know/care about that other type&quot;.</p>
-<p>This in turn lets the compiler know that <code>&amp;node</code> should have deref coercion
-applied to it, so we don't need to manually apply all those *'s!</p>
-<p>But in this case I don't think it's really an improvement, this was just a
-thinly veiled excuse to show off deref coercion and the sometimes-useful turbofish. 😅</p>
-<p>Let's write a test to be sure we didn't no-op it or anything:</p>
+<p>涡轮鱼，<code>:&lt;&gt;</code>，让我们告诉编译器我们认为这些泛型的类型应该是什么。在这个例子中
+<code>::&lt;&amp;Node&lt;T&gt;, _&gt;</code>说 &quot;它应该返回一个<code>&amp;Node&lt;T&gt;</code>，而我不知道/不关心其他类型&quot;。</p>
+<p>这反过来又让编译器知道<code>&amp;node</code>应该被应用于解引用强制转换，所以我们不需要手动应用所有这
+些*!</p>
+<p>但在这种情况下，我不认为这真的是一种改进，这只是一个薄薄的借口，来展示解引用强制转换和
+有时有用的涡轮鱼。😅</p>
+<p>让我们写一个测试，以确定我们没有拒绝它或任何东西：</p>
 <pre><code class="language-rust ignore">#[test]
 fn iter() {
     let mut list = List::new();
@@ -2130,52 +2098,50 @@ test second::test::peek ... ok
 test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured
 
 </code></pre>
-<p>Heck yeah.</p>
-<p>Finally, it should be noted that we <em>can</em> actually apply lifetime elision here:</p>
+<p>赫赫有名。</p>
+<p>最后，应该指出的是，我们实际上可以在这里应用生命周期消除：</p>
 <pre><code class="language-rust ignore">impl&lt;T&gt; List&lt;T&gt; {
     pub fn iter&lt;'a&gt;(&amp;'a self) -&gt; Iter&lt;'a, T&gt; {
         Iter { next: self.head.as_deref() }
     }
 }
 </code></pre>
-<p>is equivalent to:</p>
+<p>等同于：</p>
 <pre><code class="language-rust ignore">impl&lt;T&gt; List&lt;T&gt; {
     pub fn iter(&amp;self) -&gt; Iter&lt;T&gt; {
         Iter { next: self.head.as_deref() }
     }
 }
 </code></pre>
-<p>Yay fewer lifetimes!</p>
-<p>Or, if you're not comfortable &quot;hiding&quot; that a struct contains a lifetime,
-you can use the Rust 2018 &quot;explicitly elided lifetime&quot; syntax,  <code>'_</code>:</p>
+<p>更少的生命期!</p>
+<p>或者，如果你不愿意&quot;隐藏&quot;一个结构包含一个生命周期，你可以使用Rust 2018的“
+明确删除生命周期”语法，<code>'_</code>：</p>
 <pre><code class="language-rust ignore">impl&lt;T&gt; List&lt;T&gt; {
     pub fn iter(&amp;self) -&gt; Iter&lt;'_, T&gt; {
         Iter { next: self.head.as_deref() }
     }
 }
 </code></pre>
-<h1><a class="header" href="#itermut" id="itermut">IterMut</a></h1>
-<p>I'm gonna be honest, IterMut is WILD. Which in itself seems like a wild
-thing to say; surely it's identical to Iter!</p>
-<p>Semantically, yes, but the nature of shared and mutable references means
-that Iter is &quot;trivial&quot; while IterMut is Legit Wizard Magic.</p>
-<p>The key insight comes from our implementation of Iterator for Iter:</p>
+<h1><a class="header" href="#可变遍历" id="可变遍历">可变遍历</a></h1>
+<p>老实说，可变遍历是很疯狂的。这本身就像是一个疯狂的说法；它肯定与Iter相同！</p>
+<p>从语义上讲，是的，但是共享和可变引用的本质意味着Iter是&quot;微不足道的&quot;，而
+IterMut是合法的巫师魔法。</p>
+<p>关键的洞察力来自于我们对Iter的Iterator的实现：</p>
 <pre><code class="language-rust ignore">impl&lt;'a, T&gt; Iterator for Iter&lt;'a, T&gt; {
     type Item = &amp;'a T;
 
     fn next(&amp;mut self) -&gt; Option&lt;Self::Item&gt; { /* stuff */ }
 }
 </code></pre>
-<p>Which can be desugarred to:</p>
+<p>这可以被解开语法糖为：</p>
 <pre><code class="language-rust ignore">impl&lt;'a, T&gt; Iterator for Iter&lt;'a, T&gt; {
     type Item = &amp;'a T;
 
     fn next&lt;'b&gt;(&amp;'b mut self) -&gt; Option&lt;&amp;'a T&gt; { /* stuff */ }
 }
 </code></pre>
-<p>The signature of <code>next</code> establishes <em>no</em> constraint between the lifetime
-of the input and the output! Why do we care? It means we can call <code>next</code>
-over and over unconditionally!</p>
+<p><code>next</code>的签名在输入和输出的生命周期之间<em>没有</em>建立任何约束! 我们为什么要关心这
+个？这意味着我们可以无条件地一次又一次地调用<code>next</code>!</p>
 <pre><code class="language-rust ignore">let mut list = List::new();
 list.push(1); list.push(2); list.push(3);
 
@@ -2184,14 +2150,12 @@ let x = iter.next().unwrap();
 let y = iter.next().unwrap();
 let z = iter.next().unwrap();
 </code></pre>
-<p>Cool!</p>
-<p>This is <em>definitely fine</em> for shared references because the whole point is that
-you can have tons of them at once. However mutable references <em>can't</em> coexist.
-The whole point is that they're exclusive.</p>
-<p>The end result is that it's notably harder to write IterMut using safe
-code (and we haven't gotten into what that even means yet...). Surprisingly,
-IterMut can actually be implemented for many structures completely safely!</p>
-<p>We'll start by just taking the Iter code and changing everything to be mutable:</p>
+<p>酷！</p>
+<p>这对共享引用来说<em>绝对是好的</em>，因为整个要点是你可以同时拥有大量的引用。然而，易变的
+引用<em>不能</em>共存。重点是它们是排他性的。</p>
+<p>最终的结果是，使用安全的代码来编写IterMut是非常困难的（我们还没有深入了解这意味着
+什么......）。令人惊讶的是，IterMut实际上可以完全安全地实现许多结构!</p>
+<p>我们将从Iter的代码开始，把所有的东西都改成可变的：</p>
 <pre><code class="language-rust ignore">pub struct IterMut&lt;'a, T&gt; {
     next: Option&lt;&amp;'a mut Node&lt;T&gt;&gt;,
 }
@@ -2228,36 +2192,29 @@ error[E0507]: cannot move out of borrowed content
 103 |         self.next.map(|node| {
     |         ^^^^^^^^^ cannot move out of borrowed content
 </code></pre>
-<p>Ok looks like we've got two different errors here. The first one looks really clear
-though, it even tells us how to fix it! You can't upgrade a shared reference to a mutable
-one, so <code>iter_mut</code> needs to take <code>&amp;mut self</code>. Just a silly copy-paste error.</p>
+<p>好吧，看起来我们在这里有两个不同的错误。第一个错误看起来非常清楚，它甚至告诉我们如何解决它！你
+不能把一个共享的引用升级为一个可变的引用，所以<code>iter_mut</code>需要把<code>&amp;mut self</code>。只是一个愚蠢的复制
+粘贴错误。</p>
 <pre><code class="language-rust ignore">pub fn iter_mut(&amp;mut self) -&gt; IterMut&lt;'_, T&gt; {
     IterMut { next: self.head.as_deref_mut() }
 }
 </code></pre>
-<p>What about the other one?</p>
-<p>Oops! I actually accidentally made an error when writing the <code>iter</code> impl in
-the previous section, and we were just getting lucky that it worked!</p>
-<p>We have just had our first run in with the magic of Copy. When we introduced <a href="first-ownership.html">ownership</a> we
-said that when you move stuff, you can't use it anymore. For some types, this
-makes perfect sense. Our good friend Box manages an allocation on the heap for
-us, and we certainly don't want two pieces of code to think that they need to
-free its memory.</p>
-<p>However for other types this is <em>garbage</em>. Integers have no
-ownership semantics; they're just meaningless numbers! This is why integers are
-marked as Copy. Copy types are known to be perfectly copyable by a bitwise copy.
-As such, they have a super power: when moved, the old value <em>is</em> still usable.
-As a consequence, you can even move a Copy type out of a reference without
-replacement!</p>
-<p>All numeric primitives in rust (i32, u64, bool, f32, char, etc...) are Copy.
-You can also declare any user-defined type to be Copy as well, as long as
-all its components are Copy.</p>
-<p>Critically to why this code was working, shared references are also Copy!
-Because <code>&amp;</code> is copy, <code>Option&lt;&amp;&gt;</code> is <em>also</em> Copy. So when we did <code>self.next.map</code> it
-was fine because the Option was just copied. Now we can't do that, because
-<code>&amp;mut</code> isn't Copy (if you copied an &amp;mut, you'd have two &amp;mut's to the same
-location in memory, which is forbidden). Instead, we should properly <code>take</code>
-the Option to get it.</p>
+<p>那另一个呢？</p>
+<p>哎呀! 其实我在写上一节的<code>iter</code> impl时不小心犯了一个错误，我们只是在侥幸地认为它成
+功了!</p>
+<p>我们刚刚第一次接触到了Copy的魔力。当我们介绍<a href="first-ownership.html">所有权</a>时，我们说当你移动
+东西时，你就不能再使用它了。对于某些类型，这是很有意义的。我们的好朋友Box为我们管理
+着堆上的分配，我们当然不希望有两段代码认为它们需要释放它的内存。</p>
+<p>然而，对于其他类型来说，这就是<em>垃圾</em>了。整数没有所有权语义；它们只是无意义的数字！
+这就是为什么整数被标记为Copy。众所周知，Copy类型是完全可以通过比特拷贝的方式来复制
+的。因此，它们有一个超级能力：当被移动时，旧的值仍然<em>可以</em>使用。因此，你甚至可以将
+一个Copy类型从一个引用中移出而不需要替换</p>
+<p>rust中所有的数字基元（i32, u64, bool, f32, char, etc...）都是Copy。你也可以声明任
+何用户定义的类型是Copy，只要它的所有组件都是Copy。</p>
+<p>最关键的是，共享引用也是Copy! 因为<code>&amp;</code>是Copy，<code>Option&lt;&amp;&gt;</code><em>也</em>是Copy。所以当我们做
+<code>self.next.map</code>的时候就很好，因为Option只是被复制了。现在我们不能这样做了，因为
+<code>&amp;mut</code>不是Copy（如果你复制了一个&amp;mut，你就会有两个&amp;mut到内存的同一个位置，这是禁止
+的）。相反，我们应该正确地<code>take</code> Option来获得它。</p>
 <pre><code class="language-rust ignore">fn next(&amp;mut self) -&gt; Option&lt;Self::Item&gt; {
     self.next.take().map(|node| {
         self.next = node.next.as_deref_mut();
@@ -2268,8 +2225,8 @@ the Option to get it.</p>
 <pre><code class="language-text">&gt; cargo build
 
 </code></pre>
-<p>Uh... wow. Holy shit! IterMut Just Works!</p>
-<p>Let's test this:</p>
+<p>呃......哇。我的妈呀 IterMut跑起来了!</p>
+<p>让我们测试一下这个：</p>
 <pre><code class="language-rust ignore">#[test]
 fn iter_mut() {
     let mut list = List::new();
@@ -2296,29 +2253,26 @@ test second::test::peek ... ok
 test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured
 
 </code></pre>
-<p>Yep. It works.</p>
-<p>Holy shit.</p>
-<p>What.</p>
-<p>Ok I mean it actually <em>is</em> supposed to work, but there's usually something
-stupid that gets in the way! Let's be clear here:</p>
-<p>We have just implemented a piece of code that takes a singly-linked list, and
-returns a mutable reference to every single element in the list at most once.
-And it's statically verified to do that. And it's totally safe. And we didn't
-have to do anything wild.</p>
-<p>That's kind of a big deal, if you ask me. There are a couple reasons why
-this works:</p>
+<p>是的。它是有效的。</p>
+<p>真他妈的。</p>
+<p>什么。</p>
+<p>好吧，我的意思是它实际上<em>是</em>应该工作的，但通常会有一些愚蠢的东西挡住了它的去路! 让
+我们在这里说清楚：</p>
+<p>我们刚刚实现了一段代码，它接收了一个单链的列表，并且最多返回一次列表中每个元素的可变
+引用。而且它是经过静态验证的，可以做到这一点。它是完全安全的。我们不需要做任何疯狂的
+事情。</p>
+<p>如果你问我，这是件大事。有几个原因可以说明这一点：</p>
 <ul>
-<li>We <code>take</code> the <code>Option&lt;&amp;mut&gt;</code> so we have exclusive access to the mutable
-reference. No need to worry about someone looking at it again.</li>
-<li>Rust understands that it's ok to shard a mutable reference into the subfields
-of the pointed-to struct, because there's no way to &quot;go back up&quot;, and they're
-definitely disjoint.</li>
+<li>我们<code>take</code> <code>Option&lt;&amp;mut&gt;</code>，所以我们可以独占地访问可变的引用。不需要担心有人会再看
+它。</li>
+<li>Rust知道把一个可变引用分散到指向的结构的子字段中是可以的，因为没有办法&quot;回到上面&quot;，
+而且它们肯定是不相干的。</li>
 </ul>
-<p>It turns out that you can apply this basic logic to get a safe IterMut for an
-array or a tree as well! You can even make the iterator DoubleEnded, so that
-you can consume the iterator from the front <em>and</em> the back at once! Woah!</p>
+<p>事实证明，你也可以应用这个基本逻辑来为数组或树获得一个安全的IterMut！你甚至可以把迭代
+器变成一个安全的迭代器。你甚至可以让迭代器变成DoubleEnded，这样你就可以同时从前面和后
+面消耗迭代器了。呜呼!</p>
 <h1><a class="header" href="#final-code" id="final-code">Final Code</a></h1>
-<p>Alright, that's it for the second list; here's the final code!</p>
+<p>好了，第二份清单就到此为止；这是最后的代码！</p>
 <pre><pre class="playpen"><code class="language-rust">
 # #![allow(unused_variables)]
 #fn main() {
@@ -2514,7 +2468,7 @@ mod test {
 }
 
 #}</code></pre></pre>
-<p>Getting beefier!</p>
+<p>越来越强壮了!</p>
 <h1><a class="header" href="#a-persistent-singly-linked-stack" id="a-persistent-singly-linked-stack">A Persistent Singly-Linked Stack</a></h1>
 <p>Alright, we've mastered the art of mutable singly-linked stacks.</p>
 <p>Let's move from <em>single</em> ownership to <em>shared</em> ownership by writing a
@@ -3819,7 +3773,7 @@ test result: ok. 10 passed; 0 failed; 0 ignored; 0 measured
 <p>Nice. Copy-pasting is the best kind of programming.</p>
 <h1><a class="header" href="#iteration" id="iteration">Iteration</a></h1>
 <p>Let's take a crack at iterating this bad-boy.</p>
-<h2><a class="header" href="#intoiter-1" id="intoiter-1">IntoIter</a></h2>
+<h2><a class="header" href="#intoiter" id="intoiter">IntoIter</a></h2>
 <p>IntoIter, as always, is going to be the easiest. Just wrap the stack and
 call <code>pop</code>:</p>
 <pre><code class="language-rust ignore">pub struct IntoIter&lt;T&gt;(List&lt;T&gt;);
@@ -3896,7 +3850,7 @@ test result: ok. 11 passed; 0 failed; 0 ignored; 0 measured
 
 </code></pre>
 <p>Nice.</p>
-<h2><a class="header" href="#iter-1" id="iter-1">Iter</a></h2>
+<h2><a class="header" href="#iter" id="iter">Iter</a></h2>
 <p>Iter will be a bit less forgiving. We'll have to deal with those awful <code>Ref</code>
 things again! Because of Refs, we can't store <code>&amp;Node</code>s like we did before.
 Instead, let's try to store <code>Ref&lt;Node&gt;</code>s:</p>

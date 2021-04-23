@@ -145,34 +145,28 @@
 
                 <div id="content" class="content">
                     <main>
-                        <h1><a class="header" href="#intoiter" id="intoiter">IntoIter</a></h1>
-<p>Collections are iterated in Rust using the <em>Iterator</em> trait. It's a bit more
-complicated than <code>Drop</code>:</p>
+                        <h1><a class="header" href="#进入遍历" id="进入遍历">进入遍历</a></h1>
+<p>在Rust中使用<em>Iterator</em>特性对集合进行迭代。这比<code>Drop</code>要复杂一点：</p>
 <pre><code class="language-rust ignore">pub trait Iterator {
     type Item;
     fn next(&amp;mut self) -&gt; Option&lt;Self::Item&gt;;
 }
 </code></pre>
-<p>The new kid on the block here is <code>type Item</code>. This is declaring that every
-implementation of Iterator has an <em>associated type</em> called Item. In this case,
-this is the type that it can spit out when you call <code>next</code>.</p>
-<p>The reason Iterator yields <code>Option&lt;Self::Item&gt;</code> is because the interface
-coalesces the <code>has_next</code> and <code>get_next</code> concepts. When you have the next value,
-you yield
-<code>Some(value)</code>, and when you don't you yield <code>None</code>. This makes the
-API generally more ergonomic and safe to use and implement, while avoiding
-redundant checks and logic between <code>has_next</code> and <code>get_next</code>. Nice!</p>
-<p>Sadly, Rust has nothing like a <code>yield</code> statement (yet), so we're going to have to
-implement the logic ourselves. Also, there's actually 3 different kinds of
-iterator each collection should endeavour to implement:</p>
+<p>块里的新东西是<code>type Item</code>。这宣告了每个迭代器的实现都有一个<em>相关的类型</em>，叫做Item。
+在这种情况下，当你调用<code>next</code>时，它可以吐出这个类型。</p>
+<p>Iterator产生<code>Option&lt;Self::Item&gt;</code>的原因是该接口集成了<code>has_next</code>和<code>get_next</code>的概念。
+当你有下一个值时，你产生<code>Some(value)</code>，而当你没有时，你产生<code>None</code>。这使得API在使用
+和实现上更加符合人体工程学和安全，同时避免了<code>has_next</code>和<code>get_next</code>之间多余的检查和
+逻辑。很好!</p>
+<p>遗憾的是，Rust（现在还）没有类似<code>yield</code>语句的东西，所以我们必须自己实现这个逻辑。另
+外，每个集合应该努力实现3种不同的迭代器：</p>
 <ul>
 <li>IntoIter - <code>T</code></li>
 <li>IterMut - <code>&amp;mut T</code></li>
 <li>Iter - <code>&amp;T</code></li>
 </ul>
-<p>We actually already have all the tools to implement
-IntoIter using List's interface: just call <code>pop</code> over and over. As such, we'll
-just implement IntoIter as a newtype wrapper around List:</p>
+<p>实际上，我们已经有了使用List接口实现IntoIter的所有工具：只需不断地调用<code>pop</code>。因此，
+我们只需将IntoIter作为List的一个新类型包装器来实现：</p>
 <pre><code class="language-rust ignore">// Tuple structs are an alternative form of struct,
 // useful for trivial wrappers around other types.
 pub struct IntoIter&lt;T&gt;(List&lt;T&gt;);
@@ -191,7 +185,7 @@ impl&lt;T&gt; Iterator for IntoIter&lt;T&gt; {
     }
 }
 </code></pre>
-<p>And let's write a test:</p>
+<p>然后让我们写一个测试：</p>
 <pre><code class="language-rust ignore">#[test]
 fn into_iter() {
     let mut list = List::new();
@@ -217,7 +211,7 @@ test second::test::peek ... ok
 test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured
 
 </code></pre>
-<p>Nice!</p>
+<p>棒！</p>
 
                     </main>
 

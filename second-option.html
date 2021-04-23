@@ -146,16 +146,16 @@
                 <div id="content" class="content">
                     <main>
                         <h1><a class="header" href="#使用option" id="使用option">使用Option</a></h1>
-<p>特别细心的读者可能已经注意到，我们实际上重新发明了一个非常糟糕的Option版本：</p>
+<p>细心的读者可能已经注意到，我们实际上重新发明了一个非常糟糕的Option版本：</p>
 <pre><code class="language-rust ignore">enum Link {
     Empty,
     More(Box&lt;Node&gt;),
 }
 </code></pre>
-<p>Link只是<code>Option&lt;Box&lt;Node&gt;&gt;</code>。现在，不用到处写<code>Option&lt;Box&lt;Node&gt;&gt;</code>已经很不错
-了，而且与<code>pop</code>不同的是，我们并没有把它暴露给外部世界，所以也许这很好。然而
-Option有一些<em>非常好</em>的方法，我们一直在手动实现。让我们<em>不要</em>这样做，用
-Options代替一切。首先，我们要做的是天真地重命名所有的东西，使用Some和None：</p>
+<p>Link只是<code>Option&lt;Box&lt;Node&gt;&gt;</code>。现在，可以不用到处写<code>Option&lt;Box&lt;Node&gt;&gt;</code>了，
+真不错。而且与<code>pop</code>不同的是，我们并没有把它暴露给外部世界，所以也许这很好。
+然而Option有一些<em>非常好</em>的方法，我们一直在手动实现。我们<em>不要</em>这样做，用
+Options代替一切。首先，我们要做的是简单地使用Some和None重命名所有的东西：</p>
 <pre><code class="language-rust ignore">use std::mem;
 
 pub struct List {
@@ -252,7 +252,7 @@ impl Drop for List {
     }
 }
 </code></pre>
-<p>第二，<code>match option { None =&gt; None, Some(x) =&gt; Some(y) }</code>是一个非常常见的成语，
+<p>第二，<code>match option { None =&gt; None, Some(x) =&gt; Some(y) }</code>是一个非常惯用的写法，
 以至于它被称为<code>map</code>。<code>map</code>需要一个函数来对<code>Some(x)</code>中的<code>x</code>执行，以产生<code>Some(y)</code>
 中的<code>y</code>。我们可以写一个适当的<code>fn</code>并把它传递给<code>map</code>，但我们更愿意写出<em>内联</em>要做什
 么。</p>
