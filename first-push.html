@@ -179,12 +179,12 @@ error[E0507]: cannot move out of borrowed content
 19 |             next: self.head,
    |                   ^^^^^^^^^ cannot move out of borrowed content
 </code></pre>
-<p>不——。Rust正告诉我们正确的事情，但它到底意味着什么，或者该怎么做，肯定不太显然：</p>
+<p>不——。Rust正告诉我们正确的事情，但它到底是什么意思，或者对它该怎么做，肯定不太显然：</p>
 <blockquote>
-<p>cannot move out of borrowed content</p>
+<p>不能移出借用的上下文</p>
 </blockquote>
 <p>我们想把<code>self.head</code>字段移到<code>next</code>，但Rust不希望我们这么做。这将使<code>self</code>在我们结束
-借用并将其&quot;还给&quot;它的合法所有者时，只被部分初始化。正如我们之前说过的，这是你不能用
+借用并将其“还给”它的合法所有者时，只被部分初始化。正如我们之前说过的，这是你不能用
 <code>&amp;mut</code>做的<em>一件</em>事：这将是超级无礼的，而Rust是非常有礼貌的（这也将是难以置信的危险
 ，但<em>这</em>肯定不是它关心的原因）。</p>
 <p>如果我们把东西放回去呢？也就是我们正在创建的节点：</p>
@@ -209,7 +209,8 @@ error[E0507]: cannot move out of borrowed content
 的Rust黑客Indiana Jones：</p>
 <p><img src="img/indy.gif" alt="Indy Prepares to mem::replace" /></p>
 <p>啊，对了，Indy建议使用<code>mem::replace</code>手法。这个非常有用的函数可以让我们通过用另一个值<em>替
-换</em>来偷取一个借入的值。让我们在文件的顶部拉入<code>std::mem</code>，这样<code>mem</code>就在本地范围内：</p>
+换</em>来从一个借用中偷取出来一个值。让我们在文件的顶部拉入<code>std::mem</code>，这样<code>mem</code>就在本地作
+用域内：</p>
 <pre><code class="language-rust ignore">use std::mem;
 </code></pre>
 <p>并适当地使用它：</p>
@@ -222,8 +223,8 @@ error[E0507]: cannot move out of borrowed content
     self.head = Link::More(new_node);
 }
 </code></pre>
-<p>在这里，我们用Link::Empty暂时<code>替换</code>self.head，然后再替换成列表的新头。我不会撒谎：
-这是一件非常不幸的事情。很遗憾，我们必须这么做（目前）。</p>
+<p>在这里，我们用Link::Empty暂时<code>replace</code>到self.head，然后再把self.head换成列表的新头。
+我不会撒谎：这是一件非常不幸的事情。很遗憾，我们必须这么做（目前）。</p>
 <p>但是，嘿，<code>push</code>全部完成! 可能吧。我们也许应该测试一下，说实话。现在，最简单的方法
 可能是写<code>pop</code>，并确保它产生正确的结果。</p>
 
