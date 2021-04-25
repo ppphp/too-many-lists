@@ -145,16 +145,13 @@
 
                 <div id="content" class="content">
                     <main>
-                        <h1><a class="header" href="#an-unsafe-singly-linked-queue" id="an-unsafe-singly-linked-queue">An Unsafe Singly-Linked Queue</a></h1>
-<p>Ok that reference-counted interior mutability stuff got a little out of
-control. Surely Rust doesn't really expect you to do that sort of thing
-in general? Well, yes and no. Rc and Refcell can be great for handling
-simple cases, but they can get unwieldy. Especially if you
-want to hide that it's happening. There's gotta be a better way!</p>
-<p>In this chapter we're going to roll back to singly-linked lists and
-implement a singly-linked queue to dip our toes into <em>raw pointers</em>
-and <em>Unsafe Rust</em>.</p>
-<p>Let's add a new file called <code>fifth.rs</code>:</p>
+                        <h1><a class="header" href="#一个不安全的单连接队列" id="一个不安全的单连接队列">一个不安全的单连接队列</a></h1>
+<p>好吧，那个引用计算的内部可变性的东西有点失控了。当然，Rust并不希望你在一般
+情况下做这样的事情？嗯，是的，也不是。Rc和Refcell可以很好地处理简单的情况，
+但它们可能会变得不方便。特别是如果你想隐藏它的发生。一定会有更好的方法!</p>
+<p>在这一章中，我们将回到单链列表，并实现一个单链队列，来尝试一下原始指针和<em>不
+安全的Rust</em>。</p>
+<p>让我们添加一个名为<code>fifth.rs</code>的新文件：</p>
 <pre><code class="language-rust ignore">// in lib.rs
 
 pub mod first;
@@ -163,10 +160,8 @@ pub mod third;
 pub mod fourth;
 pub mod fifth;
 </code></pre>
-<p>Our code is largely going to be derived from second.rs, since a queue is
-mostly an augmentation of a stack in the world of linked lists. Still, we're
-going to go from scratch because there's some fundamental issues we want to
-address with layout and what-not.</p>
+<p>我们的代码主要来自second.rs，因为队列在链表的世界里主要是对堆栈的一种增强。不过，
+我们还是要从头开始，因为我们要解决一些关于布局和其他方面的基本问题。</p>
 
                     </main>
 

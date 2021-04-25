@@ -145,9 +145,8 @@
 
                 <div id="content" class="content">
                     <main>
-                        <h1><a class="header" href="#breaking-down" id="breaking-down">Breaking Down</a></h1>
-<p><code>pop_front</code> should be the same basic logic as <code>push_front</code>, but backwards. Let's
-try:</p>
+                        <h1><a class="header" href="#崩溃" id="崩溃">崩溃</a></h1>
+<p><code>pop_front</code>应该是与<code>push_front</code>相同的基本逻辑，但要倒过来。我们来试试：</p>
 <pre><code class="language-rust ignore">pub fn pop_front(&amp;mut self) -&gt; Option&lt;T&gt; {
     // need to take the old head, ensuring it's -2
     self.head.take().map(|old_head| {                         // -1 old
@@ -176,7 +175,7 @@ error[E0609]: no field `elem` on type `std::rc::Rc&lt;std::cell::RefCell&lt;four
 64 |             old_head.elem
    |                      ^^^^ unknown field
 </code></pre>
-<p>ACK. <em>RefCells</em>. Gotta <code>borrow_mut</code> again I guess...</p>
+<p>啊。<em>RefCells</em>. 我想，又得<code>borrow_mut</code>了...</p>
 <pre><code class="language-rust ignore">pub fn pop_front(&amp;mut self) -&gt; Option&lt;T&gt; {
     self.head.take().map(|old_head| {
         match old_head.borrow_mut().next.take() {
@@ -200,19 +199,19 @@ error[E0507]: cannot move out of borrowed content
 64 |             old_head.borrow_mut().elem
    |             ^^^^^^^^^^^^^^^^^^^^^^^^^^ cannot move out of borrowed content
 </code></pre>
-<p><em>sigh</em></p>
+<p><em>叹息</em></p>
 <blockquote>
-<p>cannot move out of borrowed content</p>
+<p>不能移出借用的内容</p>
 </blockquote>
-<p>Hrm... It seems that Box was <em>really</em> spoiling us. <code>borrow_mut</code> only gets us
-an <code>&amp;mut Node&lt;T&gt;</code>, but we can't move out of that!</p>
-<p>We need something that takes a <code>RefCell&lt;T&gt;</code> and gives us a <code>T</code>. Let's check
-<a href="https://doc.rust-lang.org/std/cell/struct.RefCell.html">the docs</a> for something like that:</p>
+<p>嗯... 看来盒子真的是宠坏了我们。<code>borrow_mut</code>只能得到一个<code>&amp;mut Node&lt;T&gt;</code>，但我
+们不能从那里移出！</p>
+<p>我们需要一个能接收<code>RefCell&lt;T&gt;</code>并给我们一个<code>T</code>的东西，让我们看看<a href="https://doc.rust-lang.org/std/cell/struct.RefCell.html">文档</a>
+中是否有这样的东西：</p>
 <blockquote>
 <p><code>fn into_inner(self) -&gt; T</code></p>
-<p>Consumes the RefCell, returning the wrapped value.</p>
+<p>消费RefCell，返回被包装的值。</p>
 </blockquote>
-<p>That looks promising!</p>
+<p>这看起来很有希望！</p>
 <pre><code class="language-rust ignore">old_head.into_inner().elem
 </code></pre>
 <pre><code class="language-text">&gt; cargo build
@@ -223,22 +222,18 @@ error[E0507]: cannot move out of an `Rc`
 64 |             old_head.into_inner().elem
    |             ^^^^^^^^ cannot move out of an `Rc`
 </code></pre>
-<p>Ah dang. <code>into_inner</code> wants to move out the RefCell, but we can't, because it's
-in an <code>Rc</code>. As we saw in the previous chapter, <code>Rc&lt;T&gt;</code> only lets us get shared references
-into its internals. That makes sense, because that's <em>the whole point</em> of
-reference counted pointers: they're shared!</p>
-<p>This was a problem for us when we wanted to implement Drop for our reference
-counted list, and the solution is the same: <code>Rc::try_unwrap</code>, which moves out
-the contents of an Rc if its refcount is 1.</p>
+<p>啊偶。<code>into_inner</code>想要移出RefCell，但是我们不能，因为它在一个<code>Rc</code>中。正如我们在上一章看到的，
+<code>Rc&lt;T&gt;</code>只允许我们把共享的引用移到它的内部。这是有道理的，因为这就是引用计数指针的<em>全部意义</em>：
+它们是共享的！</p>
+<p>当我们想为我们的引用计数列表实现Drop时，这是一个问题，解决方案也是一样的：<code>Rc::try_unwrap</code>，
+如果一个Rc的refcount是1，它将移出其内容。</p>
 <pre><code class="language-rust ignore">Rc::try_unwrap(old_head).unwrap().into_inner().elem
 </code></pre>
-<p><code>Rc::try_unwrap</code> returns a <code>Result&lt;T, Rc&lt;T&gt;&gt;</code>. Results are basically a
-generalized <code>Option</code>, where the <code>None</code> case has data associated with it. In
-this case, the <code>Rc</code> you tried to unwrap. Since we don't care about the case
-where it fails (if we wrote our program correctly, it <em>has</em> to succeed), we
-just call <code>unwrap</code> on it.</p>
-<p>Anyway, let's see what compiler error we get next (let's face it, there's going
-to be one).</p>
+<p><code>Rc::try_unwrap</code>返回一个<code>Result&lt;T, Rc&lt;T&gt;&gt;</code>。结果基本上是一个广义的<code>Option</code>，
+其中<code>None</code>的情况下有数据与之相关。在这种情况下，就是你试图解包的<code>Rc</code>。由于我们并
+不关心它失败的情况（如果我们的程序写得正确，它一定会成功），我们只是对它调用
+<code>unwrap</code>。</p>
+<p>总之，让我们看看接下来会出现什么编译器错误（让我们面对现实吧，一定会有的）。</p>
 <pre><code class="language-text">&gt; cargo build
 
 error[E0599]: no method named `unwrap` found for type `std::result::Result&lt;std::cell::RefCell&lt;fourth::Node&lt;T&gt;&gt;, std::rc::Rc&lt;std::cell::RefCell&lt;fourth::Node&lt;T&gt;&gt;&gt;&gt;` in the current scope
@@ -250,22 +245,21 @@ error[E0599]: no method named `unwrap` found for type `std::result::Result&lt;st
    = note: the method `unwrap` exists but the following trait bounds were not satisfied:
            `std::rc::Rc&lt;std::cell::RefCell&lt;fourth::Node&lt;T&gt;&gt;&gt; : std::fmt::Debug`
 </code></pre>
-<p>UGH. <code>unwrap</code> on Result requires that you can debug-print the error case.
-<code>RefCell&lt;T&gt;</code> only implements <code>Debug</code> if <code>T</code> does. <code>Node</code> doesn't implement Debug.</p>
-<p>Rather than doing that, let's just work around it by converting the Result to
-an Option with <code>ok</code>:</p>
+<p>UGH.Result上的<code>unwrap</code>要求你能调试打印出错的情况。<code>RefCell&lt;T&gt;</code>只有在<code>T</code>实现时才实现
+<code>Debug</code>。<code>Node</code>并没有实现Debug。</p>
+<p>与其这样做，不如通过将Result转换为一个带有<code>ok</code>的Option来解决这个问题：</p>
 <pre><code class="language-rust ignore">Rc::try_unwrap(old_head).ok().unwrap().into_inner().elem
 </code></pre>
-<p>PLEASE.</p>
+<p>请。</p>
 <pre><code class="language-text">cargo build
 
 </code></pre>
-<p>YES.</p>
-<p><em>phew</em></p>
-<p>We did it.</p>
-<p>We implemented <code>push</code> and <code>pop</code>.</p>
-<p>Let's test by stealing the old <code>stack</code> basic test (because that's all that
-we've implemented so far):</p>
+<p>对了。</p>
+<p><em>呼</em></p>
+<p>我们做到了。</p>
+<p>我们应用了<code>push</code>和<code>pop</code>。</p>
+<p>让我们通过窃取旧的<code>stack</code>基本测试来进行测试（因为这就是我们到目前为止所实现的全
+部）：</p>
 <pre><code class="language-rust ignore">#[cfg(test)]
 mod test {
     use super::List;
@@ -318,19 +312,17 @@ test second::test::into_iter ... ok
 test result: ok. 9 passed; 0 failed; 0 ignored; 0 measured
 
 </code></pre>
-<p><em>Nailed it</em>.</p>
-<p>Now that we can properly remove things from the list, we can implement Drop.
-Drop is a little more conceptually interesting this time around. Where
-previously we bothered to implement Drop for our stacks just to avoid unbounded
-recursion, now we need to implement Drop to get <em>anything</em> to happen at all.</p>
-<p><code>Rc</code> can't deal with cycles. If there's a cycle, everything will keep everything
-else alive. A doubly-linked list, as it turns out, is just a big chain of tiny
-cycles! So when we drop our list, the two end nodes will have their refcounts
-decremented down to 1... and then nothing else will happen. Well, if our list
-contains exactly one node we're good to go. But ideally a list should work right
-if it contains multiple elements. Maybe that's just me.</p>
-<p>As we saw, removing elements was a bit painful. So the easiest thing for us to
-do is just <code>pop</code> until we get None:</p>
+<p><em>钉住了</em>。</p>
+<p>现在我们可以正确地从列表中删除东西，我们可以实现Drop。这次的Drop在概念上更加有趣。
+以前我们费力地为我们的堆栈实现Drop只是为了避免无界递归，现在我们需要实现Drop才能
+让<em>任何事情</em>发生。</p>
+<p><code>Rc</code>不能处理循环。如果有一个循环，所有的东西都会让其他的东西活着。事实证明，一个
+双向链接的列表只是一个由微小的循环组成的大链子！因此，当我们放弃我们的列表时，两
+个末端节点的refcounts将被递减到1......然后就不会再发生什么了。好吧，如果我们的列
+表正好包含一个节点，我们就可以了。但理想情况下，如果一个列表包含多个元素，它就应
+该正常工作。也许这只是我的问题。</p>
+<p>正如我们所看到的，删除元素是有点痛苦的。所以对我们来说，最简单的事情就是<code>pop</code>，直
+到我们得到None：</p>
 <pre><code class="language-rust ignore">impl&lt;T&gt; Drop for List&lt;T&gt; {
     fn drop(&amp;mut self) {
         while self.pop_front().is_some() {}
@@ -340,11 +332,9 @@ do is just <code>pop</code> until we get None:</p>
 <pre><code class="language-text">cargo build
 
 </code></pre>
-<p>(We actually could have done this with our mutable stacks, but shortcuts are for
-people who understand things!)</p>
-<p>We could look at implementing the <code>_back</code> versions of <code>push</code> and <code>pop</code>, but
-they're just copy-paste jobs which we'll defer to later in the chapter. For now
-let's look at more interesting things!</p>
+<p>(我们实际上可以用我们的可变堆栈做到这一点，但捷径是给那些理解事物的人的！)</p>
+<p>我们可以考虑实现<code>push</code>和<code>pop</code>的<code>_back</code>版本，但这只是复制粘贴的工作，我们将在本章的
+后面进行讨论。现在，让我们看看更有趣的事情吧！</p>
 
                     </main>
 

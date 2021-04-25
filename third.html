@@ -145,23 +145,21 @@
 
                 <div id="content" class="content">
                     <main>
-                        <h1><a class="header" href="#a-persistent-singly-linked-stack" id="a-persistent-singly-linked-stack">A Persistent Singly-Linked Stack</a></h1>
-<p>Alright, we've mastered the art of mutable singly-linked stacks.</p>
-<p>Let's move from <em>single</em> ownership to <em>shared</em> ownership by writing a
-<em>persistent</em> immutable singly-linked list. This will be exactly the list
-that functional programmers have come to know and love. You can get the
-head <em>or</em> the tail and put someone's head on someone else's tail...
-and... that's basically it. Immutability is a hell of a drug.</p>
-<p>In the process we'll largely just become familiar with Rc and Arc, but this
-will set us up for the next list which will <em>change the game</em>.</p>
-<p>Let's add a new file called <code>third.rs</code>:</p>
+                        <h1><a class="header" href="#一个持久化的单链栈" id="一个持久化的单链栈">一个持久化的单链栈</a></h1>
+<p>好了，我们已经掌握了可变单链堆栈的艺术。</p>
+<p>让我们通过编写一个<em>持久化的</em>不可变的单链接列表，从<em>单一</em>所有权转向<em>共享</em>所有权。
+这将是函数式程序员所熟悉和喜爱的列表。你可以得到头或尾，把别人的头放在别人的尾
+上......而且......基本上就是这样了。不变性是一种地狱般的毒药。</p>
+<p>在这个过程中，我们很大程度上只是熟悉了Rc和Arc，但这将为我们下一个<em>改变游戏</em>的清
+单做准备。</p>
+<p>让我们添加一个名为<code>third.rs</code>的新文件：</p>
 <pre><code class="language-rust ignore">// in lib.rs
 
 pub mod first;
 pub mod second;
 pub mod third;
 </code></pre>
-<p>No copy-pasta this time. This is a clean room operation.</p>
+<p>这次没有复制--粘帖。这是一个净室操作。</p>
 
                     </main>
 

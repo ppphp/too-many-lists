@@ -145,41 +145,31 @@
 
                 <div id="content" class="content">
                     <main>
-                        <h1><a class="header" href="#unsafe-rust" id="unsafe-rust">Unsafe Rust</a></h1>
-<p>This is a serious, big, complicated, and dangerous topic.
-It's so serious that I wrote <a href="https://doc.rust-lang.org/nightly/nomicon/">an entire other book</a> on it.</p>
-<p>The long and the short of it is that <em>every</em> language is actually unsafe as soon
-as you allow calling into other languages, because you can just have C do
-arbitrarily bad things. Yes: Java, Python, Ruby, Haskell... everyone is wildly
-unsafe in the face of Foreign Function Interfaces (FFI).</p>
-<p>Rust embraces this truth by splitting itself into two languages: Safe Rust, and
-Unsafe Rust. So far we've only worked with Safe Rust. It's completely 100%
-safe... except that it can FFI into Unsafe Rust.</p>
-<p>Unsafe Rust is a <em>superset</em> of Safe Rust. It's completely the same as Safe Rust in all its
-semantics and rules, you're just allowed to do a few <em>extra</em> things that are
-wildly unsafe and can cause the dreaded Undefined Behaviour that haunts C.</p>
-<p>Again, this is a really huge topic that has a lot of interesting corner cases.
-I <em>really</em> don't want to go really deep into it (well, I do. I did. <a href="https://doc.rust-lang.org/nightly/nomicon/">Read that
-book</a>). That's ok, because with linked lists we can actually ignore almost
-all of it.</p>
-<p>The main Unsafe tool we'll be using are <em>raw pointers</em>. Raw pointers are
-basically C's pointers. They have no inherent aliasing rules. They have no
-lifetimes. They can be null. They can be dangling. They can point to
-uninitialized memory. They can be cast to and from integers. They can be cast
-to point to a different type. Mutability? Cast it. Pretty much everything goes,
-and that means pretty much anything can go wrong.</p>
-<p>This is some bad stuff and honestly you'll live a happier life never having
-to touch these. Unfortunately, we want to write linked lists, and linked lists
-are awful. That means we're going to have to use unsafe pointers.</p>
-<p>There are two kinds of raw pointer: <code>*const T</code> and <code>*mut T</code>. These are meant to
-be <code>const T*</code> and <code>T*</code> from C, but we really don't care about what C thinks they
-mean that much. You can only dereference a <code>*const T</code> to an <code>&amp;T</code>, but much like
-the mutability of a variable, this is just a lint against incorrect usage. At
-most it just means you have to cast the <code>*const</code> to a <code>*mut</code> first. Although if
-you don't actually have permission to mutate the referrent of the pointer,
-you're gonna have a bad time.</p>
-<p>Anyway, we'll get a better feel for this as we write some code. For now,
-<code>*mut T == &amp;unchecked mut T</code>!</p>
+                        <h1><a class="header" href="#不安全的rust" id="不安全的rust">不安全的Rust</a></h1>
+<p>这是一个严肃、巨大、复杂和危险的话题。它是如此严重，以至于关于它，我写了
+<a href="https://doc.rust-lang.org/nightly/nomicon/">一整本书</a>。</p>
+<p>长话短说，只要你允许调用其他语言，<em>每一种</em>语言实际上都是不安全的，因为你可以让C做任
+意的坏事。是的：Java、Python、Ruby、Haskell......每个人在面对外来函数接口（FFI）的
+时候都是很不安全的。</p>
+<p>Rust通过将自己分成两种语言来接受这一事实。安全的Rust和不安全的Rust。到目前为止，我
+们只使用了安全的Rust。它是完全100%安全的......除了它可以FFI到不安全的Rust。</p>
+<p>不安全的Rust是安全Rust的一个<em>超集</em>。它的所有语义和规则与安全Rust完全相同，你只是被
+允许做一些<em>额外</em>的事情，这些事情是非常不安全的，可能会导致可怕的未定义行为，困扰着C。</p>
+<p>同样，这是一个非常巨大的话题，有很多有趣的角落案例。我<em>真的</em>不想深入研究它（好吧，我
+其实想。我已经研究了。<a href="https://doc.rust-lang.org/nightly/nomicon/">读那本书</a>）。这没关系，因为有了链表，我们实际上可以忽略
+几乎所有的东西。</p>
+<p>我们要使用的主要不安全工具是<em>原始指针</em>。原始指针基本上是C的指针。它们没有固有的别名规
+则。它们没有生命期。它们可以是空的。它们可以是悬空的。它们可以指向未初始化的内存。它
+们可以被转换为整数或从整数中转换。它们可以被转换为指向不同的类型。可变性？转换它。几
+乎所有的东西都可以，这意味着几乎所有的东西都可能出错。</p>
+<p>这是一些不好的东西，老实说，要是永远不用碰这些东西，你会活得更快乐。不幸的是，我们想写
+链表，而链表是很糟糕的。这意味着我们将不得不使用不安全的指针。</p>
+<p>有两种类型的原始指针：<code>*const T</code>和<code>*mut T</code>。这些是指C语言中的<code>const T*</code>和<code>T*</code>，但
+我们真的不关心 C 语言认为它们是什么意思。你只能将<code>*const T</code>解除引用为<code>&amp;T</code>，但就像变
+量的可变性一样，这只是对不正确使用的一种提示。最多只是意味着你必须先将<code>*const</code>转为
+<code>*mut</code>。尽管如果你实际上没有权限去改变指针的引用，你会有一个糟糕的时间。</p>
+<p>总之，当我们写一些代码时，我们会对此有更好的感觉。现在，
+<code>*mut T == &amp;unchecked mut T</code>！</p>
 
                     </main>
 

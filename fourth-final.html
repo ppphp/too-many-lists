@@ -145,20 +145,15 @@
 
                 <div id="content" class="content">
                     <main>
-                        <h1><a class="header" href="#final-code" id="final-code">Final Code</a></h1>
-<p>Alright, so that's implementing a 100% safe doubly-linked list in Rust. It was
-a nightmare to implement, leaks implementation details, and doesn't support several
-fundamental operations.</p>
-<p>But, it exists.</p>
-<p>Oh, I guess it's also riddled with tons of &quot;unnecessary&quot; runtime checks for
-correctness between <code>Rc</code> and <code>RefCell</code>. I put unnecessary in quotes because
-they're actually necessary to guarantee the whole <em>actually being safe</em> thing.
-We encountered a few places where those checks actually <em>were</em> necessary.
-Doubly-linked lists have a horribly tangled aliasing and ownership story!</p>
-<p>Still, it's a thing we can do. Especially if we don't care about exposing
-internal data structures to our consumers.</p>
-<p>From here on out, we're going to be focusing on other side of this coin:
-getting back all the control by making our implementation <em>unsafe</em>.</p>
+                        <h1><a class="header" href="#最终代码" id="最终代码">最终代码</a></h1>
+<p>好了，这就是在Rust中实现了一个100%安全的双链接列表。它的实现是一场噩梦，泄露了实现细
+节，而且不支持几个基本操作。</p>
+<p>但是，它存在。</p>
+<p>哦，我猜它还充斥着大量&quot;不必要的&quot;<code>Rc</code>和<code>RefCell</code>之间正确性的运行时检查。我把&quot;不必要&quot;
+加了引号，因为它们对于保证整个实际安全的事情来说是必要的。我们遇到了一些地方，这些检
+查实际上是必要的。双重链接的列表有一个可怕的纠缠不清的别名和所有权的故事!</p>
+<p>不过，这也是我们可以做的事情。特别是如果我们不关心向消费者暴露内部数据结构的话。</p>
+<p>从这里开始，我们将专注于这个硬币的另一面：通过使我们的实现<em>不安全</em>来夺回所有控制权。</p>
 <pre><pre class="playpen"><code class="language-rust">
 # #![allow(unused_variables)]
 #fn main() {

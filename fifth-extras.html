@@ -145,12 +145,10 @@
 
                 <div id="content" class="content">
                     <main>
-                        <h1><a class="header" href="#extra-junk" id="extra-junk">Extra Junk</a></h1>
-<p>Now that <code>push</code> and <code>pop</code> are written, everything else is exactly the same
-as the stack case. Only operations that change the length of the list need
-to actually worry about the tail pointer.</p>
-<p>So let's just steal all that from our second list (be sure to reverse the
-expected test output):</p>
+                        <h1><a class="header" href="#额外的废品" id="额外的废品">额外的废品</a></h1>
+<p>现在<code>push</code>和<code>pop</code>已经写好了，其他的都和栈的情况完全一样。只有那些改变列表长度
+的操作才需要真正担心尾部指针的问题。</p>
+<p>所以让我们从我们的第二个列表中窃取所有的东西（一定要把预期的测试输出倒过来）：</p>
 <pre><code class="language-rust ignore">// ...
 
 pub struct IntoIter&lt;T&gt;(List&lt;T&gt;);
@@ -301,9 +299,8 @@ test third::test::iter ... ok
 
 test result: ok. 11 passed; 0 failed; 0 ignored; 0 measured
 </code></pre>
-<p>Shout-outs to copy-paste programming.</p>
-<p>At first I thought we'd have to mess around with IntoIter, but we still
-conveniently pop in iteration order!</p>
+<p>向复制-粘贴编程致敬。</p>
+<p>起初我以为我们要用IntoIter来捣乱，但我们还是很方便地按迭代顺序弹出了！</p>
 
                     </main>
 

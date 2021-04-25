@@ -2469,34 +2469,30 @@ mod test {
 
 #}</code></pre></pre>
 <p>越来越强壮了!</p>
-<h1><a class="header" href="#a-persistent-singly-linked-stack" id="a-persistent-singly-linked-stack">A Persistent Singly-Linked Stack</a></h1>
-<p>Alright, we've mastered the art of mutable singly-linked stacks.</p>
-<p>Let's move from <em>single</em> ownership to <em>shared</em> ownership by writing a
-<em>persistent</em> immutable singly-linked list. This will be exactly the list
-that functional programmers have come to know and love. You can get the
-head <em>or</em> the tail and put someone's head on someone else's tail...
-and... that's basically it. Immutability is a hell of a drug.</p>
-<p>In the process we'll largely just become familiar with Rc and Arc, but this
-will set us up for the next list which will <em>change the game</em>.</p>
-<p>Let's add a new file called <code>third.rs</code>:</p>
+<h1><a class="header" href="#一个持久化的单链栈" id="一个持久化的单链栈">一个持久化的单链栈</a></h1>
+<p>好了，我们已经掌握了可变单链堆栈的艺术。</p>
+<p>让我们通过编写一个<em>持久化的</em>不可变的单链接列表，从<em>单一</em>所有权转向<em>共享</em>所有权。
+这将是函数式程序员所熟悉和喜爱的列表。你可以得到头或尾，把别人的头放在别人的尾
+上......而且......基本上就是这样了。不变性是一种地狱般的毒药。</p>
+<p>在这个过程中，我们很大程度上只是熟悉了Rc和Arc，但这将为我们下一个<em>改变游戏</em>的清
+单做准备。</p>
+<p>让我们添加一个名为<code>third.rs</code>的新文件：</p>
 <pre><code class="language-rust ignore">// in lib.rs
 
 pub mod first;
 pub mod second;
 pub mod third;
 </code></pre>
-<p>No copy-pasta this time. This is a clean room operation.</p>
-<h1><a class="header" href="#layout" id="layout">Layout</a></h1>
-<p>Alright, back to the drawing board on layout.</p>
-<p>The most important thing about
-a persistent list is that you can manipulate the tails of lists basically
-for free:</p>
-<p>For instance, this isn't an uncommon workload to see with a persistent list:</p>
+<p>这次没有复制--粘帖。这是一个净室操作。</p>
+<h1><a class="header" href="#布局" id="布局">布局</a></h1>
+<p>好了，回到布局的画板上。</p>
+<p>持久列表最重要的一点是，你基本上可以没有成本地操作列表的尾部：</p>
+<p>例如，在持久性列表中，这并不是一个不常见的工作量：</p>
 <pre><code class="language-text">list1 = A -&gt; B -&gt; C -&gt; D
 list2 = tail(list1) = B -&gt; C -&gt; D
 list3 = push(list2, X) = X -&gt; B -&gt; C -&gt; D
 </code></pre>
-<p>But at the end we want the memory to look like this:</p>
+<p>但在最后，我们希望内存看起来像这样：</p>
 <pre><code class="language-text">list1 -&gt; A ---+
               |
               v
@@ -2505,26 +2501,20 @@ list2 ------&gt; B -&gt; C -&gt; D
               |
 list3 -&gt; X ---+
 </code></pre>
-<p>This just can't work with Boxes, because ownership of <code>B</code> is <em>shared</em>. Who
-should free it? If I drop list2, does it free B? With boxes we certainly would
-expect so!</p>
-<p>Functional languages -- and indeed almost every other language -- get away with
-this by using <em>garbage collection</em>. With the magic of garbage collection, B will
-be freed only after everyone stops looking at it. Hooray!</p>
-<p>Rust doesn't have anything like the garbage collectors these languages have.
-They have <em>tracing</em> GC, which will dig through all the memory that's sitting
-around at runtime and figure out what's garbage automatically. Instead, all
-Rust has today is <em>reference counting</em>. Reference counting can be thought of
-as a very simple GC. For many workloads, it has significantly less throughput
-than a tracing collector, and it completely falls over if you manage to
-build cycles. But hey, it's all we've got! Thankfully, for our usecase we'll never run into cycles
-(feel free to try to prove this to yourself -- I sure won't).</p>
-<p>So how do we do reference-counted garbage collection? <code>Rc</code>! Rc is just like
-Box, but we can duplicate it, and its memory will <em>only</em> be freed when <em>all</em>
-the Rc's derived from it are dropped. Unfortunately, this flexibility comes at
-a serious cost: we can only take a shared reference to its internals. This means
-we can't ever really get data out of one of our lists, nor can we mutate them.</p>
-<p>So what's our layout gonna look like? Well, previously we had:</p>
+<p>这对Boxes来说就是不行的，因为<code>B</code>的所有权是<em>共享</em>的。谁应该释放它？如果我放弃list2，
+它会释放B吗？对于盒子，我们当然希望如此。</p>
+<p>函数式语言--事实上几乎所有其他语言--都通过使用<em>垃圾回收</em>来解决这个问题。有了垃圾收集
+的魔力，只有在每个人都不再看它的时候，B才会被释放。万幸！</p>
+<p>Rust没有像这些语言那样的垃圾收集器。他们有<em>追踪</em>的GC，它将挖掘所有在运行时闲置的内
+存，并自动找出哪些是垃圾。相反，Rust现在有的只是<em>引用计数</em>。引用计数可以被认为是一个
+非常简单的GC。对于许多工作情况来说，它的吞吐量明显低于跟踪收集器，而且如果你设法建立
+循环，它就会完全崩溃。但是，这就是我们所能得到的一切了。值得庆幸的是，对于我们的用例
+来说，我们永远不会遇到周期问题（请随时尝试向自己证明这一点 -- 我肯定不会）。</p>
+<p>那么，我们如何进行引用计数的垃圾收集呢？<code>Rc</code>! Rc就像Box一样，但我们可以复制它，而且
+它的内存<em>只有</em>在<em>所有</em>从它派生出来的Rc被丢弃时才会被释放。不幸的是，这种灵活性有一个
+严重的代价：我们只能对其内部进行共享引用。这意味着我们永远不能从我们的一个列表中获取
+数据，也不能对它们进行变异。</p>
+<p>那么，我们的布局会是什么样子的呢？嗯，之前我们有：</p>
 <pre><code class="language-rust ignore">pub struct List&lt;T&gt; {
     head: Link&lt;T&gt;,
 }
@@ -2536,7 +2526,7 @@ struct Node&lt;T&gt; {
     next: Link&lt;T&gt;,
 }
 </code></pre>
-<p>Can we just change Box to Rc?</p>
+<p>我们能不能把Box改成Rc？</p>
 <pre><code class="language-rust ignore">// in third.rs
 
 pub struct List&lt;T&gt; {
@@ -2562,9 +2552,8 @@ help: possible candidate is found in another module, you can import it into scop
 1 | use std::rc::Rc;
   |
 </code></pre>
-<p>Oh dang, sick burn. Unlike everything we used for our mutable lists, Rc is so
-lame that it's not even implicitly imported into every single Rust program.
-<em>What a loser</em>.</p>
+<p>哦，该死，坏起来了。与我们用于可变列表的一切不同，Rc是如此蹩脚，以至于它甚至没有被
+隐含地导入到每一个Rust程序中。<em>真是个失败者。</em></p>
 <pre><code class="language-rust ignore">use std::rc::Rc;
 </code></pre>
 <pre><code class="language-text">cargo build
@@ -2589,35 +2578,31 @@ warning: field is never used: `next`
 11 |     next: Link&lt;T&gt;,
    |     ^^^^^^^^^^^^^
 </code></pre>
-<p>Seems legit. Rust continues to be <em>completely</em> trivial to write. I bet we can just
-find-and-replace Box with Rc and call it a day!</p>
+<p>似乎是合法的。Rust的编写仍然是<em>完全</em>微不足道的。我打赌我们可以用Rc查找和替换Box，然后
+就可以了。</p>
 <p>...</p>
-<p>No. No we can't.</p>
-<h1><a class="header" href="#basics" id="basics">Basics</a></h1>
-<p>We already know a lot of the basics of Rust now, so we can do a lot of the
-simple stuff again.</p>
-<p>For the constructor, we can again just copy-paste:</p>
+<p>不，不，我们不能。</p>
+<h1><a class="header" href="#基本" id="基本">基本</a></h1>
+<p>我们现在已经知道了很多Rust的基础知识，所以我们可以再次做很多简单的事情。</p>
+<p>对于构造函数，我们又可以直接复制粘贴了：</p>
 <pre><code class="language-rust ignore">impl&lt;T&gt; List&lt;T&gt; {
     pub fn new() -&gt; Self {
         List { head: None }
     }
 }
 </code></pre>
-<p><code>push</code> and <code>pop</code> don't really make sense anymore. Instead we can provide
-<code>append</code> and <code>tail</code>, which provide approximately the same thing.</p>
-<p>Let's start with appending. It takes a list and an element, and returns a
-List. Like the mutable list case, we want to make a new node, that has the old
-list as its <code>next</code> value. The only novel thing is how to <em>get</em> that next value,
-because we're not allowed to mutate anything.</p>
-<p>The answer to our prayers is the Clone trait. Clone is implemented by almost
-every type, and provides a generic way to get &quot;another one like this one&quot; that
-is logically disjoint given only a shared reference. It's like a copy
-constructor in C++, but it's never implicitly invoked.</p>
-<p>Rc in particular uses Clone as the way to increment the reference count. So
-rather than moving a Box to be in the sublist, we just clone the head of the
-old list. We don't even need to match on the head, because Option exposes a
-Clone implementation that does exactly the thing we want.</p>
-<p>Alright, let's give it a shot:</p>
+<p><code>push</code>和<code>pop</code>已经没有实际意义了。相反，我们可以提供<code>append</code>和<code>tail</code>，它们提供的东
+西大致相同。</p>
+<p>让我们从append开始。它接受一个列表和一个元素，并返回一个列表。就像可变列表的情况一样，
+我们要做一个新的节点，它的<code>next</code>值是旧列表。唯一新奇的是如何获得下一个值，因为我们不
+允许改变任何东西。</p>
+<p>我们祈祷的答案就是Clone特性。几乎所有的类型都实现了克隆，它提供了一种通用的方法来获得
+&quot;像这样的另一个&quot;，而这个逻辑上是不相干的，只给了一个共享的引用。它就像C++中的复制构造
+函数，但它从未被隐式调用。</p>
+<p>特别是Rc使用Clone作为增加引用计数的方法。因此，与其移动一个Box到子列表中，不如直接克
+隆旧列表的头部。我们甚至不需要在头部进行匹配，因为Option暴露了一个Clone的实现，它所做
+的正是我们想要的事情。</p>
+<p>好了，让我们试一试吧：</p>
 <pre><code class="language-rust ignore">pub fn append(&amp;self, elem: T) -&gt; List&lt;T&gt; {
     List { head: Some(Rc::new(Node {
         elem: elem,
@@ -2641,12 +2626,10 @@ warning: field is never used: `next`
 11 |     next: Link&lt;T&gt;,
    |     ^^^^^^^^^^^^^
 </code></pre>
-<p>Wow, Rust is really hard-nosed about actually using fields. It can tell no
-consumer can ever actually observe the use of these fields! Still, we seem good
-so far.</p>
-<p><code>tail</code> is the logical inverse of this operation. It takes a list and returns the
-whole list with the first element removed. All that is is cloning the <em>second</em>
-element in the list (if it exists). Let's try this:</p>
+<p>哇，Rust对实际使用字段真的很苛刻。它可以告诉没有消费者可以真正观察到这些字段的使用情
+况! 不过，到目前为止，我们似乎还不错。</p>
+<p><code>tail</code>是这个操作的逻辑逆运算。它接收一个列表并返回除去第一个元素的整个列表。所有这些
+都是克隆列表中的<em>第二个</em>元素（如果它存在的话）。我们来试试这个：</p>
 <pre><code class="language-rust ignore">pub fn tail(&amp;self) -&gt; List&lt;T&gt; {
     List { head: self.head.as_ref().map(|node| node.next.clone()) }
 }
@@ -2662,9 +2645,8 @@ error[E0308]: mismatched types
    = note: expected type `std::option::Option&lt;std::rc::Rc&lt;_&gt;&gt;`
               found type `std::option::Option&lt;std::option::Option&lt;std::rc::Rc&lt;_&gt;&gt;&gt;`
 </code></pre>
-<p>Hrm, we messed up. <code>map</code> expects us to return a Y, but here we're returning an
-<code>Option&lt;Y&gt;</code>. Thankfully, this is another common Option pattern, and we can just
-use <code>and_then</code> to let us return an Option.</p>
+<p>嗯，我们搞砸了。<code>map</code>希望我们返回一个Y，但是在这里我们要返回一个<code>Option&lt;Y&gt;</code>。值得庆
+幸的是，这是另一个常见的Option模式，我们可以直接使用<code>and_then</code>来让我们返回一个Option。</p>
 <pre><code class="language-rust ignore">pub fn tail(&amp;self) -&gt; List&lt;T&gt; {
     List { head: self.head.as_ref().and_then(|node| node.next.clone()) }
 }
@@ -2672,9 +2654,9 @@ use <code>and_then</code> to let us return an Option.</p>
 <pre><code class="language-text">&gt; cargo build
 
 </code></pre>
-<p>Great.</p>
-<p>Now that we have <code>tail</code>, we should probably provide <code>head</code>, which returns a
-reference to the first element. That's just <code>peek</code> from the mutable list:</p>
+<p>很好。</p>
+<p>现在我们有了<code>tail</code>，我们也许应该提供<code>head</code>，它返回对第一个元素的引用。这只是从可
+变列表中<code>peek</code>：</p>
 <pre><code class="language-rust ignore">pub fn head(&amp;self) -&gt; Option&lt;&amp;T&gt; {
     self.head.as_ref().map(|node| &amp;node.elem )
 }
@@ -2682,8 +2664,8 @@ reference to the first element. That's just <code>peek</code> from the mutable l
 <pre><code class="language-text">&gt; cargo build
 
 </code></pre>
-<p>Nice.</p>
-<p>That's enough functionality that we can test it:</p>
+<p>很好。</p>
+<p>这已经有足够的功能，我们可以测试它：</p>
 <pre><code class="language-rust ignore">#[cfg(test)]
 mod test {
     use super::List;
@@ -2726,8 +2708,8 @@ test third::test::basics ... ok
 test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured
 
 </code></pre>
-<p>Perfect!</p>
-<p>Iter is also identical to how it was for our mutable list:</p>
+<p>很完美!</p>
+<p>Iter也与我们的可变链表的情况相同：</p>
 <pre><code class="language-rust ignore">pub struct Iter&lt;'a, T&gt; {
     next: Option&lt;&amp;'a Node&lt;T&gt;&gt;,
 }
@@ -2775,16 +2757,14 @@ test third::test::iter ... ok
 test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured
 
 </code></pre>
-<p>Who ever said dynamic typing was easier?</p>
-<p>(chumps did)</p>
-<p>Note that we can't implement IntoIter or IterMut for this type. We only have
-shared access to elements.</p>
-<h1><a class="header" href="#drop" id="drop">Drop</a></h1>
-<p>Like the mutable lists, we have a recursive destructor problem.
-Admittedly, this isn't as bad of a problem for the immutable list: if we ever
-hit another node that's the head of another list <em>somewhere</em>, we won't
-recursively drop it. However it's still a thing we should care about, and
-how to deal with isn't as clear. Here's how we solved it before:</p>
+<p>谁曾说过动态类型更容易？</p>
+<p>(笨蛋说的)</p>
+<p>注意，我们不能为这个类型实现IntoIter或IterMut。我们只有对元素的共享访问。</p>
+<h1><a class="header" href="#丢弃-1" id="丢弃-1">丢弃</a></h1>
+<p>像可变列表一样，我们有一个递归的析构器问题。诚然，对于不可变的列表来说，这并不是一
+个糟糕的问题：如果我们遇到<em>某处</em>另一个节点是另一个列表的头，我们就不会递归地放弃它。
+然而，这仍然是一个我们应该关心的问题，而且如何处理并不那么明确。下面是我们之前解决这
+个问题的方法：</p>
 <pre><code class="language-rust ignore">impl&lt;T&gt; Drop for List&lt;T&gt; {
     fn drop(&amp;mut self) {
         let mut cur_link = self.head.take();
@@ -2794,15 +2774,14 @@ how to deal with isn't as clear. Here's how we solved it before:</p>
     }
 }
 </code></pre>
-<p>The problem is the body of the loop:</p>
+<p>问题在于循环的主体：</p>
 <pre><code class="language-rust ignore">cur_link = boxed_node.next.take();
 </code></pre>
-<p>This is mutating the Node inside the Box, but we can't do that with Rc; it only
-gives us shared access, because any number of other Rc's could be pointing at it.</p>
-<p>But if we know that we're the last list that knows about this node, it
-<em>would</em> actually be fine to move the Node out of the Rc. Then we could also
-know when to stop: whenever we <em>can't</em> hoist out the Node.</p>
-<p>And look at that, Rc has a method that does exactly this: <code>try_unwrap</code>:</p>
+<p>这是在盒子里改变节点，但我们不能用Rc做这个；它只给我们共享访问权，因为任何数量的其他
+Rc都可能指向它。</p>
+<p>但是如果我们知道我们是最后一个知道这个节点的列表，那么将节点移出Rc其实是可以的。那么
+我们也可以知道什么时候停止：只要我们<em>不能</em>把Node吊出来。</p>
+<p>看看这个，Rc有一个方法正是这样做的：<code>try_unwrap</code>：</p>
 <pre><code class="language-rust ignore">impl&lt;T&gt; Drop for List&lt;T&gt; {
     fn drop(&amp;mut self) {
         let mut head = self.head.take();
@@ -2833,62 +2812,47 @@ test third::test::iter ... ok
 
 test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out
 </code></pre>
-<p>Great!
-Nice.</p>
+<p>好!
+棒。</p>
 <h1><a class="header" href="#arc" id="arc">Arc</a></h1>
-<p>One reason to use an immutable linked list is to share data across threads.
-After all, shared mutable state is the root of all evil, and one way to solve
-that is to kill the <em>mutable</em> part forever.</p>
-<p>Except our list isn't thread-safe at all. In order to be thread-safe, we need
-to fiddle with reference counts <em>atomically</em>. Otherwise, two threads could
-try to increment the reference count, <em>and only one would happen</em>. Then the
-list could get freed too soon!</p>
-<p>In order to get thread safety, we have to use <em>Arc</em>. Arc is completely identical
-to Rc except for the fact that reference counts are modified atomically. This
-has a bit of overhead if you don't need it, so Rust exposes both.
-All we need to do to make our list is replace every reference to Rc with
-<code>std::sync::Arc</code>. That's it. We're thread safe. Done!</p>
-<p>But this raises an interesting question: how do we <em>know</em> if a type is
-thread-safe or not? Can we accidentally mess up?</p>
-<p>No! You can't mess up thread-safety in Rust!</p>
-<p>The reason this is the case is because Rust models thread-safety in a
-first-class way with two traits: <code>Send</code> and <code>Sync</code>.</p>
-<p>A type is <em>Send</em> if it's safe to <em>move</em> to another thread. A type is <em>Sync</em> if
-it's safe to <em>share</em> between multiple threads. That is, if <code>T</code> is Sync, <code>&amp;T</code> is
-Send. Safe in this case means it's impossible to cause <em>data races</em>, (not to
-be mistaken with the more general issue of <em>race conditions</em>).</p>
-<p>These are marker traits, which is a fancy way of saying they're traits that
-provide absolutely no interface. You either <em>are</em> Send, or you aren't. It's just
-a property <em>other</em> APIs can require. If you aren't appropriately Send,
-then it's statically impossible to be sent to a different thread! Sweet!</p>
-<p>Send and Sync are also automatically derived traits based on whether you are
-totally composed of Send and Sync types. It's similar to how you can only
-implement Copy if you're only made of Copy types, but then we just go ahead
-and implement it automatically if you are.</p>
-<p>Almost every type is Send and Sync. Most types are Send because they totally
-own their data. Most types are Sync because the only way to share data across
-threads is to put them behind a shared reference, which makes them immutable!</p>
-<p>However there are special types that violate these properties: those that have
-<em>interior mutability</em>. So far we've only really interacted with <em>inherited
-mutability</em> (AKA external mutability): the mutability of a value is inherited
-from the mutability of its container. That is, you can't just randomly mutate
-some field of a non-mutable value because you feel like it.</p>
-<p>Interior mutability types violate this: they let you mutate through a shared
-reference. There are two major classes of interior mutability: cells, which
-only work in a single-threaded context; and locks, which work in a
-multi-threaded context. For obvious reasons, cells are cheaper when you can
-use them. There's also atomics, which are primitives that act like a lock.</p>
-<p>So what does all of this have to do with Rc and Arc? Well, they both use
-interior mutability for their <em>reference count</em>. Worse, this reference count
-is shared between every instance! Rc just uses a cell, which means it's not
-thread safe. Arc uses an atomic, which means it <em>is</em> thread safe. Of course,
-you can't magically make a type thread safe by putting it in Arc. Arc can only
-derive thread-safety like any other type.</p>
-<p>I really really really don't want to get into the finer details of atomic
-memory models or non-derived Send implementations. Needless to say, as you get
-deeper into Rust's thread-safety story, stuff gets more complicated. As a
-high-level consumer, it all <em>just works</em> and you don't really need to think
-about it.</p>
+<p>使用不可变链表的一个原因是跨线程共享数据。毕竟，共享可变的状态是所有邪恶的根源，
+解决这个问题的一个方法是永远杀死<em>可变</em>的部分。</p>
+<p>只是我们的列表根本就不是线程安全的。为了实现线程安全，我们需要<em>原子化</em>地处理引用
+计数。否则，两个线程可以尝试增加引用计数，但<em>只有一个会发生</em>。那么，列表就会过早
+地被释放！</p>
+<p>为了获得线程安全，我们必须使用<em>Arc</em>。Arc与Rc完全相同，只是引用计数被原子化地修改。
+如果你不需要的话，这有一点开销，所以Rust将两者都暴露出来。我们需要做的就是用
+<code>std::sync::Arc</code>替换所有对Rc的引用，来制作我们的列表。就这样了。我们是线程安全
+的。完成了!</p>
+<p>但这提出了一个有趣的问题：我们如何<em>知道</em>一个类型是否是线程安全的？我们会不会不小心
+搞砸了？</p>
+<p>不会！在Rust中，你不可能搞乱线程安全。</p>
+<p>之所以如此，是因为Rust通过两个特性以第一类的方式建立了线程安全模型。<code>Send</code>和
+<code>Sync</code>。</p>
+<p>如果一个类型可以安全地移动到另一个线程，那么它就是<em>Send</em>。如果一个类型在多个线程之
+间<em>共享</em>是安全的，那么它就是<em>Sync</em>。也就是说，如果<code>T</code>是Sync，<code>&amp;T</code>就是Send。在这种
+情况下，安全意味着不可能引起<em>数据竞争</em>，（不要误解为更普遍的<em>竞赛条件</em>问题）。</p>
+<p>这些是标记特性，这是一种华丽的说法，即它们是完全不提供接口的特性。你要么<em>是</em>Send，
+要么不是。这只是一个<em>其他</em>API可以要求的属性。如果你不是合适的Send，那么就不可能被发
+送到不同的线程中。很好!</p>
+<p>Send和Sync也是基于你是否完全由Send和Sync类型组成的自动派生特性。这类似于如果你只由
+Copy类型组成，你只能实现Copy，但如果你是Copy类型，我们就自动去实现它。</p>
+<p>几乎每个类型都是Send和Sync。大多数类型都是Send，因为它们完全拥有自己的数据。大多数
+类型是Sync，因为跨线程共享数据的唯一方法是把它们放在一个共享引用后面，这使得它们是
+不可改变的</p>
+<p>然而，有一些特殊的类型违反了这些属性：那些具有<em>内部可变性</em>的类型。到目前为止，我们只
+与<em>继承的可变性</em>（又称外部可变性）进行了真正的互动：一个值的可变性是从其容器的可变性
+中继承的。也就是说，你不能因为你喜欢而随机地改变一个不可变的值的某个字段。</p>
+<p>内部可变性类型违反了这一点：它们让你通过一个共享的引用进行改变。内部可变性有两大类：
+单元格，它只在单线程环境下工作；锁，它在多线程环境下工作。由于显而易见的原因，当你可
+以使用单元格时，单元格开销更小。还有atomics，它是类似于锁的基元。</p>
+<p>那么这一切与Rc和Arc有什么关系呢？好吧，它们都使用内部可变性来表示它们的<em>引用计数</em>。
+更糟的是，这个引用计数在每个实例之间都是共享的！Rc只是使用一个单元，这意味着它不是线程
+安全的。Arc使用了一个原子，这意味着它<em>是</em>线程安全的。当然，你不可能通过把一个类型放在
+Arc中而神奇地使它成为线程安全的。Arc只能像其他类型一样派生出线程安全。</p>
+<p>我真的真的不想讨论原子内存模型或非派生Send实现的更多细节。不用说，当你深入了解Rust的线
+程安全故事时，事情会变得更加复杂。作为一个高级消费者，这一切都<em>只是在工作</em>，你真的不需
+要考虑它。</p>
 <h1><a class="header" href="#final-code-1" id="final-code-1">Final Code</a></h1>
 <p>That's all I really have to say on the immutable stack. We're getting pretty
 good at implementing lists now!</p>
@@ -2998,14 +2962,12 @@ mod test {
     }
 }
 #}</code></pre></pre>
-<h1><a class="header" href="#a-bad-but-safe-doubly-linked-deque" id="a-bad-but-safe-doubly-linked-deque">A Bad but Safe Doubly-Linked Deque</a></h1>
-<p>Now that we've seen Rc and heard about interior mutability, this gives an
-interesting thought... maybe we <em>can</em> mutate through an Rc. And if <em>that's</em>
-the case, maybe we can implement a <em>doubly-linked</em> list totally safely!</p>
-<p>In the process we'll become familiar with <em>interior mutability</em>, and probably
-learn the hard way that safe doesn't mean <em>correct</em>. Doubly-linked lists are
-hard, and I always make a mistake somewhere.</p>
-<p>Let's add a new file called <code>fourth.rs</code>:</p>
+<h1><a class="header" href="#一个不好但是安全的双链双向队列" id="一个不好但是安全的双链双向队列">一个不好但是安全的双链双向队列</a></h1>
+<p>现在我们已经看到了Rc，并听说了内部可变性，这给我们一个有趣的想法......。也许我
+们<em>可以</em>通过Rc进行改变。如果<em>是这样</em>，也许我们可以完全安全地实现一个<em>双链表</em>！</p>
+<p>在这个过程中，我们将熟悉内部可变性，并可能了解到，安全并不意味着正确。双链表很
+难，我总是在某个地方犯错。</p>
+<p>让我们添加一个新的文件，叫做<code>fourth.rs</code>：</p>
 <pre><code class="language-rust ignore">// in lib.rs
 
 pub mod first;
@@ -3013,30 +2975,25 @@ pub mod second;
 pub mod third;
 pub mod fourth;
 </code></pre>
-<p>This will be another clean-room operation, though as usual we'll probably find
-some logic that applies verbatim again.</p>
-<p>Disclaimer: this chapter is basically a demonstration that this is a very bad idea.</p>
-<h1><a class="header" href="#layout-1" id="layout-1">Layout</a></h1>
-<p>The key to our design is the <code>RefCell</code> type. The heart of
-RefCell is a pair of methods:</p>
+<p>这将是另一个净室操作，尽管像往常一样，我们可能会发现一些逻辑再次逐字适用。</p>
+<p>免责声明：这一章基本上是一个示范，说明这是一个非常糟糕的主意。</p>
+<h1><a class="header" href="#布局-1" id="布局-1">布局</a></h1>
+<p>我们设计的关键是<code>RefCell</code>类型。RefCell的核心是一对方法：</p>
 <pre><code class="language-rust ignore">fn borrow(&amp;self) -&gt; Ref&lt;'_, T&gt;;
 fn borrow_mut(&amp;self) -&gt; RefMut&lt;'_, T&gt;;
 </code></pre>
-<p>The rules for <code>borrow</code> and <code>borrow_mut</code> are exactly those of <code>&amp;</code> and <code>&amp;mut</code>:
-you can call <code>borrow</code> as many times as you want, but <code>borrow_mut</code> requires
-exclusivity.</p>
-<p>Rather than enforcing this statically, RefCell enforces them at runtime.
-If you break the rules, RefCell will just panic and crash the program.
-Why does it return these Ref and RefMut things? Well, they basically behave
-like <code>Rc</code>s but for borrowing. They also keep the RefCell borrowed until they go out
-of scope. We'll get to that later.</p>
-<p>Now with Rc and RefCell we can become... an incredibly verbose pervasively
-mutable garbage collected language that can't collect cycles! Y-yaaaaay...</p>
-<p>Alright, we want to be <em>doubly-linked</em>. This means each node has a pointer to
-the previous and next node. Also, the list itself has a pointer to the
-first and last node. This gives us fast insertion and removal on <em>both</em>
-ends of the list.</p>
-<p>So we probably want something like:</p>
+<p><code>borrow</code>和<code>borrow_mut</code>的规则正是<code>&amp;</code>和<code>&amp;mut</code>的规则：你可以随意调用<code>borrow</code>，但
+<code>borrow_mut</code>需要独占性。</p>
+<p>RefCell不是静态地执行这些规则，而是在运行时执行这些规则。如果你违反了这些规则，
+RefCell就会惊慌失措，使程序崩溃。为什么它会返回这些Ref和RefMut的东西？好吧，它们的
+行为基本上和<code>Rc</code>s一样，只是用于借用。它们也保持RefCell的借用，直到它们超出范围。我
+们稍后会讨论这个问题。</p>
+<p>现在有了Rc和RefCell，我们可以成为......一种令人难以置信的冗长的普遍可变异的垃圾收集
+语言，它不能收集循环 呀呀呀...</p>
+<p>好了，我们要做<em>双向链接</em>的。这意味着每个节点都有一个指向上一个和下一个节点的指针。同
+时，列表本身也有一个指向第一个和最后一个节点的指针。这样我们就可以在列表的两端快速插
+入和删除。</p>
+<p>所以我们可能需要这样的东西：</p>
 <pre><code class="language-rust ignore">use std::rc::Rc;
 use std::cell::RefCell;
 
@@ -3087,12 +3044,10 @@ warning: field is never used: `prev`
 14 |     prev: Link&lt;T&gt;,
    |     ^^^^^^^^^^^^^
 </code></pre>
-<p>Hey, it built! Lots of dead code warnings, but it built! Let's try to use it.</p>
-<h1><a class="header" href="#building-up" id="building-up">Building Up</a></h1>
-<p>Alright, we'll start with building the list. That's pretty straight-forward
-with this new system. <code>new</code> is still trivial, just None out all the fields.
-Also because it's getting a bit unwieldy, let's break out a Node constructor
-too:</p>
+<p>嘿，它建好了! 很多死代码的警告，但它构建了！让我们试着使用它。</p>
+<h1><a class="header" href="#构建" id="构建">构建</a></h1>
+<p>好吧，我们先从建立链表开始。在这个新的系统中，这是很直接的事情。<code>new</code>仍然简单，
+所有的字段都是None。另外，因为它变得有点不方便，我们也来做一个Node构造函数：</p>
 <pre><code class="language-rust ignore">impl&lt;T&gt; Node&lt;T&gt; {
     fn new(elem: T) -&gt; Rc&lt;RefCell&lt;Self&gt;&gt; {
         Rc::new(RefCell::new(Node {
@@ -3113,20 +3068,15 @@ impl&lt;T&gt; List&lt;T&gt; {
 
 **A BUNCH OF DEAD CODE WARNINGS BUT IT BUILT**
 </code></pre>
-<p>Yay!</p>
-<p>Now let's try to write pushing onto the front of the list. Because
-doubly-linked lists are significantly more complicated, we're going to need
-to do a fair bit more work. Where singly-linked list operations could be
-reduced to an easy one-liner, doubly-linked list ops are fairly complicated.</p>
-<p>In particular we now need to specially handle some boundary cases around
-empty lists. Most operations will only touch the <code>head</code> or <code>tail</code> pointer.
-However when transitioning to or from the empty list, we need to edit
-<em>both</em> at once.</p>
-<p>An easy way for us to validate if our methods make sense is if we maintain
-the following invariant: each node should have exactly two pointers to it.
-Each node in the middle of the list is pointed at by its predecessor and
-successor, while the nodes on the ends are pointed to by the list itself.</p>
-<p>Let's take a crack at it:</p>
+<p>耶!</p>
+<p>现在让我们试着把推入写到链表的前面。因为双链表明显更复杂，我们需要做更多的工作。
+单链表的操作可以简化为一个简单的单行代码，而双链表的操作则相当复杂。</p>
+<p>特别是我们现在需要特别处理一些围绕空列表的边界情况。大多数操作只涉及<code>head</code>或
+<code>tail</code>的指针。然而当过渡到空列表或从空列表过渡时，我们需要<em>同时</em>编辑两个列表。</p>
+<p>如果我们保持以下的不变性，我们验证我们的方法是否有意义的一个简单方法是：每个节
+点应该正好有两个指向它的指针。列表中间的每个节点都被其前任和后任所指向，而两端
+的节点则被列表本身所指向。</p>
+<p>让我们来试一试：</p>
 <pre><code class="language-rust ignore">pub fn push_front(&amp;mut self, elem: T) {
     // new node needs +2 links, everything else should be +0
     let new_head = Node::new(elem);
@@ -3161,52 +3111,45 @@ error[E0609]: no field `next` on type `std::rc::Rc&lt;std::cell::RefCell&lt;four
 40 |                 new_head.next = Some(old_head);         // +1 old_head
    |                          ^^^^ unknown field
 </code></pre>
-<p>Alright. Compiler error. Good start. Good start.</p>
-<p>Why can't we access the <code>prev</code> and <code>next</code> fields on our nodes? It worked before
-when we just had an <code>Rc&lt;Node&gt;</code>. Seems like the <code>RefCell</code> is getting in the way.</p>
-<p>We should probably check the docs.</p>
-<p><em>Google's &quot;rust refcell&quot;</em></p>
-<p><em><a href="https://doc.rust-lang.org/std/cell/struct.RefCell.html">clicks first link</a></em></p>
+<p>好吧。编译器错误。好的开始。好的开始。</p>
+<p>为什么我们不能访问我们节点上的<code>prev</code>和<code>next</code>字段？以前当我们只有一个<code>Rc&lt;Node&gt;</code>的
+时候，它是可以工作的。似乎<code>RefCell</code>妨碍了它。</p>
+<p>我们也许应该检查一下文档。</p>
+<p><em>谷歌一下&quot;rust refcell&quot;</em></p>
+<p><em><a href="https://doc.rust-lang.org/std/cell/struct.RefCell.html">点击第一个链接</a></em></p>
 <blockquote>
-<p>A mutable memory location with dynamically checked borrow rules</p>
-<p>See the <a href="https://doc.rust-lang.org/std/cell/index.html">module-level documentation</a> for more.</p>
+<p>一个具有动态检查的借用规则的可变的内存位置</p>
+<p>参见<a href="https://doc.rust-lang.org/std/cell/index.html">模块级文档</a>以了解更多。</p>
 </blockquote>
-<p><em>clicks link</em></p>
+<p><em>点击链接</em></p>
 <blockquote>
-<p>Shareable mutable containers.</p>
-<p>Values of the <code>Cell&lt;T&gt;</code> and <code>RefCell&lt;T&gt;</code> types may be mutated through shared references (i.e.
-the common <code>&amp;T</code> type), whereas most Rust types can only be mutated through unique (<code>&amp;mut T</code>)
-references. We say that <code>Cell&lt;T&gt;</code> and <code>RefCell&lt;T&gt;</code> provide 'interior mutability', in contrast
-with typical Rust types that exhibit 'inherited mutability'.</p>
-<p>Cell types come in two flavors: <code>Cell&lt;T&gt;</code> and <code>RefCell&lt;T&gt;</code>. <code>Cell&lt;T&gt;</code> provides <code>get</code> and <code>set</code>
-methods that change the interior value with a single method call. <code>Cell&lt;T&gt;</code> though is only
-compatible with types that implement <code>Copy</code>. For other types, one must use the <code>RefCell&lt;T&gt;</code>
-type, acquiring a write lock before mutating.</p>
-<p><code>RefCell&lt;T&gt;</code> uses Rust's lifetimes to implement 'dynamic borrowing', a process whereby one can
-claim temporary, exclusive, mutable access to the inner value. Borrows for <code>RefCell&lt;T&gt;</code>s are
-tracked 'at runtime', unlike Rust's native reference types which are entirely tracked
-statically, at compile time. Because <code>RefCell&lt;T&gt;</code> borrows are dynamic it is possible to attempt
-to borrow a value that is already mutably borrowed; when this happens it results in thread
-panic.</p>
-<h1><a class="header" href="#when-to-choose-interior-mutability" id="when-to-choose-interior-mutability">When to choose interior mutability</a></h1>
-<p>The more common inherited mutability, where one must have unique access to mutate a value, is
-one of the key language elements that enables Rust to reason strongly about pointer aliasing,
-statically preventing crash bugs. Because of that, inherited mutability is preferred, and
-interior mutability is something of a last resort. Since cell types enable mutation where it
-would otherwise be disallowed though, there are occasions when interior mutability might be
-appropriate, or even <em>must</em> be used, e.g.</p>
+<p>可共享的可变异容器。</p>
+<p><code>Cell&lt;T&gt;</code>和<code>RefCell&lt;T&gt;</code>类型的值可以通过共享引用（即常见的<code>&amp;T</code>类型）进行改变
+，而大多数Rust类型只能通过唯一的（<code>&amp;mut T</code>）引用进行变异。我们说<code>Cell&lt;T&gt;</code>和
+<code>RefCell</code><T>提供了 &quot;内部可变性&quot;，而典型的Rust类型则表现为 &quot;继承的可变性&quot;。</p>
+<p>细胞类型有两种风格：<code>Cell&lt;T&gt;</code>和<code>RefCell&lt;T&gt;</code>。<code>Cell&lt;T&gt;</code>提供了<code>get</code>和<code>set</code>方
+法，只需调用一个方法就可以改变内部值。不过<code>Cell&lt;T&gt;</code>只与实现Copy的类型兼容。对
+于其他类型，必须使用<code>RefCell&lt;T&gt;</code>类型，在改变之前获得一个写锁。</p>
+<p><code>RefCell</code><T>使用Rust的生命周期来实现 &quot;动态借用&quot;，在这个过程中，我们可以要求对
+内部值进行临时的、独占的、可改变的访问。<code>RefCell&lt;T&gt;</code>的借用是在&quot;运行时&quot;跟踪的，
+而不像Rust的本地引用类型那样完全是在编译时静态跟踪的。因为<code>RefCell&lt;T&gt;</code>的借用是
+动态的，所以有可能试图借用一个已经被变异借用的值；当这种情况发生时，会导致线程恐
+慌。</p>
+<h1><a class="header" href="#何时选择内部可变性" id="何时选择内部可变性">何时选择内部可变性</a></h1>
+<p>更常见的继承可变性，即必须有唯一的访问权才能改变一个值，这是一个关键的语言元素，
+使Rust能够强有力地推理指针别名，静态地防止崩溃的错误。正因为如此，继承的可变性是
+首选，而内部可变性是最后的手段。由于单元格类型能够在原本不允许的地方进行改变，所
+以在某些情况下，内部变异可能是合适的，甚至是<em>必须</em>使用的，比如说</p>
 <ul>
-<li>Introducing inherited mutability roots to shared types.</li>
-<li>Implementation details of logically-immutable methods.</li>
-<li>Mutating implementations of <code>Clone</code>.</li>
+<li>为共享类型引入继承的可变性根源。</li>
+<li>逻辑上不可变的方法的实现细节。</li>
+<li><code>Clone</code>的可变实现。</li>
 </ul>
-<h2><a class="header" href="#introducing-inherited-mutability-roots-to-shared-types" id="introducing-inherited-mutability-roots-to-shared-types">Introducing inherited mutability roots to shared types</a></h2>
-<p>Shared smart pointer types, including <code>Rc&lt;T&gt;</code> and <code>Arc&lt;T&gt;</code>, provide containers that can be
-cloned and shared between multiple parties. Because the contained values may be
-multiply-aliased, they can only be borrowed as shared references, not mutable references.
-Without cells it would be impossible to mutate data inside of shared boxes at all!</p>
-<p>It's very common then to put a <code>RefCell&lt;T&gt;</code> inside shared pointer types to reintroduce
-mutability:</p>
+<h2><a class="header" href="#为共享类型引入继承的可变性根基" id="为共享类型引入继承的可变性根基">为共享类型引入继承的可变性根基</a></h2>
+<p>共享的智能指针类型，包括<code>Rc&lt;T&gt;</code>和<code>Arc&lt;T&gt;</code>，提供了可以在多方之间克隆和共享的容器
+。因为所包含的值可能是多重别名的，所以它们只能作为共享引用被借用，而不是可变型引用
+。如果没有单元格，就根本不可能对共享盒内的数据进行变异！</p>
+<p>因此，在共享指针类型内放置一个<code>RefCell&lt;T&gt;</code>以重新引入可变性是非常常见的：</p>
 <pre><code class="language-rust ignore">use std::collections::HashMap;
 use std::cell::RefCell;
 use std::rc::Rc;
@@ -3219,16 +3162,15 @@ fn main() {
     shared_map.borrow_mut().insert(&quot;marbles&quot;, 38);
 }
 </code></pre>
-<p>Note that this example uses <code>Rc&lt;T&gt;</code> and not <code>Arc&lt;T&gt;</code>. <code>RefCell&lt;T&gt;</code>s are for single-threaded
-scenarios. Consider using <code>Mutex&lt;T&gt;</code> if you need shared mutability in a multi-threaded
-situation.</p>
+<p>注意这个例子使用了<code>Rc&lt;T&gt;</code>而不是<code>Arc&lt;T&gt;</code>。<code>RefCell&lt;T&gt;</code>是用于单线程的情况。如果你在
+多线程情况下需要共享可变性，请考虑使用<code>Mutex&lt;T&gt;</code>。</p>
 </blockquote>
-<p>Hey, Rust's docs continue to be incredibly awesome.</p>
-<p>The meaty bit we care about is this line:</p>
+<p>嘿，Rust的文档仍然是令人难以置信的棒。</p>
+<p>我们关心的主要内容是这一行：</p>
 <pre><code class="language-rust ignore">shared_map.borrow_mut().insert(&quot;africa&quot;, 92388);
 </code></pre>
-<p>In particular, the <code>borrow_mut</code> thing. Seems we need to explicitly borrow a
-RefCell. The <code>.</code> operator's not going to do it for us. Weird. Let's try:</p>
+<p>特别是<code>borrow_mut</code>的事情。似乎我们需要明确地借用一个RefCell。<code>.</code>运算符不会为我
+们这样做。很奇怪。让我们试试：</p>
 <pre><code class="language-rust ignore">pub fn push_front(&amp;mut self, elem: T) {
     let new_head = Node::new(elem);
     match self.head.take() {
@@ -3254,10 +3196,9 @@ warning: field is never used: `elem`
    |
    = note: #[warn(dead_code)] on by default
 </code></pre>
-<p>Hey, it built! Docs win again.</p>
-<h1><a class="header" href="#breaking-down" id="breaking-down">Breaking Down</a></h1>
-<p><code>pop_front</code> should be the same basic logic as <code>push_front</code>, but backwards. Let's
-try:</p>
+<p>嘿，它构建了！文档又赢了。</p>
+<h1><a class="header" href="#崩溃" id="崩溃">崩溃</a></h1>
+<p><code>pop_front</code>应该是与<code>push_front</code>相同的基本逻辑，但要倒过来。我们来试试：</p>
 <pre><code class="language-rust ignore">pub fn pop_front(&amp;mut self) -&gt; Option&lt;T&gt; {
     // need to take the old head, ensuring it's -2
     self.head.take().map(|old_head| {                         // -1 old
@@ -3286,7 +3227,7 @@ error[E0609]: no field `elem` on type `std::rc::Rc&lt;std::cell::RefCell&lt;four
 64 |             old_head.elem
    |                      ^^^^ unknown field
 </code></pre>
-<p>ACK. <em>RefCells</em>. Gotta <code>borrow_mut</code> again I guess...</p>
+<p>啊。<em>RefCells</em>. 我想，又得<code>borrow_mut</code>了...</p>
 <pre><code class="language-rust ignore">pub fn pop_front(&amp;mut self) -&gt; Option&lt;T&gt; {
     self.head.take().map(|old_head| {
         match old_head.borrow_mut().next.take() {
@@ -3310,19 +3251,19 @@ error[E0507]: cannot move out of borrowed content
 64 |             old_head.borrow_mut().elem
    |             ^^^^^^^^^^^^^^^^^^^^^^^^^^ cannot move out of borrowed content
 </code></pre>
-<p><em>sigh</em></p>
+<p><em>叹息</em></p>
 <blockquote>
-<p>cannot move out of borrowed content</p>
+<p>不能移出借用的内容</p>
 </blockquote>
-<p>Hrm... It seems that Box was <em>really</em> spoiling us. <code>borrow_mut</code> only gets us
-an <code>&amp;mut Node&lt;T&gt;</code>, but we can't move out of that!</p>
-<p>We need something that takes a <code>RefCell&lt;T&gt;</code> and gives us a <code>T</code>. Let's check
-<a href="https://doc.rust-lang.org/std/cell/struct.RefCell.html">the docs</a> for something like that:</p>
+<p>嗯... 看来盒子真的是宠坏了我们。<code>borrow_mut</code>只能得到一个<code>&amp;mut Node&lt;T&gt;</code>，但我
+们不能从那里移出！</p>
+<p>我们需要一个能接收<code>RefCell&lt;T&gt;</code>并给我们一个<code>T</code>的东西，让我们看看<a href="https://doc.rust-lang.org/std/cell/struct.RefCell.html">文档</a>
+中是否有这样的东西：</p>
 <blockquote>
 <p><code>fn into_inner(self) -&gt; T</code></p>
-<p>Consumes the RefCell, returning the wrapped value.</p>
+<p>消费RefCell，返回被包装的值。</p>
 </blockquote>
-<p>That looks promising!</p>
+<p>这看起来很有希望！</p>
 <pre><code class="language-rust ignore">old_head.into_inner().elem
 </code></pre>
 <pre><code class="language-text">&gt; cargo build
@@ -3333,22 +3274,18 @@ error[E0507]: cannot move out of an `Rc`
 64 |             old_head.into_inner().elem
    |             ^^^^^^^^ cannot move out of an `Rc`
 </code></pre>
-<p>Ah dang. <code>into_inner</code> wants to move out the RefCell, but we can't, because it's
-in an <code>Rc</code>. As we saw in the previous chapter, <code>Rc&lt;T&gt;</code> only lets us get shared references
-into its internals. That makes sense, because that's <em>the whole point</em> of
-reference counted pointers: they're shared!</p>
-<p>This was a problem for us when we wanted to implement Drop for our reference
-counted list, and the solution is the same: <code>Rc::try_unwrap</code>, which moves out
-the contents of an Rc if its refcount is 1.</p>
+<p>啊偶。<code>into_inner</code>想要移出RefCell，但是我们不能，因为它在一个<code>Rc</code>中。正如我们在上一章看到的，
+<code>Rc&lt;T&gt;</code>只允许我们把共享的引用移到它的内部。这是有道理的，因为这就是引用计数指针的<em>全部意义</em>：
+它们是共享的！</p>
+<p>当我们想为我们的引用计数列表实现Drop时，这是一个问题，解决方案也是一样的：<code>Rc::try_unwrap</code>，
+如果一个Rc的refcount是1，它将移出其内容。</p>
 <pre><code class="language-rust ignore">Rc::try_unwrap(old_head).unwrap().into_inner().elem
 </code></pre>
-<p><code>Rc::try_unwrap</code> returns a <code>Result&lt;T, Rc&lt;T&gt;&gt;</code>. Results are basically a
-generalized <code>Option</code>, where the <code>None</code> case has data associated with it. In
-this case, the <code>Rc</code> you tried to unwrap. Since we don't care about the case
-where it fails (if we wrote our program correctly, it <em>has</em> to succeed), we
-just call <code>unwrap</code> on it.</p>
-<p>Anyway, let's see what compiler error we get next (let's face it, there's going
-to be one).</p>
+<p><code>Rc::try_unwrap</code>返回一个<code>Result&lt;T, Rc&lt;T&gt;&gt;</code>。结果基本上是一个广义的<code>Option</code>，
+其中<code>None</code>的情况下有数据与之相关。在这种情况下，就是你试图解包的<code>Rc</code>。由于我们并
+不关心它失败的情况（如果我们的程序写得正确，它一定会成功），我们只是对它调用
+<code>unwrap</code>。</p>
+<p>总之，让我们看看接下来会出现什么编译器错误（让我们面对现实吧，一定会有的）。</p>
 <pre><code class="language-text">&gt; cargo build
 
 error[E0599]: no method named `unwrap` found for type `std::result::Result&lt;std::cell::RefCell&lt;fourth::Node&lt;T&gt;&gt;, std::rc::Rc&lt;std::cell::RefCell&lt;fourth::Node&lt;T&gt;&gt;&gt;&gt;` in the current scope
@@ -3360,22 +3297,21 @@ error[E0599]: no method named `unwrap` found for type `std::result::Result&lt;st
    = note: the method `unwrap` exists but the following trait bounds were not satisfied:
            `std::rc::Rc&lt;std::cell::RefCell&lt;fourth::Node&lt;T&gt;&gt;&gt; : std::fmt::Debug`
 </code></pre>
-<p>UGH. <code>unwrap</code> on Result requires that you can debug-print the error case.
-<code>RefCell&lt;T&gt;</code> only implements <code>Debug</code> if <code>T</code> does. <code>Node</code> doesn't implement Debug.</p>
-<p>Rather than doing that, let's just work around it by converting the Result to
-an Option with <code>ok</code>:</p>
+<p>UGH.Result上的<code>unwrap</code>要求你能调试打印出错的情况。<code>RefCell&lt;T&gt;</code>只有在<code>T</code>实现时才实现
+<code>Debug</code>。<code>Node</code>并没有实现Debug。</p>
+<p>与其这样做，不如通过将Result转换为一个带有<code>ok</code>的Option来解决这个问题：</p>
 <pre><code class="language-rust ignore">Rc::try_unwrap(old_head).ok().unwrap().into_inner().elem
 </code></pre>
-<p>PLEASE.</p>
+<p>请。</p>
 <pre><code class="language-text">cargo build
 
 </code></pre>
-<p>YES.</p>
-<p><em>phew</em></p>
-<p>We did it.</p>
-<p>We implemented <code>push</code> and <code>pop</code>.</p>
-<p>Let's test by stealing the old <code>stack</code> basic test (because that's all that
-we've implemented so far):</p>
+<p>对了。</p>
+<p><em>呼</em></p>
+<p>我们做到了。</p>
+<p>我们应用了<code>push</code>和<code>pop</code>。</p>
+<p>让我们通过窃取旧的<code>stack</code>基本测试来进行测试（因为这就是我们到目前为止所实现的全
+部）：</p>
 <pre><code class="language-rust ignore">#[cfg(test)]
 mod test {
     use super::List;
@@ -3428,19 +3364,17 @@ test second::test::into_iter ... ok
 test result: ok. 9 passed; 0 failed; 0 ignored; 0 measured
 
 </code></pre>
-<p><em>Nailed it</em>.</p>
-<p>Now that we can properly remove things from the list, we can implement Drop.
-Drop is a little more conceptually interesting this time around. Where
-previously we bothered to implement Drop for our stacks just to avoid unbounded
-recursion, now we need to implement Drop to get <em>anything</em> to happen at all.</p>
-<p><code>Rc</code> can't deal with cycles. If there's a cycle, everything will keep everything
-else alive. A doubly-linked list, as it turns out, is just a big chain of tiny
-cycles! So when we drop our list, the two end nodes will have their refcounts
-decremented down to 1... and then nothing else will happen. Well, if our list
-contains exactly one node we're good to go. But ideally a list should work right
-if it contains multiple elements. Maybe that's just me.</p>
-<p>As we saw, removing elements was a bit painful. So the easiest thing for us to
-do is just <code>pop</code> until we get None:</p>
+<p><em>钉住了</em>。</p>
+<p>现在我们可以正确地从列表中删除东西，我们可以实现Drop。这次的Drop在概念上更加有趣。
+以前我们费力地为我们的堆栈实现Drop只是为了避免无界递归，现在我们需要实现Drop才能
+让<em>任何事情</em>发生。</p>
+<p><code>Rc</code>不能处理循环。如果有一个循环，所有的东西都会让其他的东西活着。事实证明，一个
+双向链接的列表只是一个由微小的循环组成的大链子！因此，当我们放弃我们的列表时，两
+个末端节点的refcounts将被递减到1......然后就不会再发生什么了。好吧，如果我们的列
+表正好包含一个节点，我们就可以了。但理想情况下，如果一个列表包含多个元素，它就应
+该正常工作。也许这只是我的问题。</p>
+<p>正如我们所看到的，删除元素是有点痛苦的。所以对我们来说，最简单的事情就是<code>pop</code>，直
+到我们得到None：</p>
 <pre><code class="language-rust ignore">impl&lt;T&gt; Drop for List&lt;T&gt; {
     fn drop(&amp;mut self) {
         while self.pop_front().is_some() {}
@@ -3450,25 +3384,23 @@ do is just <code>pop</code> until we get None:</p>
 <pre><code class="language-text">cargo build
 
 </code></pre>
-<p>(We actually could have done this with our mutable stacks, but shortcuts are for
-people who understand things!)</p>
-<p>We could look at implementing the <code>_back</code> versions of <code>push</code> and <code>pop</code>, but
-they're just copy-paste jobs which we'll defer to later in the chapter. For now
-let's look at more interesting things!</p>
-<h1><a class="header" href="#peeking" id="peeking">Peeking</a></h1>
-<p>Alright, we made it through <code>push</code> and <code>pop</code>. I'm not gonna lie, it got a
-bit emotional there. Compile-time correctness is a hell of a drug.</p>
-<p>Let's cool off by doing something simple: let's just implement <code>peek_front</code>.
-That was always really easy before. Gotta still be easy, right?</p>
-<p>Right?</p>
-<p>In fact, I think I can just copy-paste it!</p>
+<p>(我们实际上可以用我们的可变堆栈做到这一点，但捷径是给那些理解事物的人的！)</p>
+<p>我们可以考虑实现<code>push</code>和<code>pop</code>的<code>_back</code>版本，但这只是复制粘贴的工作，我们将在本章的
+后面进行讨论。现在，让我们看看更有趣的事情吧！</p>
+<h1><a class="header" href="#选择-1" id="选择-1">选择</a></h1>
+<p>好了，我们用<code>push</code>和<code>pop</code>做。不瞒你说，我在那里有点情绪化了。编译时的正确性是
+一种可怕的毒药。</p>
+<p>让我们做一些简单的事情来冷静一下：让我们实现<code>peek_front</code>。这在以前是非常容易
+的。应该还是很容易的，对吗？</p>
+<p>对吗？</p>
+<p>事实上，我想我可以直接复制粘贴它！&quot;。</p>
 <pre><code class="language-rust ignore">pub fn peek_front(&amp;self) -&gt; Option&lt;&amp;T&gt; {
     self.head.as_ref().map(|node| {
         &amp;node.elem
     })
 }
 </code></pre>
-<p>Wait. Not this time.</p>
+<p>等等。不是这时候。</p>
 <pre><code class="language-rust ignore">pub fn peek_front(&amp;self) -&gt; Option&lt;&amp;T&gt; {
     self.head.as_ref().map(|node| {
         // BORROW!!!!
@@ -3476,7 +3408,7 @@ That was always really easy before. Gotta still be easy, right?</p>
     })
 }
 </code></pre>
-<p>HAH.</p>
+<p>哈。</p>
 <pre><code class="language-text">cargo build
 
 error[E0515]: cannot return value referencing temporary value
@@ -3489,43 +3421,34 @@ error[E0515]: cannot return value referencing temporary value
    |             |
    |             returns a value referencing data owned by the current function
 </code></pre>
-<p>Ok I'm just burning my computer.</p>
-<p>This is exactly the same logic as our singly-linked stack. Why are things
-different. WHY.</p>
-<p>The answer is really the whole moral of this chapter: RefCells make everything
-sadness. Up until now, RefCells have just been a nuisance. Now they're going to
-become a nightmare.</p>
-<p>So what's going on? To understand that, we need to go back to the definition of
-<code>borrow</code>:</p>
+<p>好吧，我只是在烧我的电脑。</p>
+<p>这与我们的单链栈的逻辑完全相同。为什么事情会不同。为什么。</p>
+<p>答案其实就是本章的全部寓意。RefCells使一切变得悲伤。到现在为止，RefCells只是一个讨
+厌的东西。现在它们将成为一场噩梦。</p>
+<p>那么发生了什么？为了理解这一点，我们需要回到<code>borrow</code>的定义上：</p>
 <pre><code class="language-rust ignore">fn borrow&lt;'a&gt;(&amp;'a self) -&gt; Ref&lt;'a, T&gt;
 fn borrow_mut&lt;'a&gt;(&amp;'a self) -&gt; RefMut&lt;'a, T&gt;
 </code></pre>
-<p>In the layout section we said:</p>
+<p>在布局部分，我们说：</p>
 <blockquote>
-<p>Rather than enforcing this statically, RefCell enforces them at runtime.
-If you break the rules, RefCell will just panic and crash the program.
-Why does it return these Ref and RefMut things? Well, they basically behave
-like <code>Rc</code>s but for borrowing. Also they keep the RefCell borrowed until they go out
-of scope. <strong>We'll get to that later.</strong></p>
+<p>RefCell不是静态地执行这些规则，而是在运行时执行它们。
+如果你违反了这些规则，RefCell就会惊慌失措，使程序崩溃。
+为什么它会返回这些Ref和RefMut的东西？好吧，它们的行为基本上和<code>Rc</code>s一样，只是用于借用。
+另外，它们保持RefCell的借用，直到它们超出范围。<strong>我们稍后会讨论这个问题。</strong></p>
 </blockquote>
-<p>It's later.</p>
-<p><code>Ref</code> and <code>RefMut</code> implement <code>Deref</code> and <code>DerefMut</code> respectively. So for most
-intents and purposes they behave <em>exactly</em> like <code>&amp;T</code> and <code>&amp;mut T</code>. However,
-because of how those traits work, the reference that's returned is connected
-to the lifetime of the Ref, and not the actual RefCell. This means that the Ref
-has to be sitting around as long as we keep the reference around.</p>
-<p>This is in fact necessary for correctness. When a Ref gets dropped, it tells
-the RefCell that it's not borrowed anymore. So if we <em>did</em> manage to hold onto our
-reference longer than the Ref existed, we could get a RefMut while a reference
-was kicking around and totally break Rust's type system in half.</p>
-<p>So where does that leave us? We only want to return a reference, but we need
-to keep this Ref thing around. But as soon as we return the reference from
-<code>peek</code>, the function is over and the <code>Ref</code> goes out of scope.</p>
+<p>现在就是那个稍后。</p>
+<p><code>Ref</code>和<code>RefMut</code>分别实现了<code>Deref</code>和<code>DerefMut</code>。因此，就大多数意图和目的而言，它们
+的行为与<code>&amp;T</code>和<code>&amp;mut T</code><em>完全</em>一样。然而，由于这些特性的工作方式，被返回的引用与引用
+的生命周期有关，而不是与实际的RefCell有关。这意味着，只要我们保留引用，Ref就必须一直
+存在。</p>
+<p>事实上，这对于正确性是必要的。当一个Ref被放弃时，它告诉RefCell它不再被借用。因此，如
+果我们<em>确实</em>设法保持我们的引用比引用存在的时间长，我们就可以在引用四处游荡时得到一个
+RefMut，并完全破坏Rust的类型系统的一半。</p>
+<p>那么，这让我们怎么办呢？我们只想返回一个引用，但我们需要保持这个引用的存在。但是一旦
+我们从<code>peek</code>中返回引用，函数就结束了，而<code>Ref</code>就出了范围。</p>
 <p>😖</p>
-<p>As far as I know, we're actually totally dead in the water here. You can't
-totally encapsulate the use of RefCells like that.</p>
-<p>But... what if we just give up on totally hiding our implementation details?
-What if we returns Refs?</p>
+<p>据我所知，我们在这里实际上已经完全陷入了困境。你不能像这样把RefCells的使用完全封装起来。</p>
+<p>但是......如果我们放弃了完全隐藏我们的实现细节呢？如果我们返回Refs呢？</p>
 <pre><code class="language-rust ignore">pub fn peek_front(&amp;self) -&gt; Option&lt;Ref&lt;T&gt;&gt; {
     self.head.as_ref().map(|node| {
         node.borrow()
@@ -3546,7 +3469,7 @@ help: possible candidates are found in other modules, you can import them into s
 1  | use std::cell::Ref;
    |
 </code></pre>
-<p>Blurp. Gotta import some stuff.</p>
+<p>啊这。要导入一些东西。</p>
 <pre><code class="language-rust ignore">use std::cell::{Ref, RefCell};
 </code></pre>
 <pre><code class="language-text">&gt; cargo build
@@ -3562,25 +3485,22 @@ error[E0308]: mismatched types
    = note: expected type `std::option::Option&lt;std::cell::Ref&lt;'_, T&gt;&gt;`
               found type `std::option::Option&lt;std::cell::Ref&lt;'_, fourth::Node&lt;T&gt;&gt;&gt;`
 </code></pre>
-<p>Hmm... that's right. We have a <code>Ref&lt;Node&lt;T&gt;&gt;</code>, but we want a <code>Ref&lt;T&gt;</code>. We could
-abandon all hope of encapsulation and just return that. We could also make
-things even more complicated and wrap <code>Ref&lt;Node&lt;T&gt;&gt;</code> in a new type to only
-expose access to an <code>&amp;T</code>.</p>
-<p>Both of those options are <em>kinda</em> lame.</p>
-<p>Instead, we're going to go deeper down. Let's
-have some <em>fun</em>. Our source of fun is <em>this beast</em>:</p>
+<p>嗯...这就对了。我们有一个<code>Ref&lt;Node&lt;T&gt;&gt;</code>，但是我们想要一个<code>Ref&lt;T&gt;</code>。我们可以放弃所
+有封装的希望，直接返回它。我们也可以把事情搞得更复杂，把<code>Ref&lt;Node&lt;T&gt;&gt;</code>包装成一个新
+的类型，只暴露对<code>&amp;T</code>的访问。</p>
+<p>这两种方法都<em>有点</em>蹩脚。</p>
+<p>相反，我们要更深入地去做。让我们找点<em>乐子</em>。我们的乐趣之源是这只<em>野兽</em>：</p>
 <pre><code class="language-rust ignore">map&lt;U, F&gt;(orig: Ref&lt;'b, T&gt;, f: F) -&gt; Ref&lt;'b, U&gt;
     where F: FnOnce(&amp;T) -&gt; &amp;U,
           U: ?Sized
 </code></pre>
 <blockquote>
-<p>Make a new Ref for a component of the borrowed data.</p>
+<p>为借来的数据的一个组成部分做一个新的参考。</p>
 </blockquote>
-<p>Yes: just like you can map over an Option, you can map over a Ref.</p>
-<p>I'm sure someone somewhere is really excited because <em>monads</em> or whatever but
-I don't care about any of that. Also I don't think it's a proper monad since
-there's no None-like case, but I digress.</p>
-<p>It's cool and that's all that matters to me. <em>I need this</em>.</p>
+<p>是的：就像你可以映射一个Option，你也可以映射一个Ref。</p>
+<p>我相信某些人真的很兴奋，因为<em>单体</em>或其他什么，但我并不关心这些。我也不认为这是一个合
+适的单体，因为没有None-like的情况，但我离题了。</p>
+<p>它很酷，这对我来说才是最重要的。<em>我需要这个</em>。</p>
 <pre><code class="language-rust ignore">pub fn peek_front(&amp;self) -&gt; Option&lt;Ref&lt;T&gt;&gt; {
     self.head.as_ref().map(|node| {
         Ref::map(node.borrow(), |node| &amp;node.elem)
@@ -3589,9 +3509,9 @@ there's no None-like case, but I digress.</p>
 </code></pre>
 <pre><code class="language-text">&gt; cargo build
 </code></pre>
-<p>Awww yissss</p>
-<p>Let's make sure this is working by munging up the test from our stack. We need
-to do some munging to deal with the fact that Refs don't implement comparisons.</p>
+<p>啊耶。</p>
+<p>让我们通过从我们的堆栈中插入测试来确保它的工作。我们需要做一些处理，以应对Refs不实
+现比较的事实。</p>
 <pre><code class="language-rust ignore">#[test]
 fn peek() {
     let mut list = List::new();
@@ -3620,15 +3540,15 @@ test third::test::iter ... ok
 test result: ok. 10 passed; 0 failed; 0 ignored; 0 measured
 
 </code></pre>
-<p>Great!</p>
-<h1><a class="header" href="#symmetric-junk" id="symmetric-junk">Symmetric Junk</a></h1>
-<p>Alright let's get all that combinatoric symmetry over with.</p>
-<p>All we have to do is some basic text replacement:</p>
+<p>棒！</p>
+<h1><a class="header" href="#对称的垃圾" id="对称的垃圾">对称的垃圾</a></h1>
+<p>好了，让我们把所有的组合对称性问题都解决了。</p>
+<p>我们所要做的就是一些基本的文本替换：</p>
 <pre><code class="language-text">tail &lt;-&gt; head
 next &lt;-&gt; prev
 front -&gt; back
 </code></pre>
-<p>Oh, also we need to add <code>_mut</code> variants for peeking.</p>
+<p>哦，我们还需要为选取增加<code>_mut</code>的变体。</p>
 <pre><code class="language-rust ignore">pub fn push_back(&amp;mut self, elem: T) {
     let new_tail = Node::new(elem);
     match self.tail.take() {
@@ -3677,7 +3597,7 @@ pub fn peek_front_mut(&amp;mut self) -&gt; Option&lt;RefMut&lt;T&gt;&gt; {
     })
 }
 </code></pre>
-<p>And massively flesh out our tests:</p>
+<p>并大规模地充实我们的测试：</p>
 <pre><code class="language-rust ignore">#[test]
 fn basics() {
     let mut list = List::new();
@@ -3749,8 +3669,8 @@ fn peek() {
     assert_eq!(&amp;mut *list.peek_back_mut().unwrap(), &amp;mut 1);
 }
 </code></pre>
-<p>Are there some cases we're not testing? Probably. The combinatoric space
-has really blown up here. Our code is at very least not <em>obviously wrong</em>.</p>
+<p>是否有一些情况我们没有测试？可能吧。组合空间在这里真的炸开了锅。我们的代码至少
+没有<em>明显的错误</em>。</p>
 <pre><code class="language-text">&gt; cargo test
 
      Running target/debug/lists-5c71138492ad4b4a
@@ -3770,12 +3690,11 @@ test third::test::basics ... ok
 test result: ok. 10 passed; 0 failed; 0 ignored; 0 measured
 
 </code></pre>
-<p>Nice. Copy-pasting is the best kind of programming.</p>
-<h1><a class="header" href="#iteration" id="iteration">Iteration</a></h1>
-<p>Let's take a crack at iterating this bad-boy.</p>
+<p>不错。复制-粘贴是最好的编程方式。</p>
+<h1><a class="header" href="#迭代" id="迭代">迭代</a></h1>
+<p>让我们来试着迭代这个坏小子。</p>
 <h2><a class="header" href="#intoiter" id="intoiter">IntoIter</a></h2>
-<p>IntoIter, as always, is going to be the easiest. Just wrap the stack and
-call <code>pop</code>:</p>
+<p>IntoIter和往常一样，是最简单的。只是包装了栈并调用<code>pop</code>：</p>
 <pre><code class="language-rust ignore">pub struct IntoIter&lt;T&gt;(List&lt;T&gt;);
 
 impl&lt;T&gt; List&lt;T&gt; {
@@ -3791,31 +3710,25 @@ impl&lt;T&gt; Iterator for IntoIter&lt;T&gt; {
     }
 }
 </code></pre>
-<p>But we have an interesting new development. Where previously there was only
-ever one &quot;natural&quot; iteration order for our lists, a Deque is inherently
-bi-directional. What's so special about front-to-back? What if someone wants
-to iterate in the other direction?</p>
-<p>Rust actually has an answer to this: <code>DoubleEndedIterator</code>. DoubleEndedIterator
-<em>inherits</em> from Iterator (meaning all DoubleEndedIterator are Iterators) and
-requires one new method: <code>next_back</code>. It has the exact same signature as
-<code>next</code>, but it's supposed to yield elements from the other end. The semantics
-of DoubleEndedIterator are super convenient for us: the iterator becomes a
-deque. You can consume elements from the front and back until the two ends
-converge, at which point the iterator is empty.</p>
-<p>Much like Iterator and <code>next</code>, it turns out that <code>next_back</code> isn't really
-something consumers of the DoubleEndedIterator really care about. Rather, the
-best part of this interface is that it exposes the <code>rev</code> method, which wraps
-up the iterator to make a new one that yields the elements in reverse order.
-The semantics of this are fairly straight-forward: calls to <code>next</code> on the
-reversed iterator are just calls to <code>next_back</code>.</p>
-<p>Anyway, because we're already a deque providing this API is pretty easy:</p>
+<p>但我们有一个有趣的新发展。以前，我们的列表只有一种&quot;自然&quot;的迭代顺序，而双向队列本
+身就是双向的。从前到后有什么特别之处？如果有人想从另一个方向迭代呢？</p>
+<p>Rust实际上对此有一个答案：<code>DoubleEndedIterator</code>。DoubleEndedIterator<em>继承</em>自
+Iterator（意味着所有的DoubleEndedIterator都是Iterators），并且需要一个新方法：
+<code>next_back</code>。它的签名与<code>next</code>完全相同，但它应该从另一端产生元素。
+DoubleEndedIterator的语义对我们来说是非常方便的：迭代器成为一个双向队列。你可以
+从前面和后面消耗元素，直到两端汇合，这时迭代器是空的。</p>
+<p>与Iterator和<code>next</code>一样，事实证明<code>next_back</code>并不是DoubleEndedIterator的消费者
+真正关心的东西。相反，这个接口最好的部分是它暴露了<code>rev</code>方法，它将迭代器包装起来，
+形成一个新的迭代器，以相反的顺序产生元素。这方面的语义是相当直接的：对反向迭代器
+的<code>next</code>的调用只是对<code>next_back</code>的调用。</p>
+<p>总之，因为我们已经是一个双向队列，所以提供这个API是非常容易的：</p>
 <pre><code class="language-rust ignore">impl&lt;T&gt; DoubleEndedIterator for IntoIter&lt;T&gt; {
     fn next_back(&amp;mut self) -&gt; Option&lt;T&gt; {
         self.0.pop_back()
     }
 }
 </code></pre>
-<p>And let's test it out:</p>
+<p>然后让我们测试它：</p>
 <pre><code class="language-rust ignore">#[test]
 fn into_iter() {
     let mut list = List::new();
@@ -3849,11 +3762,10 @@ test second::test::peek ... ok
 test result: ok. 11 passed; 0 failed; 0 ignored; 0 measured
 
 </code></pre>
-<p>Nice.</p>
+<p>好。</p>
 <h2><a class="header" href="#iter" id="iter">Iter</a></h2>
-<p>Iter will be a bit less forgiving. We'll have to deal with those awful <code>Ref</code>
-things again! Because of Refs, we can't store <code>&amp;Node</code>s like we did before.
-Instead, let's try to store <code>Ref&lt;Node&gt;</code>s:</p>
+<p>Iter的宽容度会低一些。我们将不得不再次处理那些可怕的<code>Ref</code>的东西 由于Refs的存在，
+我们不能像以前那样存储<code>&amp;Nodes</code>。相反，让我们尝试存储<code>Ref&lt;Node&gt;</code>s：</p>
 <pre><code class="language-rust ignore">pub struct Iter&lt;'a, T&gt;(Option&lt;Ref&lt;'a, Node&lt;T&gt;&gt;&gt;);
 
 impl&lt;T&gt; List&lt;T&gt; {
@@ -3865,9 +3777,8 @@ impl&lt;T&gt; List&lt;T&gt; {
 <pre><code class="language-text">&gt; cargo build
 
 </code></pre>
-<p>So far so good. Implementing <code>next</code> is going to be a bit hairy, but I think
-it's the same basic logic as the old stack IterMut but with extra RefCell
-madness:</p>
+<p>到目前为止还不错。<code>next</code>的实现会有点棘手，但我认为它与旧的堆栈IterMut的基本逻辑
+是一样的，只是多了RefCell的疯狂：</p>
 <pre><code class="language-rust ignore">impl&lt;'a, T&gt; Iterator for Iter&lt;'a, T&gt; {
     type Item = Ref&lt;'a, T&gt;;
     fn next(&amp;mut self) -&gt; Option&lt;Self::Item&gt; {
@@ -3904,20 +3815,18 @@ error[E0505]: cannot move out of `node_ref` because it is borrowed
 156 |             Ref::map(node_ref, |node| &amp;node.elem)
     |                      ^^^^^^^^ move out of `node_ref` occurs here
 </code></pre>
-<p>Shoot.</p>
-<p><code>node_ref</code> doesn't live long enough. Unlike normal references, Rust doesn't let
-us just split Refs up like that. The Ref we get out of <code>head.borrow()</code> is only
-allowed to live as long as <code>node_ref</code>, but we end up trashing that in our
-<code>Ref::map</code> call.</p>
-<p>Coincidentally, as of the moment I am writing this, the function we want was
-actually stabilized 2 days ago. That means it will be a few months before it
-hits the stable release. So let's continue along with the latest nightly build:</p>
+<p>完成。</p>
+<p><code>node_ref</code>的生命周期不够长。与普通的引用不同，Rust不允许我们像这样把Ref拆开。我们从
+<code>head.borrow()</code>中得到的Ref只允许活得和<code>node_ref</code>一样长，但我们最终在<code>Ref::map</code>
+的调用中破坏了它。</p>
+<p>巧合的是，就在我写这篇文章的时候，我们想要的函数实际上在两天前就已经稳定了。这意味着它
+将在几个月后进入稳定版。所以让我们继续使用最新的每夜构建：</p>
 <pre><code class="language-rust ignore">pub fn map_split&lt;U, V, F&gt;(orig: Ref&lt;'b, T&gt;, f: F) -&gt; (Ref&lt;'b, U&gt;, Ref&lt;'b, V&gt;) where
     F: FnOnce(&amp;T) -&gt; (&amp;U, &amp;V),
     U: ?Sized,
     V: ?Sized,
 </code></pre>
-<p>Woof. Let's give it a try...</p>
+<p>芜湖。让我们试一试...</p>
 <pre><code class="language-rust ignore">fn next(&amp;mut self) -&gt; Option&lt;Self::Item&gt; {
     self.0.take().map(|node_ref| {
         let (next, elem) = Ref::map_split(node_ref, |node| {
@@ -3943,10 +3852,9 @@ error[E0521]: borrowed data escapes outside of closure
     |             |
     |             reference to `next` escapes the closure body here
 </code></pre>
-<p>Ergh. We need to <code>Ref::Map</code> again to get our lifetimes right. But <code>Ref::Map</code>
-returns a <code>Ref</code> and we need an <code>Option&lt;Ref&gt;</code>, but we need to go through the
-Ref to map over our Option...</p>
-<p><strong>stares into distance for a long time</strong></p>
+<p>Ergh. 我们需要再次使用<code>Ref::Map</code>来使我们的生命周期正确。但是<code>Ref::Map</code>返回一个
+<code>Ref</code>，我们需要一个<code>Option&lt;Ref&gt;</code>，但是我们需要通过Ref来映射我们的Option......</p>
+<p><strong>盯着远方看了很久</strong></p>
 <p>??????</p>
 <pre><code class="language-rust ignore">fn next(&amp;mut self) -&gt; Option&lt;Self::Item&gt; {
     self.0.take().map(|node_ref| {
@@ -3973,16 +3881,12 @@ Ref to map over our Option...</p>
     = note: expected type `std::cell::Ref&lt;'_, fourth::Node&lt;_&gt;&gt;`
                found type `std::cell::Ref&lt;'_, std::cell::RefCell&lt;fourth::Node&lt;_&gt;&gt;&gt;`
 </code></pre>
-<p>Oh. Right. There's multiple RefCells. The deeper we walk into the list, the more
-nested we become under each RefCell. We would need to maintain, like, a stack of
-Refs to represent all the outstanding loans we're holding, because if we stop
-looking at an element we need to decrement the borrow-count on every RefCell that
-comes before it.................</p>
-<p>I don't think there's anything we can do here. It's a dead end. Let's try
-getting out of the RefCells.</p>
-<p>What about our <code>Rc</code>s. Who said we even needed to store references?
-Why can't we just Clone the whole Rc to get a nice owning handle into the middle
-of the list?</p>
+<p>哦。对。这里有多个RefCell。我们在列表中走得越深，每个RefCell下的嵌套就越多。我们需要
+维护，比如说，一个堆栈的Refs来代表我们持有的所有未偿借贷，因为如果我们停止查看一个元
+素，我们需要递减它之前的每个RefCell的借用计数.................</p>
+<p>我不认为我们在这里有什么可以做的。这是个死胡同。让我们试着离开RefCell。</p>
+<p>那我们的<code>Rc</code>s呢？谁说我们甚至需要存储引用？为什么我们不能克隆整个Rc，以获得一个漂亮的
+自己的解决方案到列表的中间？</p>
 <pre><pre class="playpen"><code class="language-rust">
 # #![allow(unused_variables)]
 #fn main() {
@@ -3997,61 +3901,46 @@ impl&lt;T&gt; List&lt;T&gt; {
 impl&lt;T&gt; Iterator for Iter&lt;T&gt; {
     type Item =
 #}</code></pre></pre>
-<p>Uh... Wait what do we return now? <code>&amp;T</code>? <code>Ref&lt;T&gt;</code>?</p>
-<p>No, none of those work... our Iter doesn't have a lifetime anymore! Both <code>&amp;T</code>
-and <code>Ref&lt;T&gt;</code> require us to declare some lifetime up front before we get into
-<code>next</code>. But anything we manage to get out of our Rc would be borrowing the
-Iterator... brain... hurt... aaaaaahhhhhh</p>
-<p>Maybe we can... map... the Rc... to get an <code>Rc&lt;T&gt;</code>? Is that a thing? Rc's docs
-don't seem to have anything like that. Actually someone made <a href="https://crates.io/crates/owning_ref">a crate</a>
-that lets you do that.</p>
-<p>But wait, even if we do <em>that</em> then we've got an even bigger problem: the
-dreaded spectre of iterator invalidation. Previously we've been totally immune
-to iterator invalidation, because the Iter borrowed the list, leaving it totally
-immutable. However if our Iter was yielding Rcs, they wouldn't borrow the list
-at all! That means people can start calling <code>push</code> and <code>pop</code> on the list while
-they hold pointers into it!</p>
-<p>Oh lord, what will that do?!</p>
-<p>Well, pushing is actually fine. We've got a view into some sub-range of the
-list, and the list will just grow beyond our sights. No biggie.</p>
-<p>However <code>pop</code> is another story. If they're popping elements outside of our
-range, it should <em>still</em> be fine. We can't see those nodes so nothing will
-happen. However if they try to pop off the node we're pointing at... everything
-will blow up! In particular when they go to <code>unwrap</code> the result of the
-<code>try_unwrap</code>, it will actually fail, and the whole program will panic.</p>
-<p>That's actually pretty cool. We can get tons of interior owning pointers into
-the list and mutate it at the same time <em>and it will just work</em> until they
-try to remove the nodes that we're pointing at. And even then we don't get
-dangling pointers or anything, the program will deterministically panic!</p>
-<p>But having to deal with iterator invalidation on top of mapping Rcs just
-seems... bad. <code>Rc&lt;RefCell&gt;</code> has really truly finally failed us. Interestingly,
-we've experienced an inversion of the persistent stack case. Where the
-persistent stack struggled to ever reclaim ownership of the data but could get
-references all day every day, our list had no problem gaining ownership, but
-really struggled to loan our references.</p>
-<p>Although to be fair, most of our struggles revolved around wanting to hide the
-implementation details and have a decent API. We <em>could</em> do everything fine
-if we wanted to just pass around Nodes all over the place.</p>
-<p>Heck, we could make multiple concurrent IterMuts that were runtime checked to
-not be mutable accessing the same element!</p>
-<p>Really, this design is more appropriate for an internal data structure that
-never makes it out to consumers of the API. Interior mutability is great for
-writing safe <em>applications</em>. Not so much safe <em>libraries</em>.</p>
-<p>Anyway, that's me giving up on Iter and IterMut. We could do them, but <em>ugh</em>.</p>
-<h1><a class="header" href="#final-code-2" id="final-code-2">Final Code</a></h1>
-<p>Alright, so that's implementing a 100% safe doubly-linked list in Rust. It was
-a nightmare to implement, leaks implementation details, and doesn't support several
-fundamental operations.</p>
-<p>But, it exists.</p>
-<p>Oh, I guess it's also riddled with tons of &quot;unnecessary&quot; runtime checks for
-correctness between <code>Rc</code> and <code>RefCell</code>. I put unnecessary in quotes because
-they're actually necessary to guarantee the whole <em>actually being safe</em> thing.
-We encountered a few places where those checks actually <em>were</em> necessary.
-Doubly-linked lists have a horribly tangled aliasing and ownership story!</p>
-<p>Still, it's a thing we can do. Especially if we don't care about exposing
-internal data structures to our consumers.</p>
-<p>From here on out, we're going to be focusing on other side of this coin:
-getting back all the control by making our implementation <em>unsafe</em>.</p>
+<p>呃......等等，我们现在返回什么？ <code>&amp;T</code>？<code>Ref&lt;T&gt;</code>？</p>
+<p>不，这些都不行......我们的Iter已经没有生命周期了！<code>&amp;T</code>和<code>Ref&lt;T&gt;</code>都要求我们在进
+入下一步之前先声明一些生命周期。但是我们设法从Rc中得到的任何东西都会借用迭代
+器......脑子......受伤了......啊啊啊啊啊啊</p>
+<p>也许我们可以......映射......Rc......得到一个<code>Rc&lt;T&gt;</code>？这是个问题吗？Rc的文档似乎
+没有这样的东西。事实上，有人做了一个<a href="https://crates.io/crates/owning_ref">板条箱</a>，可以让你这样做。</p>
+<p>但是等等，即使我们<em>这样</em>做了，我们也有一个更大的问题：如幽灵般可怕的迭代器失效。
+以前我们对迭代器失效完全免疫，因为Iter借用了列表，使其完全不可改变。然而，如果我
+们的 Iter 产生了 Rcs，他们就根本不会借用列表了！这意味着人们可以在持有指向列表的
+指针时开始调用<code>push</code>和<code>pop</code>。</p>
+<p>哦，天哪，那会怎么样？</p>
+<p>好吧，推入其实是可以的。我们已经得到了一个进入列表的某个子范围的视图，而列表只是在
+我们的视线之外增长。没什么大不了的。</p>
+<p>然而<code>pop</code>是另一个故事。如果他们在我们的范围之外弹出元素，应该<em>还</em>是可以的。我们看
+不到那些节点，所以不会发生什么。然而，如果他们试图从我们指向的节点上弹出......一切
+都会被炸毁！特别是当他们去<code>unwrap</code> <code>try_unwrap</code>的结果时，实际上会失败，整个程序
+会恐慌。</p>
+<p>这实际上是非常酷的。我们可以把大量的内部拥有的指针放入列表中，并同时对其进行改变，
+它就<em>会一直工作</em>，直到他们试图删除我们所指向的节点。即使如此，我们也不会出现悬空指
+针或任何东西，程序会确定地发生恐慌！</p>
+<p>但是在映射Rc的基础上还要处理迭代器失效的问题，这似乎......很糟糕。<code>Rc&lt;RefCell&gt;</code>
+真的真的终于让我们失望了。有趣的是，我们经历了持久化堆栈案例的反转。持久堆栈努力地
+收回数据的所有权，但每天都能得到引用，而我们的列表在获得所有权方面没有问题，但在借
+出引用方面却非常困难。</p>
+<p>尽管公平地说，我们的大部分挣扎都是围绕着想要隐藏实现细节和拥有一个体面的API。如果我
+们想在所有地方传递节点，我们<em>可以</em>做得很好。</p>
+<p>见鬼，我们可以制作多个并发的IterMuts，这些IterMuts在运行时被检查为不可改变地访问同
+一个元素！这就是我们的设计。</p>
+<p>实际上，这种设计更适合于内部数据结构，因为它永远不会让API的消费者看到。内部可变性对
+于编写安全的<em>应用程序</em>是很好的。但对于安全的<em>库</em>来说就不是那么回事了。</p>
+<p>总之，我放弃了Iter和IterMut。我们可以做它们，但是<em>唉</em>。</p>
+<h1><a class="header" href="#最终代码" id="最终代码">最终代码</a></h1>
+<p>好了，这就是在Rust中实现了一个100%安全的双链接列表。它的实现是一场噩梦，泄露了实现细
+节，而且不支持几个基本操作。</p>
+<p>但是，它存在。</p>
+<p>哦，我猜它还充斥着大量&quot;不必要的&quot;<code>Rc</code>和<code>RefCell</code>之间正确性的运行时检查。我把&quot;不必要&quot;
+加了引号，因为它们对于保证整个实际安全的事情来说是必要的。我们遇到了一些地方，这些检
+查实际上是必要的。双重链接的列表有一个可怕的纠缠不清的别名和所有权的故事!</p>
+<p>不过，这也是我们可以做的事情。特别是如果我们不关心向消费者暴露内部数据结构的话。</p>
+<p>从这里开始，我们将专注于这个硬币的另一面：通过使我们的实现<em>不安全</em>来夺回所有控制权。</p>
 <pre><pre class="playpen"><code class="language-rust">
 # #![allow(unused_variables)]
 #fn main() {
@@ -4287,16 +4176,13 @@ mod test {
     }
 }
 #}</code></pre></pre>
-<h1><a class="header" href="#an-unsafe-singly-linked-queue" id="an-unsafe-singly-linked-queue">An Unsafe Singly-Linked Queue</a></h1>
-<p>Ok that reference-counted interior mutability stuff got a little out of
-control. Surely Rust doesn't really expect you to do that sort of thing
-in general? Well, yes and no. Rc and Refcell can be great for handling
-simple cases, but they can get unwieldy. Especially if you
-want to hide that it's happening. There's gotta be a better way!</p>
-<p>In this chapter we're going to roll back to singly-linked lists and
-implement a singly-linked queue to dip our toes into <em>raw pointers</em>
-and <em>Unsafe Rust</em>.</p>
-<p>Let's add a new file called <code>fifth.rs</code>:</p>
+<h1><a class="header" href="#一个不安全的单连接队列" id="一个不安全的单连接队列">一个不安全的单连接队列</a></h1>
+<p>好吧，那个引用计算的内部可变性的东西有点失控了。当然，Rust并不希望你在一般
+情况下做这样的事情？嗯，是的，也不是。Rc和Refcell可以很好地处理简单的情况，
+但它们可能会变得不方便。特别是如果你想隐藏它的发生。一定会有更好的方法!</p>
+<p>在这一章中，我们将回到单链列表，并实现一个单链队列，来尝试一下原始指针和<em>不
+安全的Rust</em>。</p>
+<p>让我们添加一个名为<code>fifth.rs</code>的新文件：</p>
 <pre><code class="language-rust ignore">// in lib.rs
 
 pub mod first;
@@ -4305,15 +4191,12 @@ pub mod third;
 pub mod fourth;
 pub mod fifth;
 </code></pre>
-<p>Our code is largely going to be derived from second.rs, since a queue is
-mostly an augmentation of a stack in the world of linked lists. Still, we're
-going to go from scratch because there's some fundamental issues we want to
-address with layout and what-not.</p>
-<h1><a class="header" href="#layout-2" id="layout-2">Layout</a></h1>
-<p>So what's a singly-linked queue like? Well, when we had a singly-linked stack
-we pushed onto one end of the list, and then popped off the same end. The only
-difference between a stack and a queue is that a queue pops off the <em>other</em>
-end. So from our stack implementation we have:</p>
+<p>我们的代码主要来自second.rs，因为队列在链表的世界里主要是对堆栈的一种增强。不过，
+我们还是要从头开始，因为我们要解决一些关于布局和其他方面的基本问题。</p>
+<h1><a class="header" href="#布局-2" id="布局-2">布局</a></h1>
+<p>那么，单链队列是什么样的呢？好吧，当我们有一个单链接的堆栈时，我们推到列表的一端，
+然后从同一端弹出。栈和队列的唯一区别是，队列会从<em>另</em>一端弹出。所以从我们的堆栈实现
+来看，我们有：</p>
 <pre><code class="language-text">input list:
 [Some(ptr)] -&gt; (A, Some(ptr)) -&gt; (B, None)
 
@@ -4323,41 +4206,32 @@ stack push X:
 stack pop:
 [Some(ptr)] -&gt; (A, Some(ptr)) -&gt; (B, None)
 </code></pre>
-<p>To make a queue, we just need to decide which operation to move to the
-end of the list: push, or pop? Since our list is singly-linked, we can
-actually move <em>either</em> operation to the end with the same amount of effort.</p>
-<p>To move <code>push</code> to the end, we just walk all the way to the <code>None</code> and set it
-to Some with the new element.</p>
+<p>要制作一个队列，我们只需要决定将哪个操作移到列表的末尾：推，还是弹？由于我们的列表
+是单链的，我们实际上可以用同样的努力把<em>任何一个</em>操作移到最后。</p>
+<p>要把<code>push</code>移到最后，我们只需一路走到<code>None</code>，并把它和新元素一起设置为Some。</p>
 <pre><code class="language-text">input list:
 [Some(ptr)] -&gt; (A, Some(ptr)) -&gt; (B, None)
 
 flipped push X:
 [Some(ptr)] -&gt; (A, Some(ptr)) -&gt; (B, Some(ptr)) -&gt; (X, None)
 </code></pre>
-<p>To move <code>pop</code> to the end, we just walk all the way to the node <em>before</em> the
-None, and <code>take</code> it:</p>
+<p>要把<code>pop</code>移到最后，我们只需一路走到None<em>之前</em>的节点，然后<code>take</code>它：</p>
 <pre><code class="language-text">input list:
 [Some(ptr)] -&gt; (A, Some(ptr)) -&gt; (B, Some(ptr)) -&gt; (X, None)
 
 flipped pop:
 [Some(ptr)] -&gt; (A, Some(ptr)) -&gt; (B, None)
 </code></pre>
-<p>We could do this today and call it quits, but that would stink! Both of these
-operations walk over the <em>entire</em> list. Some would argue that such a queue
-implementation is indeed a queue because it exposes the right interface. However
-I believe that performance guarantees are part of the interface. I don't care
-about precise asymptotic bounds, just &quot;fast&quot; vs &quot;slow&quot;. Queues guarantee
-that push and pop are fast, and walking over the whole list is definitely <em>not</em>
-fast.</p>
-<p>One key observation is that we're wasting a ton of work doing <em>the same thing</em>
-over and over. Can we memoize this work? Why, yes! We can store a pointer to
-the end of the list, and just jump straight to there!</p>
-<p>It turns out that only one inversion of <code>push</code> and <code>pop</code> works with this.
-To invert <code>pop</code> we would have to move the &quot;tail&quot; pointer backwards, but
-because our list is singly-linked, we can't do that efficiently.
-If we instead invert <code>push</code> we only have to move the &quot;head&quot; pointer
-forwards, which is easy.</p>
-<p>Let's try that:</p>
+<p>我们今天可以做这个，然后就不干了，但那会很臭！。这两种操作都是在<em>整个</em>列表上行走。有
+些人认为，这样的队列实现确实是一个队列，因为它暴露了正确的接口。然而我认为性能保证是
+接口的一部分。我不关心精确的渐近界线，只关心“快”与“慢”。队列保证推送和弹出是快速的，
+而在整个列表上行走肯定是<em>不</em>快的。</p>
+<p>一个关键的观察是，我们在重复做<em>同样的事情</em>，浪费了大量的工作。我们能不能把这项工作记
+忆化？为什么，是的？我们可以存储一个指向列表末尾的指针，然后直接跳到那里去！</p>
+<p>事实证明，只有一种反转的<code>push</code>和<code>pop</code>方式可以使用。要反转<code>pop</code>，我们必须将“尾部”指针
+向后移动，但由于我们的列表是单链的，我们无法有效地做到这一点。如果我们反转<code>push</code>，我
+们只需要将“头部”指针向前移动，这很容易。</p>
+<p>让我们试试吧：</p>
 <pre><code class="language-rust ignore">use std::mem;
 
 pub struct List&lt;T&gt; {
@@ -4400,13 +4274,10 @@ impl&lt;T&gt; List&lt;T&gt; {
     }
 }
 </code></pre>
-<p>I'm going a bit faster with the impl details now since we should be pretty
-comfortable with this sort of thing. Not that you should necessarily expect
-to produce this code on the first try. I'm just skipping over some of the
-trial-and-error we've had to deal with before. I actually made a ton of mistakes
-writing this code that I'm not showing. You can only see me leave off a <code>mut</code> or
-<code>;</code> so many times before it stops being instructive. Don't worry, we'll see
-plenty of <em>other</em> error messages!</p>
+<p>由于我们对这种事情应该很熟悉，所以我现在在实现细节方面走得快一点。并不是说你应该期望
+在第一次尝试时就能产生这样的代码。我只是跳过了一些我们以前不得不处理的试验和错误。实
+际上，我在写这段代码时犯了很多错误，我没有显示出来。你只能看到我漏掉了<code>mut</code>或<code>;</code>这么
+多次，然后它就不再具有指导意义了。别担心，我们会看到很多<em>其他的</em>错误信息的！</p>
 <pre><code class="language-text">&gt; cargo build
 
 error[E0382]: use of moved value: `new_tail`
@@ -4421,16 +4292,14 @@ error[E0382]: use of moved value: `new_tail`
 38 |                 old_tail.next = Some(new_tail);
    |                                      ^^^^^^^^ value used here after move
 </code></pre>
-<p>Shoot!</p>
+<p>发现了！</p>
 <blockquote>
-<p>use of moved value: <code>new_tail</code></p>
+<p>使用了移动过的值： <code>new_tail</code></p>
 </blockquote>
-<p>Box doesn't implement Copy, so we can't just assign it to two locations. More
-importantly, Box <em>owns</em> the thing it points to, and will try to free it when
-it's dropped. If our <code>push</code> implementation compiled, we'd double-free the tail
-of our list! Actually, as written, our code would free the old_tail on every
-push. Yikes! 🙀</p>
-<p>Alright, well we know how to make a non-owning pointer. That's just a reference!</p>
+<p>盒子没有实现复制，所以我们不能直接把它分配到两个位置。更重要的是，Box<em>拥有</em>它所指向
+的东西，当它被丢弃时，会尝试释放它。如果我们的<code>push</code>实现被编译了，我们就会把列表的
+尾部释放出来。实际上，按照写法，我们的代码会在每次推送时释放 old_tail。呀! 🙀</p>
+<p>好了，我们知道如何制作一个不能拥有的指针。这只是一个引用！</p>
 <pre><code class="language-rust ignore">pub struct List&lt;T&gt; {
     head: Link&lt;T&gt;,
     tail: Option&lt;&amp;mut Node&lt;T&gt;&gt;, // NEW!
@@ -4473,9 +4342,8 @@ impl&lt;T&gt; List&lt;T&gt; {
     }
 }
 </code></pre>
-<p>Nothing too tricky here. Same basic idea as the previous code, except we're
-using some of that implicit return goodness to extract the tail reference from
-wherever we stuff the actual Box.</p>
+<p>这里没有什么太棘手的问题。与前面的代码的基本思路相同，只是我们使用了一些隐含返回的
+好处，从我们放置实际Box的地方提取尾部引用。</p>
 <pre><code class="language-text">&gt; cargo build
 
 error[E0106]: missing lifetime specifier
@@ -4484,9 +4352,8 @@ error[E0106]: missing lifetime specifier
 3 |     tail: Option&lt;&amp;mut Node&lt;T&gt;&gt;, // NEW!
   |                  ^ expected lifetime parameter
 </code></pre>
-<p>Oh right, we need to give references in types lifetimes. Hmm... what's the
-lifetime of this reference? Well, this seems like IterMut, right? Let's try
-what we did for IterMut, and just add a generic <code>'a</code>:</p>
+<p>哦，对了，我们需要在类型的生命期中给出参考。嗯......这个引用的生命期是多少？嗯，
+这好像是IterMut，对吗？让我们试试我们为IterMut所做的，只是添加一个通用的<code>'a</code>：</p>
 <pre><code class="language-rust ignore">pub struct List&lt;'a, T&gt; {
     head: Link&lt;T&gt;,
     tail: Option&lt;&amp;'a mut Node&lt;T&gt;&gt;, // NEW!
@@ -4564,13 +4431,13 @@ note: but, the lifetime must be valid for the lifetime 'a as defined on the impl
 
 
 </code></pre>
-<p>Woah, that's a really detailed error message. That's a bit concerning, because it
-suggests we're doing something really messed up. Here's an interesting part:</p>
+<p>哇，这是一个非常详细的错误信息。这有点令人担忧，因为它表明我们正在做一些非常混乱的事
+情。这里有一个有趣的部分：</p>
 <blockquote>
-<p>the lifetime must be valid for the lifetime <code>'a</code> as defined on the impl</p>
+<p>生命期必须对内联中定义的 &quot;a &quot;的生命期有效。</p>
 </blockquote>
-<p>We're borrowing from <code>self</code>, but the compiler wants us to last as long as <code>'a</code>,
-what if we tell it <code>self</code> <em>does</em> last that long..?</p>
+<p>我们借用了<code>self</code>，但编译器希望我们的生命期和<code>'a</code>一样长，如果我们告诉它<code>self</code><em>确实</em>
+能持续那么久呢……？</p>
 <pre><code class="language-rust ignore">    pub fn push(&amp;'a mut self, elem: T) {
 </code></pre>
 <pre><code class="language-text">cargo build
@@ -4583,8 +4450,8 @@ warning: field is never used: `elem`
   |
   = note: #[warn(dead_code)] on by default
 </code></pre>
-<p>Oh, hey, that worked! Great!</p>
-<p>Let's just do <code>pop</code> too:</p>
+<p>哦，嘿，成功了! 很好!</p>
+<p>我们也来做<code>pop</code>吧：</p>
 <pre><code class="language-rust ignore">pub fn pop(&amp;'a mut self) -&gt; Option&lt;T&gt; {
     // Grab the list's current head
     self.head.take().map(|head| {
@@ -4600,7 +4467,7 @@ warning: field is never used: `elem`
     })
 }
 </code></pre>
-<p>And write a quick test for that:</p>
+<p>并为此写一个快速测试：</p>
 <pre><code class="language-rust ignore">mod test {
     use super::List;
     #[test]
@@ -4681,32 +4548,26 @@ error[E0499]: cannot borrow `list` as mutable more than once at a time
 error: aborting due to 11 previous errors
 </code></pre>
 <p>🙀🙀🙀🙀🙀🙀🙀🙀🙀🙀🙀🙀🙀🙀🙀🙀🙀🙀🙀🙀🙀🙀🙀</p>
-<p>Oh my goodness.</p>
-<p>The compiler's not wrong for vomiting all over us. We just committed a
-cardinal Rust sin: we stored a reference to ourselves <em>inside ourselves</em>.
-Somehow, we managed to convince Rust that this totally made sense in our
-<code>push</code> and <code>pop</code> implementations (I was legitimately shocked we did). I believe
-the reason is that Rust can't yet tell that the reference is into ourselves
-from just <code>push</code> and <code>pop</code> -- or rather, Rust doesn't really have that notion
-at all. Reference-into-yourself failing to work is just an emergent behaviour.</p>
-<p>As soon as we tried to <em>use</em> our list, everything quickly fell apart.
-When we call <code>push</code> or <code>pop</code>, we promptly store a reference to ourselves in
-ourselves and become <em>trapped</em>. We are literally borrowing ourselves.</p>
-<p>Our <code>pop</code> implementation hints at why this could be really dangerous:</p>
+<p>哦，我的天哪。</p>
+<p>编译器在我们身上呕吐是没有错的。我们刚刚犯了一个Rust的大罪：我们在<em>自己内部</em>存储了
+一个对自己的引用。不知何故，我们成功地说服了Rust，在我们的<code>push</code>和<code>pop</code>实现中，这
+完全是有意义的（我真的很震惊，我们做到了）。我相信原因是Rust还不能从<code>push</code>和<code>pop</code>
+中分辨出引用是进入自己的--或者说，Rust根本就没有这个概念。引用到自己身上不能生效只
+是一种突发行为。</p>
+<p>当我们试图<em>使用</em>我们的列表时，一切都迅速崩溃了。当我们调用<code>push</code>或<code>pop</code>时，我们立
+即在自己身上存储了一个对自己的引用，并被<em>困住</em>。我们实际上是在借用我们自己。</p>
+<p>我们的<code>pop</code>实现暗示了为什么这可能是非常危险的：</p>
 <pre><code class="language-rust ignore">// ...
 if self.head.is_none() {
     self.tail = None;
 }
 </code></pre>
-<p>What if we forgot to do this? Then our tail would point to some node <em>that
-had been removed from the list</em>. Such a node would be instantly freed, and we'd
-have a dangling pointer which Rust was supposed to protect us from!</p>
-<p>And indeed Rust is protecting us from that kind of danger. Just in a very...
-<strong>roundabout</strong> way.</p>
-<p>So what can we do? Go back to <code>Rc&lt;RefCell&gt;&gt;</code> hell?</p>
-<p>Please. No.</p>
-<p>No instead we're going to go off the rails and use <em>raw pointers</em>.
-Our layout is going to look like this:</p>
+<p>如果我们忘记这样做呢？那么我们的尾巴就会指向<em>某个已经从列表中删除的节点</em>。这样的节
+点会立即被释放，我们就会有一个悬空的指针，而Rust应该保护我们免受其害！</p>
+<p>事实上，Rust正在保护我们远离这种危险。只是以一种非常...<strong>迂回</strong>的方式。</p>
+<p>那么我们能做什么呢？回到<code>Rc&lt;RefCell&gt;&gt;</code>地狱？</p>
+<p>拜托了。不，不。</p>
+<p>不，我们要离开轨道，使用<em>原始指针</em>。我们的布局将看起来像这样：</p>
 <pre><code class="language-rust ignore">pub struct List&lt;T&gt; {
     head: Link&lt;T&gt;,
     tail: *mut Node&lt;T&gt;, // DANGER DANGER
@@ -4719,56 +4580,46 @@ struct Node&lt;T&gt; {
     next: Link&lt;T&gt;,
 }
 </code></pre>
-<p>And that's that. None of this wimpy reference-counted-dynamic-borrow-checking
-nonsense! Real. Hard. Unchecked. Pointers.</p>
-<p>Let's be C everyone. Let's be C all day.</p>
-<p>I'm home. I'm ready.</p>
-<p>Hello <code>unsafe</code>.</p>
-<h1><a class="header" href="#unsafe-rust" id="unsafe-rust">Unsafe Rust</a></h1>
-<p>This is a serious, big, complicated, and dangerous topic.
-It's so serious that I wrote <a href="https://doc.rust-lang.org/nightly/nomicon/">an entire other book</a> on it.</p>
-<p>The long and the short of it is that <em>every</em> language is actually unsafe as soon
-as you allow calling into other languages, because you can just have C do
-arbitrarily bad things. Yes: Java, Python, Ruby, Haskell... everyone is wildly
-unsafe in the face of Foreign Function Interfaces (FFI).</p>
-<p>Rust embraces this truth by splitting itself into two languages: Safe Rust, and
-Unsafe Rust. So far we've only worked with Safe Rust. It's completely 100%
-safe... except that it can FFI into Unsafe Rust.</p>
-<p>Unsafe Rust is a <em>superset</em> of Safe Rust. It's completely the same as Safe Rust in all its
-semantics and rules, you're just allowed to do a few <em>extra</em> things that are
-wildly unsafe and can cause the dreaded Undefined Behaviour that haunts C.</p>
-<p>Again, this is a really huge topic that has a lot of interesting corner cases.
-I <em>really</em> don't want to go really deep into it (well, I do. I did. <a href="https://doc.rust-lang.org/nightly/nomicon/">Read that
-book</a>). That's ok, because with linked lists we can actually ignore almost
-all of it.</p>
-<p>The main Unsafe tool we'll be using are <em>raw pointers</em>. Raw pointers are
-basically C's pointers. They have no inherent aliasing rules. They have no
-lifetimes. They can be null. They can be dangling. They can point to
-uninitialized memory. They can be cast to and from integers. They can be cast
-to point to a different type. Mutability? Cast it. Pretty much everything goes,
-and that means pretty much anything can go wrong.</p>
-<p>This is some bad stuff and honestly you'll live a happier life never having
-to touch these. Unfortunately, we want to write linked lists, and linked lists
-are awful. That means we're going to have to use unsafe pointers.</p>
-<p>There are two kinds of raw pointer: <code>*const T</code> and <code>*mut T</code>. These are meant to
-be <code>const T*</code> and <code>T*</code> from C, but we really don't care about what C thinks they
-mean that much. You can only dereference a <code>*const T</code> to an <code>&amp;T</code>, but much like
-the mutability of a variable, this is just a lint against incorrect usage. At
-most it just means you have to cast the <code>*const</code> to a <code>*mut</code> first. Although if
-you don't actually have permission to mutate the referrent of the pointer,
-you're gonna have a bad time.</p>
-<p>Anyway, we'll get a better feel for this as we write some code. For now,
-<code>*mut T == &amp;unchecked mut T</code>!</p>
-<h1><a class="header" href="#basics-1" id="basics-1">Basics</a></h1>
-<p>Alright, back to basics. How do we construct our list?</p>
-<p>Before we just did:</p>
+<p>就这样了。没有这种懦弱的参考-计算-动态-借贷-检查的废话! 真实。硬的。未经检查的。
+指针。</p>
+<p>让我们都成为C语言。让我们整天都是C。</p>
+<p>我回来了。我准备好了。</p>
+<p>你好，<code>unsafe</code>。</p>
+<h1><a class="header" href="#不安全的rust" id="不安全的rust">不安全的Rust</a></h1>
+<p>这是一个严肃、巨大、复杂和危险的话题。它是如此严重，以至于关于它，我写了
+<a href="https://doc.rust-lang.org/nightly/nomicon/">一整本书</a>。</p>
+<p>长话短说，只要你允许调用其他语言，<em>每一种</em>语言实际上都是不安全的，因为你可以让C做任
+意的坏事。是的：Java、Python、Ruby、Haskell......每个人在面对外来函数接口（FFI）的
+时候都是很不安全的。</p>
+<p>Rust通过将自己分成两种语言来接受这一事实。安全的Rust和不安全的Rust。到目前为止，我
+们只使用了安全的Rust。它是完全100%安全的......除了它可以FFI到不安全的Rust。</p>
+<p>不安全的Rust是安全Rust的一个<em>超集</em>。它的所有语义和规则与安全Rust完全相同，你只是被
+允许做一些<em>额外</em>的事情，这些事情是非常不安全的，可能会导致可怕的未定义行为，困扰着C。</p>
+<p>同样，这是一个非常巨大的话题，有很多有趣的角落案例。我<em>真的</em>不想深入研究它（好吧，我
+其实想。我已经研究了。<a href="https://doc.rust-lang.org/nightly/nomicon/">读那本书</a>）。这没关系，因为有了链表，我们实际上可以忽略
+几乎所有的东西。</p>
+<p>我们要使用的主要不安全工具是<em>原始指针</em>。原始指针基本上是C的指针。它们没有固有的别名规
+则。它们没有生命期。它们可以是空的。它们可以是悬空的。它们可以指向未初始化的内存。它
+们可以被转换为整数或从整数中转换。它们可以被转换为指向不同的类型。可变性？转换它。几
+乎所有的东西都可以，这意味着几乎所有的东西都可能出错。</p>
+<p>这是一些不好的东西，老实说，要是永远不用碰这些东西，你会活得更快乐。不幸的是，我们想写
+链表，而链表是很糟糕的。这意味着我们将不得不使用不安全的指针。</p>
+<p>有两种类型的原始指针：<code>*const T</code>和<code>*mut T</code>。这些是指C语言中的<code>const T*</code>和<code>T*</code>，但
+我们真的不关心 C 语言认为它们是什么意思。你只能将<code>*const T</code>解除引用为<code>&amp;T</code>，但就像变
+量的可变性一样，这只是对不正确使用的一种提示。最多只是意味着你必须先将<code>*const</code>转为
+<code>*mut</code>。尽管如果你实际上没有权限去改变指针的引用，你会有一个糟糕的时间。</p>
+<p>总之，当我们写一些代码时，我们会对此有更好的感觉。现在，
+<code>*mut T == &amp;unchecked mut T</code>！</p>
+<h1><a class="header" href="#基础" id="基础">基础</a></h1>
+<p>好了，回到基本的问题上。我们如何构建我们的链表？</p>
+<p>之前我们只是做了：</p>
 <pre><code class="language-rust ignore">impl&lt;T&gt; List&lt;T&gt; {
     pub fn new() -&gt; Self {
         List { head: None, tail: None }
     }
 }
 </code></pre>
-<p>But we're not using Option for the <code>tail</code> anymore:</p>
+<p>但我们不再为<code>tail</code>使用Option：</p>
 <pre><code class="language-text">&gt; cargo build
 
 error[E0308]: mismatched types
@@ -4780,12 +4631,10 @@ error[E0308]: mismatched types
    = note: expected type `*mut fifth::Node&lt;T&gt;`
               found type `std::option::Option&lt;_&gt;`
 </code></pre>
-<p>We <em>could</em> use an Option, but unlike Box, <code>*mut</code> <em>is</em> nullable. This means it
-can't benefit from the null pointer optimization. Instead, we'll be using <code>null</code>
-to represent None.</p>
-<p>So how do we get a null pointer? There's a few ways, but I prefer to use
-<code>std::ptr::null_mut()</code>. If you want, you can also use <code>0 as *mut _</code>, but that
-just seems so <em>messy</em>.</p>
+<p>我们<em>可以</em>使用一个Option，但是与Box不同，<code>*mut</code>是可以置空的。这意味着它不能受益于
+空指针的优化。相反，我们将使用<code>null</code>来表示无。</p>
+<p>那么，我们怎样才能得到一个空指针呢？有几种方法，但我更喜欢使用
+<code>std::ptr::null_mut()</code>。如果你愿意，你也可以用<code>0 as *mut _</code>，但这似乎<em>太乱了</em>。</p>
 <pre><code class="language-rust ignore">use std::ptr;
 
 // defns...
@@ -4824,19 +4673,16 @@ warning: field is never used: `head`
 12 |     head: Link&lt;T&gt;,
    |     ^^^^^^^^^^^^^
 </code></pre>
-<p><em>shush</em> compiler, we will use them soon.</p>
-<p>Alright, let's move on to writing <code>push</code> again. This time, instead of grabbing
-an <code>Option&lt;&amp;mut Node&lt;T&gt;&gt;</code> after we insert, we're just going to grab a
-<code>*mut Node&lt;T&gt;</code> to the insides of the Box right away. We know we can soundly do
-this because the contents of a Box has a stable address, even if we move the
-Box around. Of course, this isn't <em>safe</em>, because if we just drop the Box we'll
-have a pointer to freed memory.</p>
-<p>How do we make a raw pointer from a normal pointer? Coercions! If a variable
-is declared to be a raw pointer, a normal reference will coerce into it:</p>
+<p><em>噓</em>编译器，我们很快就会用到它们。</p>
+<p>好了，让我们继续写<code>push</code>。这一次，我们不是在插入后抓取一个<code>Option&lt;&amp;mut Node&lt;T&gt;&gt;</code>
+，而是直接抓取一个<code>*mut Node&lt;T&gt;</code>到Box的内部。我们知道我们可以稳妥地这样做，因为盒子
+里的内容有一个稳定的地址，即使我们把盒子移来移去。当然，这并不<em>安全</em>，因为如果我们直
+接丢掉盒子，我们就会有一个指向已释放内存的指针。</p>
+<p>我们如何从一个普通的指针变成一个原始指针呢？强制的! 如果一个变量被声明为一个原始指针，
+那么一个普通的引用就会被强制放到它里面：</p>
 <pre><code class="language-rust ignore">let raw_tail: *mut _ = &amp;mut *new_tail;
 </code></pre>
-<p>We have all the info we need. We can translate our code into, approximately,
-the previous reference version:</p>
+<p>我们有我们需要的所有信息。我们可以把我们的代码翻译成，大约是以前的参考版本：</p>
 <pre><code class="language-rust ignore">pub fn push(&amp;mut self, elem: T) {
     let mut new_tail = Box::new(Node {
         elem: elem,
@@ -4867,10 +4713,9 @@ error[E0609]: no field `next` on type `*mut fifth::Node&lt;T&gt;`
    |             |
    |             help: `self.tail` is a raw pointer; try dereferencing it: `(*self.tail).next`
 </code></pre>
-<p>Huh? We have a pointer to a Node, why can't we get the <code>next</code> field?</p>
-<p>Rust is kinda a jerk when you use raw pointers. To access the contents of a
-raw pointer, it insists that we manually deref them, because it's such an unsafe
-operation. So let's do that:</p>
+<p>嗯？我们有一个指向Node的指针，为什么我们不能得到<code>next</code>字段？</p>
+<p>当你使用原始指针时，Rust是个混蛋。要访问一个原始指针的内容，它坚持要求我们手动地取消
+引用它们，因为这是一个不安全的操作。所以让我们来做这个：</p>
 <pre><code class="language-rust ignore">*self.tail.next = Some(new_tail);
 </code></pre>
 <pre><code class="language-text">&gt; cargo build
@@ -4883,7 +4728,7 @@ error[E0609]: no field `next` on type `*mut fifth::Node&lt;T&gt;`
    |             |
    |             help: `self.tail` is a raw pointer; try dereferencing it: `(*self.tail).next`
 </code></pre>
-<p>Uuuugh operator precedence.</p>
+<p>呜运算符优先级。</p>
 <pre><code class="language-rust ignore">(*self.tail).next = Some(new_tail);
 </code></pre>
 <pre><code class="language-text">&gt; cargo build
@@ -4896,14 +4741,12 @@ error[E0133]: dereference of raw pointer is unsafe and requires unsafe function 
    |
    = note: raw pointers may be NULL, dangling or unaligned; they can violate aliasing rules and cause data races: all of these are undefined behavior
 </code></pre>
-<p>THIS SHOULDN'T BE THIS HARD.</p>
-<p>Remember how I said Unsafe Rust is like an FFI language for Safe Rust? Well, the
-compiler wants us to explicitly delimit where we're doing this FFI-ing. We have
-two options. First, we can mark our <em>entire</em> function as unsafe, in which case
-it becomes an Unsafe Rust function and can only be called in an <code>unsafe</code>
-context. This isn't great, because we want our list to be safe to use. Second,
-we can write an <code>unsafe</code> block inside our function, to delimit the FFI boundary.
-This declares the overall function to be safe. Let's do that one:</p>
+<p>这不应该是这么难的事。</p>
+<p>还记得我说过不安全的Rust就像是安全Rust的FFI语言吗？那么，编译器希望我们明确地划分出
+我们正在做的FFI-ing的地方。我们有两个选择。首先，我们可以把<em>整个</em>函数标记为不安全的
+，在这种情况下，它就变成了一个不安全的Rust函数，只能在<code>unsafe</code>的上下文中调用。这不
+是很好，因为我们希望我们的列表可以安全使用。其次，我们可以在我们的函数中写一个
+<code>unsafe</code>的块，来划定FFI的边界。这就宣告了整个函数是安全的。让我们来做这件事：</p>
 <pre><code class="language-rust ignore">pub fn push(&amp;mut self, elem: T) {
     let mut new_tail = Box::new(Node {
         elem: elem,
@@ -4935,37 +4778,26 @@ warning: field is never used: `elem`
    |
    = note: #[warn(dead_code)] on by default
 </code></pre>
-<p>Yay!</p>
-<p>It's kind've interesting that that's the <em>only</em> place we've had to write an
-unsafe block so far. We do raw pointer stuff all over the place, what's up with
-that?</p>
-<p>It turns out that Rust is a massive rules-lawyer pedant when it comes to
-<code>unsafe</code>. We quite reasonably want to maximize the set of Safe Rust programs,
-because those are programs we can be much more confident in. To accomplish this,
-Rust carefully carves out a minimal surface area for unsafety. Note that all
-the other places we've worked with raw pointers has been <em>assigning</em> them, or
-just observing whether they're null or not.</p>
-<p>If you never actually dereference a raw pointer <em>those are totally safe things
-to do</em>. You're just reading and writing an integer! The only time you can
-actually get into trouble with a raw pointer is if you actually dereference it.
-So Rust says <em>only</em> that operation is unsafe, and everything else is totally
-safe.</p>
-<p>Super. Pedantic. But technically correct.</p>
-<p>However this raises an interesting problem: although we're supposed to delimit
-the scope of the unsafety with the <code>unsafe</code> block, it actually depends on
-state that was established outside of the block. Outside of the function, even!</p>
-<p>This is what I call unsafe <em>taint</em>. As soon as you use <code>unsafe</code> in a module,
-that whole module is tainted with unsafety. Everything has to be correctly
-written in order to make sure that invariants are upheld for the unsafe code.</p>
-<p>This taint is manageable because of <em>privacy</em>. Outside of our module, all of our
-struct fields are totally private, so no one else can mess with our state in
-arbitrary ways. As long as no combination of the APIs we expose causes bad stuff
-to happen, as far as an outside observer is concerned, all of our code is safe!
-And really, this is no different from the FFI case. No one needs to care
-if some python math library shells out to C as long as it exposes a safe
-interface.</p>
-<p>Anyway, let's move on to <code>pop</code>, which is pretty much verbatim the reference
-version:</p>
+<p>耶！</p>
+<p>有意思的是，这是迄今为止我们<em>唯一</em>需要写不安全块的地方。我们到处都在做原始指针的事
+情，这到底是怎么回事？</p>
+<p>事实证明，当涉及到<code>unsafe</code>的时候，Rust是一个巨大的规则法学家的迂腐者。我们有理由
+希望最大化安全的Rust程序集，因为那些程序是我们可以更有信心的。为了达到这个目的，
+Rust仔细地划出了一个最小的不安全区域。请注意，我们在处理原始指针的所有其他地方都是
+在<em>分配</em>它们，或者只是观察它们是否为空。</p>
+<p>如果你从来没有真正解除过一个原始指针的引用，<em>那么这些事情是完全安全的</em>。你只是在读
+写一个整数而已。唯一的一次，你可能会因为一个原始指针而陷入困境，那就是你真的解除了
+对它的引用。所以Rust说<em>只有</em>这种操作是不安全的，而其他的都是完全安全的。</p>
+<p>超强。迂腐。但在技术上是正确的。</p>
+<p>然而，这引起了一个有趣的问题：尽管我们应该用<code>unsafe</code>块来限定不安全的范围，但它实际
+上依赖于在块之外建立的状态。甚至是在函数之外！</p>
+<p>这就是我所说的不安全<em>污点</em>。只要你在一个模块中使用<code>unsafe</code>，整个模块就会被不安全所
+玷污。所有的东西都必须正确编写，以确保不安全代码的不变性得到维护。</p>
+<p>这种污点是可以管理的，因为有<em>隐藏性</em>。在我们的模块之外，我们所有的结构字段都是完全私
+有的，所以其他人不能以任意的方式乱用我们的状态。只要我们公开的API的组合没有导致坏事
+发生，就外部观察者而言，我们所有的代码都是安全的 实际上，这与FFI的情况没有什么不同。
+只要它暴露了一个安全的接口，没有人需要关心某个Python数学库是否向C语言脱壳。</p>
+<p>总之，让我们继续讨论<code>pop</code>，它几乎是逐字逐句的参考版本：</p>
 <pre><code class="language-rust ignore">pub fn pop(&amp;mut self) -&gt; Option&lt;T&gt; {
     self.head.take().map(|head| {
         let head = *head;
@@ -4979,10 +4811,9 @@ version:</p>
     })
 }
 </code></pre>
-<p>Again we see another case where safety is stateful. If we fail to null out the
-tail pointer in <em>this</em> function, we'll see no problems at all. However
-subsequent calls to <code>push</code> will start writing to the dangling tail!</p>
-<p>Let's test it out:</p>
+<p>我们再次看到另一种情况，安全是有状态的。如果我们在<em>这个</em>函数中未能将尾巴指针清空，
+我们就不会看到任何问题。然而，随后对<code>push</code>的调用将开始写到悬空的尾巴上！</p>
+<p>让我们来测试一下：</p>
 <pre><code class="language-rust ignore">#[cfg(test)]
 mod test {
     use super::List;
@@ -5025,9 +4856,8 @@ mod test {
     }
 }
 </code></pre>
-<p>This is just the stack test, but with the expected <code>pop</code> results flipped around.
-I also added some extra steps at the end to make sure that tail-pointer
-corruption case in <code>pop</code> doesn't occur.</p>
+<p>这只是堆栈测试，但预期的<code>pop</code>结果被翻转过来。我还在最后添加了一些额外的步骤，以确保
+<code>pop</code>中的尾部指针损坏情况不会发生。</p>
 <pre><code class="language-text">cargo test
 
      Running target/debug/lists-5c71138492ad4b4a
@@ -5048,13 +4878,11 @@ test third::test::iter ... ok
 
 test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured
 </code></pre>
-<p>Gold Star!</p>
-<h1><a class="header" href="#extra-junk" id="extra-junk">Extra Junk</a></h1>
-<p>Now that <code>push</code> and <code>pop</code> are written, everything else is exactly the same
-as the stack case. Only operations that change the length of the list need
-to actually worry about the tail pointer.</p>
-<p>So let's just steal all that from our second list (be sure to reverse the
-expected test output):</p>
+<p>完美！</p>
+<h1><a class="header" href="#额外的废品" id="额外的废品">额外的废品</a></h1>
+<p>现在<code>push</code>和<code>pop</code>已经写好了，其他的都和栈的情况完全一样。只有那些改变列表长度
+的操作才需要真正担心尾部指针的问题。</p>
+<p>所以让我们从我们的第二个列表中窃取所有的东西（一定要把预期的测试输出倒过来）：</p>
 <pre><code class="language-rust ignore">// ...
 
 pub struct IntoIter&lt;T&gt;(List&lt;T&gt;);
@@ -5205,14 +5033,12 @@ test third::test::iter ... ok
 
 test result: ok. 11 passed; 0 failed; 0 ignored; 0 measured
 </code></pre>
-<p>Shout-outs to copy-paste programming.</p>
-<p>At first I thought we'd have to mess around with IntoIter, but we still
-conveniently pop in iteration order!</p>
-<h1><a class="header" href="#final-code-3" id="final-code-3">Final Code</a></h1>
-<p>Alright, so with a teeny-tiny dash of unsafety we managed to get a linear
-time improvement over the naive safe queue, and we managed to reuse almost
-all of the logic from the safe stack!</p>
-<p>We also notably <em>didn't</em> have to write any crazy Rc or RefCell stuff.</p>
+<p>向复制-粘贴编程致敬。</p>
+<p>起初我以为我们要用IntoIter来捣乱，但我们还是很方便地按迭代顺序弹出了！</p>
+<h1><a class="header" href="#最终代码-1" id="最终代码-1">最终代码</a></h1>
+<p>好了，通过一个小小的不安全因素，我们成功地在时间上比简单的安全队列有了线性的改
+善，而且我们成功地重用了安全堆栈中几乎所有的逻辑！</p>
+<p>我们也<em>没有</em>写任何疯狂的Rc或RefCell的东西。</p>
 <pre><pre class="playpen"><code class="language-rust">
 # #![allow(unused_variables)]
 #fn main() {
@@ -5418,30 +5244,32 @@ mod test {
     }
 }
 #}</code></pre></pre>
-<h1><a class="header" href="#an-ok-unsafe-doubly-linked-deque" id="an-ok-unsafe-doubly-linked-deque">An Ok Unsafe Doubly-Linked Deque</a></h1>
-<p>Nope, still haven't written this one! It's really just not that much more instructive.</p>
-<p>Read <a href="https://doc.rust-lang.org/nightly/nomicon/">The Rustonomicon</a> and the source for <a href="https://github.com/rust-lang/rust/blob/master/library/alloc/src/collections/linked_list.rs">std::collections::LinkedList</a> if you
-really want more!</p>
-<h1><a class="header" href="#a-bunch-of-silly-lists" id="a-bunch-of-silly-lists">A Bunch of Silly Lists</a></h1>
-<p>Alright. That's it. We made all the lists.</p>
-<p>ahahahaha</p>
-<p>No</p>
-<p>There's always more lists.</p>
+<h1><a class="header" href="#一个好的不安全的双链双向队列" id="一个好的不安全的双链双向队列">一个好的不安全的双链双向队列</a></h1>
+<p>不，还是没有写这篇! 它真的只是没有那么多的指导意义。</p>
+<p>如果你真的想了解更多，请阅读[Rustonomicon][]和<a href="https://github.com/rust-lang/rust/blob/master/library/alloc/src/collections/linked_list.rs">std::collections::LinkedList</a>的源代码！</p>
+<h1><a class="header" href="#一堆笨链表" id="一堆笨链表">一堆笨链表</a></h1>
+<p>好了。就这样吧。我们做了所有的列表。</p>
+<p>啊哈哈哈哈</p>
+<p>不</p>
+<p>总会有更多的列表。</p>
+<p>这一章是一个关于更多可笑的链接列表以及它们如何与Rust交互的鲜活的文件。</p>
+<pre><code>TODO: BLIST?
+TODO: SkipList?
+TODO: std::channel? -- 这就像另一个完整的章节。或者是3。
+</code></pre>
 <p>This chapter is a living document of the more ridiculous linked lists and how
 they interact with Rust.</p>
 <ol>
-<li><a href="infinity-double-single.html">The Double Single</a></li>
+<li><a href="infinity-double-single.html">双重单链表</a></li>
 <li>TODO: BList?</li>
 <li>TODO: SkipList?</li>
-<li>TODO: std::channel? -- That's like another whole chapter. Or 3.</li>
+<li>TODO: std::channel? -- 这就像另一个完整的章节。或者是3。</li>
 </ol>
-<h1><a class="header" href="#the-double-singly-linked-list" id="the-double-singly-linked-list">The Double Singly-Linked List</a></h1>
-<p>We struggled with doubly-linked lists because they have tangled ownership
-semantics: no node strictly owns any other node. However we struggled
-with this because we brought in our preconceived notions of what a linked
-list <em>is</em>. Namely, we assumed that all the links go in the same direction.</p>
-<p>Instead, we can smash our list into two halves: one going to the left,
-and one going to the right:</p>
+<h1><a class="header" href="#双重单链表" id="双重单链表">双重单链表</a></h1>
+<p>我们在处理双链表时很纠结，因为它们有纠结的所有权语义：没有一个节点严格地拥有任
+何其他节点。然而，我们对此感到挣扎，因为我们带来了我们对什么<em>是</em>链表的先入为主
+的概念。也就是说，我们假设所有的链接都在同一个方向。</p>
+<p>相反，我们可以把我们的列表分成两半：一个向左走，一个向右走：</p>
 <pre><code class="language-rust ignore">// lib.rs
 // ...
 pub mod silly1;     // NEW!
@@ -5454,11 +5282,9 @@ struct List&lt;T&gt; {
     right: Stack&lt;T&gt;,
 }
 </code></pre>
-<p>Now, rather than having a mere safe stack, we have a general purpose list.
-We can grow the list leftwards or rightwards by pushing onto either stack.
-We can also &quot;walk&quot; along the list by popping values off one end and onto the
-other. To avoid needless allocations, we're going to copy the source of
-our safe Stack to get access to its private details:</p>
+<p>现在，我们不再有一个单纯的安全堆栈，而是有一个通用的列表。我们可以通过推送到任何
+一个堆栈来向左或向右增长这个列表。我们还可以通过从一端弹出数值到另一端来沿着列表
+“行走”。为了避免不必要的分配，我们将复制我们的安全堆栈的源码，以获得它的私有细节：</p>
 <pre><code class="language-rust ignore">pub struct Stack&lt;T&gt; {
     head: Link&lt;T&gt;,
 }
@@ -5514,7 +5340,7 @@ impl&lt;T&gt; Drop for Stack&lt;T&gt; {
     }
 }
 </code></pre>
-<p>And just rework <code>push</code> and <code>pop</code> a bit:</p>
+<p>然后只是重新设计一下<code>push</code>和<code>pop</code>：</p>
 <pre><code class="language-rust ignore">pub fn push(&amp;mut self, elem: T) {
     let new_node = Box::new(Node {
         elem: elem,
@@ -5542,7 +5368,7 @@ fn pop_node(&amp;mut self) -&gt; Option&lt;Box&lt;Node&lt;T&gt;&gt;&gt; {
     })
 }
 </code></pre>
-<p>Now we can make our List:</p>
+<p>现在我们可以做我们自己的链表：</p>
 <pre><code class="language-rust ignore">pub struct List&lt;T&gt; {
     left: Stack&lt;T&gt;,
     right: Stack&lt;T&gt;,
@@ -5554,7 +5380,7 @@ impl&lt;T&gt; List&lt;T&gt; {
     }
 }
 </code></pre>
-<p>And we can do the usual stuff:</p>
+<p>我们还可以做一些常规的事情：</p>
 <pre><code class="language-rust ignore">pub fn push_left(&amp;mut self, elem: T) { self.left.push(elem) }
 pub fn push_right(&amp;mut self, elem: T) { self.right.push(elem) }
 pub fn pop_left(&amp;mut self) -&gt; Option&lt;T&gt; { self.left.pop() }
@@ -5564,7 +5390,7 @@ pub fn peek_right(&amp;self) -&gt; Option&lt;&amp;T&gt; { self.right.peek() }
 pub fn peek_left_mut(&amp;mut self) -&gt; Option&lt;&amp;mut T&gt; { self.left.peek_mut() }
 pub fn peek_right_mut(&amp;mut self) -&gt; Option&lt;&amp;mut T&gt; { self.right.peek_mut() }
 </code></pre>
-<p>But most interestingly, we can walk around!</p>
+<p>但最有趣的是，我们可以走来走去！</p>
 <pre><code class="language-rust ignore">pub fn go_left(&amp;mut self) -&gt; bool {
     self.left.pop_node().map(|node| {
         self.right.push_node(node);
@@ -5577,8 +5403,8 @@ pub fn go_right(&amp;mut self) -&gt; bool {
     }).is_some()
 }
 </code></pre>
-<p>We return booleans here as just a convenience to indicate whether we actually
-managed to move. Now let's test this baby out:</p>
+<p>我们在这里返回布尔值，只是为了方便表明我们是否真的成功移动了。现在让我们测试一下
+这个宝贝：</p>
 <pre><code class="language-rust ignore">#[cfg(test)]
 mod test {
     use super::List;
@@ -5638,15 +5464,12 @@ test silly1::test::walk_aboot ... ok
 
 test result: ok. 16 passed; 0 failed; 0 ignored; 0 measured
 </code></pre>
-<p>This is an extreme example of a <em>finger</em> data structure, where we maintain
-some kind of finger into the structure, and as a consequence can support
-operations on locations in time proportional to the distance from the finger.</p>
-<p>We can make very fast changes to the list around our finger, but if we want
-to make changes far away from our finger we have to walk all the way over there.
-We can permanently walk over there by shifting the elements from one stack to
-the other, or we could just walk along the links with an <code>&amp;mut</code>
-temporarily to do the changes. However the <code>&amp;mut</code> can never go back up the
-list, while our finger can!</p>
+<p>这是一个<em>手指</em>数据结构的极端例子，我们将某种手指维护到结构中，结果是可以支持对位
+置的操作，时间与手指的距离成正比。</p>
+<p>我们可以对手指周围的列表进行非常快速的修改，但是如果我们想在离手指很远的地方进行修
+改，我们就必须一直走到那里。我们可以通过将元素从一个堆栈转移到另一个堆栈来永久地走
+过去，或者我们可以用一个<code>&amp;mut</code>临时沿着链接走过去做改变。然而，<code>&amp;mut</code>永远不能回到
+列表中去，而我们的手指却可以！</p>
 
                     </main>
 

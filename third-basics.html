@@ -145,31 +145,27 @@
 
                 <div id="content" class="content">
                     <main>
-                        <h1><a class="header" href="#basics" id="basics">Basics</a></h1>
-<p>We already know a lot of the basics of Rust now, so we can do a lot of the
-simple stuff again.</p>
-<p>For the constructor, we can again just copy-paste:</p>
+                        <h1><a class="header" href="#基本" id="基本">基本</a></h1>
+<p>我们现在已经知道了很多Rust的基础知识，所以我们可以再次做很多简单的事情。</p>
+<p>对于构造函数，我们又可以直接复制粘贴了：</p>
 <pre><code class="language-rust ignore">impl&lt;T&gt; List&lt;T&gt; {
     pub fn new() -&gt; Self {
         List { head: None }
     }
 }
 </code></pre>
-<p><code>push</code> and <code>pop</code> don't really make sense anymore. Instead we can provide
-<code>append</code> and <code>tail</code>, which provide approximately the same thing.</p>
-<p>Let's start with appending. It takes a list and an element, and returns a
-List. Like the mutable list case, we want to make a new node, that has the old
-list as its <code>next</code> value. The only novel thing is how to <em>get</em> that next value,
-because we're not allowed to mutate anything.</p>
-<p>The answer to our prayers is the Clone trait. Clone is implemented by almost
-every type, and provides a generic way to get &quot;another one like this one&quot; that
-is logically disjoint given only a shared reference. It's like a copy
-constructor in C++, but it's never implicitly invoked.</p>
-<p>Rc in particular uses Clone as the way to increment the reference count. So
-rather than moving a Box to be in the sublist, we just clone the head of the
-old list. We don't even need to match on the head, because Option exposes a
-Clone implementation that does exactly the thing we want.</p>
-<p>Alright, let's give it a shot:</p>
+<p><code>push</code>和<code>pop</code>已经没有实际意义了。相反，我们可以提供<code>append</code>和<code>tail</code>，它们提供的东
+西大致相同。</p>
+<p>让我们从append开始。它接受一个列表和一个元素，并返回一个列表。就像可变列表的情况一样，
+我们要做一个新的节点，它的<code>next</code>值是旧列表。唯一新奇的是如何获得下一个值，因为我们不
+允许改变任何东西。</p>
+<p>我们祈祷的答案就是Clone特性。几乎所有的类型都实现了克隆，它提供了一种通用的方法来获得
+&quot;像这样的另一个&quot;，而这个逻辑上是不相干的，只给了一个共享的引用。它就像C++中的复制构造
+函数，但它从未被隐式调用。</p>
+<p>特别是Rc使用Clone作为增加引用计数的方法。因此，与其移动一个Box到子列表中，不如直接克
+隆旧列表的头部。我们甚至不需要在头部进行匹配，因为Option暴露了一个Clone的实现，它所做
+的正是我们想要的事情。</p>
+<p>好了，让我们试一试吧：</p>
 <pre><code class="language-rust ignore">pub fn append(&amp;self, elem: T) -&gt; List&lt;T&gt; {
     List { head: Some(Rc::new(Node {
         elem: elem,
@@ -193,12 +189,10 @@ warning: field is never used: `next`
 11 |     next: Link&lt;T&gt;,
    |     ^^^^^^^^^^^^^
 </code></pre>
-<p>Wow, Rust is really hard-nosed about actually using fields. It can tell no
-consumer can ever actually observe the use of these fields! Still, we seem good
-so far.</p>
-<p><code>tail</code> is the logical inverse of this operation. It takes a list and returns the
-whole list with the first element removed. All that is is cloning the <em>second</em>
-element in the list (if it exists). Let's try this:</p>
+<p>哇，Rust对实际使用字段真的很苛刻。它可以告诉没有消费者可以真正观察到这些字段的使用情
+况! 不过，到目前为止，我们似乎还不错。</p>
+<p><code>tail</code>是这个操作的逻辑逆运算。它接收一个列表并返回除去第一个元素的整个列表。所有这些
+都是克隆列表中的<em>第二个</em>元素（如果它存在的话）。我们来试试这个：</p>
 <pre><code class="language-rust ignore">pub fn tail(&amp;self) -&gt; List&lt;T&gt; {
     List { head: self.head.as_ref().map(|node| node.next.clone()) }
 }
@@ -214,9 +208,8 @@ error[E0308]: mismatched types
    = note: expected type `std::option::Option&lt;std::rc::Rc&lt;_&gt;&gt;`
               found type `std::option::Option&lt;std::option::Option&lt;std::rc::Rc&lt;_&gt;&gt;&gt;`
 </code></pre>
-<p>Hrm, we messed up. <code>map</code> expects us to return a Y, but here we're returning an
-<code>Option&lt;Y&gt;</code>. Thankfully, this is another common Option pattern, and we can just
-use <code>and_then</code> to let us return an Option.</p>
+<p>嗯，我们搞砸了。<code>map</code>希望我们返回一个Y，但是在这里我们要返回一个<code>Option&lt;Y&gt;</code>。值得庆
+幸的是，这是另一个常见的Option模式，我们可以直接使用<code>and_then</code>来让我们返回一个Option。</p>
 <pre><code class="language-rust ignore">pub fn tail(&amp;self) -&gt; List&lt;T&gt; {
     List { head: self.head.as_ref().and_then(|node| node.next.clone()) }
 }
@@ -224,9 +217,9 @@ use <code>and_then</code> to let us return an Option.</p>
 <pre><code class="language-text">&gt; cargo build
 
 </code></pre>
-<p>Great.</p>
-<p>Now that we have <code>tail</code>, we should probably provide <code>head</code>, which returns a
-reference to the first element. That's just <code>peek</code> from the mutable list:</p>
+<p>很好。</p>
+<p>现在我们有了<code>tail</code>，我们也许应该提供<code>head</code>，它返回对第一个元素的引用。这只是从可
+变列表中<code>peek</code>：</p>
 <pre><code class="language-rust ignore">pub fn head(&amp;self) -&gt; Option&lt;&amp;T&gt; {
     self.head.as_ref().map(|node| &amp;node.elem )
 }
@@ -234,8 +227,8 @@ reference to the first element. That's just <code>peek</code> from the mutable l
 <pre><code class="language-text">&gt; cargo build
 
 </code></pre>
-<p>Nice.</p>
-<p>That's enough functionality that we can test it:</p>
+<p>很好。</p>
+<p>这已经有足够的功能，我们可以测试它：</p>
 <pre><code class="language-rust ignore">#[cfg(test)]
 mod test {
     use super::List;
@@ -278,8 +271,8 @@ test third::test::basics ... ok
 test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured
 
 </code></pre>
-<p>Perfect!</p>
-<p>Iter is also identical to how it was for our mutable list:</p>
+<p>很完美!</p>
+<p>Iter也与我们的可变链表的情况相同：</p>
 <pre><code class="language-rust ignore">pub struct Iter&lt;'a, T&gt; {
     next: Option&lt;&amp;'a Node&lt;T&gt;&gt;,
 }
@@ -327,10 +320,9 @@ test third::test::iter ... ok
 test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured
 
 </code></pre>
-<p>Who ever said dynamic typing was easier?</p>
-<p>(chumps did)</p>
-<p>Note that we can't implement IntoIter or IterMut for this type. We only have
-shared access to elements.</p>
+<p>谁曾说过动态类型更容易？</p>
+<p>(笨蛋说的)</p>
+<p>注意，我们不能为这个类型实现IntoIter或IterMut。我们只有对元素的共享访问。</p>
 
                     </main>
 

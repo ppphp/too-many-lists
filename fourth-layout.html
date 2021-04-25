@@ -145,27 +145,23 @@
 
                 <div id="content" class="content">
                     <main>
-                        <h1><a class="header" href="#layout" id="layout">Layout</a></h1>
-<p>The key to our design is the <code>RefCell</code> type. The heart of
-RefCell is a pair of methods:</p>
+                        <h1><a class="header" href="#布局" id="布局">布局</a></h1>
+<p>我们设计的关键是<code>RefCell</code>类型。RefCell的核心是一对方法：</p>
 <pre><code class="language-rust ignore">fn borrow(&amp;self) -&gt; Ref&lt;'_, T&gt;;
 fn borrow_mut(&amp;self) -&gt; RefMut&lt;'_, T&gt;;
 </code></pre>
-<p>The rules for <code>borrow</code> and <code>borrow_mut</code> are exactly those of <code>&amp;</code> and <code>&amp;mut</code>:
-you can call <code>borrow</code> as many times as you want, but <code>borrow_mut</code> requires
-exclusivity.</p>
-<p>Rather than enforcing this statically, RefCell enforces them at runtime.
-If you break the rules, RefCell will just panic and crash the program.
-Why does it return these Ref and RefMut things? Well, they basically behave
-like <code>Rc</code>s but for borrowing. They also keep the RefCell borrowed until they go out
-of scope. We'll get to that later.</p>
-<p>Now with Rc and RefCell we can become... an incredibly verbose pervasively
-mutable garbage collected language that can't collect cycles! Y-yaaaaay...</p>
-<p>Alright, we want to be <em>doubly-linked</em>. This means each node has a pointer to
-the previous and next node. Also, the list itself has a pointer to the
-first and last node. This gives us fast insertion and removal on <em>both</em>
-ends of the list.</p>
-<p>So we probably want something like:</p>
+<p><code>borrow</code>和<code>borrow_mut</code>的规则正是<code>&amp;</code>和<code>&amp;mut</code>的规则：你可以随意调用<code>borrow</code>，但
+<code>borrow_mut</code>需要独占性。</p>
+<p>RefCell不是静态地执行这些规则，而是在运行时执行这些规则。如果你违反了这些规则，
+RefCell就会惊慌失措，使程序崩溃。为什么它会返回这些Ref和RefMut的东西？好吧，它们的
+行为基本上和<code>Rc</code>s一样，只是用于借用。它们也保持RefCell的借用，直到它们超出范围。我
+们稍后会讨论这个问题。</p>
+<p>现在有了Rc和RefCell，我们可以成为......一种令人难以置信的冗长的普遍可变异的垃圾收集
+语言，它不能收集循环 呀呀呀...</p>
+<p>好了，我们要做<em>双向链接</em>的。这意味着每个节点都有一个指向上一个和下一个节点的指针。同
+时，列表本身也有一个指向第一个和最后一个节点的指针。这样我们就可以在列表的两端快速插
+入和删除。</p>
+<p>所以我们可能需要这样的东西：</p>
 <pre><code class="language-rust ignore">use std::rc::Rc;
 use std::cell::RefCell;
 
@@ -216,7 +212,7 @@ warning: field is never used: `prev`
 14 |     prev: Link&lt;T&gt;,
    |     ^^^^^^^^^^^^^
 </code></pre>
-<p>Hey, it built! Lots of dead code warnings, but it built! Let's try to use it.</p>
+<p>嘿，它建好了! 很多死代码的警告，但它构建了！让我们试着使用它。</p>
 
                     </main>
 

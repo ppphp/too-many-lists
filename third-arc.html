@@ -146,59 +146,44 @@
                 <div id="content" class="content">
                     <main>
                         <h1><a class="header" href="#arc" id="arc">Arc</a></h1>
-<p>One reason to use an immutable linked list is to share data across threads.
-After all, shared mutable state is the root of all evil, and one way to solve
-that is to kill the <em>mutable</em> part forever.</p>
-<p>Except our list isn't thread-safe at all. In order to be thread-safe, we need
-to fiddle with reference counts <em>atomically</em>. Otherwise, two threads could
-try to increment the reference count, <em>and only one would happen</em>. Then the
-list could get freed too soon!</p>
-<p>In order to get thread safety, we have to use <em>Arc</em>. Arc is completely identical
-to Rc except for the fact that reference counts are modified atomically. This
-has a bit of overhead if you don't need it, so Rust exposes both.
-All we need to do to make our list is replace every reference to Rc with
-<code>std::sync::Arc</code>. That's it. We're thread safe. Done!</p>
-<p>But this raises an interesting question: how do we <em>know</em> if a type is
-thread-safe or not? Can we accidentally mess up?</p>
-<p>No! You can't mess up thread-safety in Rust!</p>
-<p>The reason this is the case is because Rust models thread-safety in a
-first-class way with two traits: <code>Send</code> and <code>Sync</code>.</p>
-<p>A type is <em>Send</em> if it's safe to <em>move</em> to another thread. A type is <em>Sync</em> if
-it's safe to <em>share</em> between multiple threads. That is, if <code>T</code> is Sync, <code>&amp;T</code> is
-Send. Safe in this case means it's impossible to cause <em>data races</em>, (not to
-be mistaken with the more general issue of <em>race conditions</em>).</p>
-<p>These are marker traits, which is a fancy way of saying they're traits that
-provide absolutely no interface. You either <em>are</em> Send, or you aren't. It's just
-a property <em>other</em> APIs can require. If you aren't appropriately Send,
-then it's statically impossible to be sent to a different thread! Sweet!</p>
-<p>Send and Sync are also automatically derived traits based on whether you are
-totally composed of Send and Sync types. It's similar to how you can only
-implement Copy if you're only made of Copy types, but then we just go ahead
-and implement it automatically if you are.</p>
-<p>Almost every type is Send and Sync. Most types are Send because they totally
-own their data. Most types are Sync because the only way to share data across
-threads is to put them behind a shared reference, which makes them immutable!</p>
-<p>However there are special types that violate these properties: those that have
-<em>interior mutability</em>. So far we've only really interacted with <em>inherited
-mutability</em> (AKA external mutability): the mutability of a value is inherited
-from the mutability of its container. That is, you can't just randomly mutate
-some field of a non-mutable value because you feel like it.</p>
-<p>Interior mutability types violate this: they let you mutate through a shared
-reference. There are two major classes of interior mutability: cells, which
-only work in a single-threaded context; and locks, which work in a
-multi-threaded context. For obvious reasons, cells are cheaper when you can
-use them. There's also atomics, which are primitives that act like a lock.</p>
-<p>So what does all of this have to do with Rc and Arc? Well, they both use
-interior mutability for their <em>reference count</em>. Worse, this reference count
-is shared between every instance! Rc just uses a cell, which means it's not
-thread safe. Arc uses an atomic, which means it <em>is</em> thread safe. Of course,
-you can't magically make a type thread safe by putting it in Arc. Arc can only
-derive thread-safety like any other type.</p>
-<p>I really really really don't want to get into the finer details of atomic
-memory models or non-derived Send implementations. Needless to say, as you get
-deeper into Rust's thread-safety story, stuff gets more complicated. As a
-high-level consumer, it all <em>just works</em> and you don't really need to think
-about it.</p>
+<p>使用不可变链表的一个原因是跨线程共享数据。毕竟，共享可变的状态是所有邪恶的根源，
+解决这个问题的一个方法是永远杀死<em>可变</em>的部分。</p>
+<p>只是我们的列表根本就不是线程安全的。为了实现线程安全，我们需要<em>原子化</em>地处理引用
+计数。否则，两个线程可以尝试增加引用计数，但<em>只有一个会发生</em>。那么，列表就会过早
+地被释放！</p>
+<p>为了获得线程安全，我们必须使用<em>Arc</em>。Arc与Rc完全相同，只是引用计数被原子化地修改。
+如果你不需要的话，这有一点开销，所以Rust将两者都暴露出来。我们需要做的就是用
+<code>std::sync::Arc</code>替换所有对Rc的引用，来制作我们的列表。就这样了。我们是线程安全
+的。完成了!</p>
+<p>但这提出了一个有趣的问题：我们如何<em>知道</em>一个类型是否是线程安全的？我们会不会不小心
+搞砸了？</p>
+<p>不会！在Rust中，你不可能搞乱线程安全。</p>
+<p>之所以如此，是因为Rust通过两个特性以第一类的方式建立了线程安全模型。<code>Send</code>和
+<code>Sync</code>。</p>
+<p>如果一个类型可以安全地移动到另一个线程，那么它就是<em>Send</em>。如果一个类型在多个线程之
+间<em>共享</em>是安全的，那么它就是<em>Sync</em>。也就是说，如果<code>T</code>是Sync，<code>&amp;T</code>就是Send。在这种
+情况下，安全意味着不可能引起<em>数据竞争</em>，（不要误解为更普遍的<em>竞赛条件</em>问题）。</p>
+<p>这些是标记特性，这是一种华丽的说法，即它们是完全不提供接口的特性。你要么<em>是</em>Send，
+要么不是。这只是一个<em>其他</em>API可以要求的属性。如果你不是合适的Send，那么就不可能被发
+送到不同的线程中。很好!</p>
+<p>Send和Sync也是基于你是否完全由Send和Sync类型组成的自动派生特性。这类似于如果你只由
+Copy类型组成，你只能实现Copy，但如果你是Copy类型，我们就自动去实现它。</p>
+<p>几乎每个类型都是Send和Sync。大多数类型都是Send，因为它们完全拥有自己的数据。大多数
+类型是Sync，因为跨线程共享数据的唯一方法是把它们放在一个共享引用后面，这使得它们是
+不可改变的</p>
+<p>然而，有一些特殊的类型违反了这些属性：那些具有<em>内部可变性</em>的类型。到目前为止，我们只
+与<em>继承的可变性</em>（又称外部可变性）进行了真正的互动：一个值的可变性是从其容器的可变性
+中继承的。也就是说，你不能因为你喜欢而随机地改变一个不可变的值的某个字段。</p>
+<p>内部可变性类型违反了这一点：它们让你通过一个共享的引用进行改变。内部可变性有两大类：
+单元格，它只在单线程环境下工作；锁，它在多线程环境下工作。由于显而易见的原因，当你可
+以使用单元格时，单元格开销更小。还有atomics，它是类似于锁的基元。</p>
+<p>那么这一切与Rc和Arc有什么关系呢？好吧，它们都使用内部可变性来表示它们的<em>引用计数</em>。
+更糟的是，这个引用计数在每个实例之间都是共享的！Rc只是使用一个单元，这意味着它不是线程
+安全的。Arc使用了一个原子，这意味着它<em>是</em>线程安全的。当然，你不可能通过把一个类型放在
+Arc中而神奇地使它成为线程安全的。Arc只能像其他类型一样派生出线程安全。</p>
+<p>我真的真的不想讨论原子内存模型或非派生Send实现的更多细节。不用说，当你深入了解Rust的线
+程安全故事时，事情会变得更加复杂。作为一个高级消费者，这一切都<em>只是在工作</em>，你真的不需
+要考虑它。</p>
 
                     </main>
 

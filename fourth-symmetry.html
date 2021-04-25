@@ -145,14 +145,14 @@
 
                 <div id="content" class="content">
                     <main>
-                        <h1><a class="header" href="#symmetric-junk" id="symmetric-junk">Symmetric Junk</a></h1>
-<p>Alright let's get all that combinatoric symmetry over with.</p>
-<p>All we have to do is some basic text replacement:</p>
+                        <h1><a class="header" href="#对称的垃圾" id="对称的垃圾">对称的垃圾</a></h1>
+<p>好了，让我们把所有的组合对称性问题都解决了。</p>
+<p>我们所要做的就是一些基本的文本替换：</p>
 <pre><code class="language-text">tail &lt;-&gt; head
 next &lt;-&gt; prev
 front -&gt; back
 </code></pre>
-<p>Oh, also we need to add <code>_mut</code> variants for peeking.</p>
+<p>哦，我们还需要为选取增加<code>_mut</code>的变体。</p>
 <pre><code class="language-rust ignore">pub fn push_back(&amp;mut self, elem: T) {
     let new_tail = Node::new(elem);
     match self.tail.take() {
@@ -201,7 +201,7 @@ pub fn peek_front_mut(&amp;mut self) -&gt; Option&lt;RefMut&lt;T&gt;&gt; {
     })
 }
 </code></pre>
-<p>And massively flesh out our tests:</p>
+<p>并大规模地充实我们的测试：</p>
 <pre><code class="language-rust ignore">#[test]
 fn basics() {
     let mut list = List::new();
@@ -273,8 +273,8 @@ fn peek() {
     assert_eq!(&amp;mut *list.peek_back_mut().unwrap(), &amp;mut 1);
 }
 </code></pre>
-<p>Are there some cases we're not testing? Probably. The combinatoric space
-has really blown up here. Our code is at very least not <em>obviously wrong</em>.</p>
+<p>是否有一些情况我们没有测试？可能吧。组合空间在这里真的炸开了锅。我们的代码至少
+没有<em>明显的错误</em>。</p>
 <pre><code class="language-text">&gt; cargo test
 
      Running target/debug/lists-5c71138492ad4b4a
@@ -294,7 +294,7 @@ test third::test::basics ... ok
 test result: ok. 10 passed; 0 failed; 0 ignored; 0 measured
 
 </code></pre>
-<p>Nice. Copy-pasting is the best kind of programming.</p>
+<p>不错。复制-粘贴是最好的编程方式。</p>
 
                     </main>
 

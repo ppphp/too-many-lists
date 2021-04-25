@@ -145,17 +145,15 @@
 
                 <div id="content" class="content">
                     <main>
-                        <h1><a class="header" href="#layout" id="layout">Layout</a></h1>
-<p>Alright, back to the drawing board on layout.</p>
-<p>The most important thing about
-a persistent list is that you can manipulate the tails of lists basically
-for free:</p>
-<p>For instance, this isn't an uncommon workload to see with a persistent list:</p>
+                        <h1><a class="header" href="#布局" id="布局">布局</a></h1>
+<p>好了，回到布局的画板上。</p>
+<p>持久列表最重要的一点是，你基本上可以没有成本地操作列表的尾部：</p>
+<p>例如，在持久性列表中，这并不是一个不常见的工作量：</p>
 <pre><code class="language-text">list1 = A -&gt; B -&gt; C -&gt; D
 list2 = tail(list1) = B -&gt; C -&gt; D
 list3 = push(list2, X) = X -&gt; B -&gt; C -&gt; D
 </code></pre>
-<p>But at the end we want the memory to look like this:</p>
+<p>但在最后，我们希望内存看起来像这样：</p>
 <pre><code class="language-text">list1 -&gt; A ---+
               |
               v
@@ -164,26 +162,20 @@ list2 ------&gt; B -&gt; C -&gt; D
               |
 list3 -&gt; X ---+
 </code></pre>
-<p>This just can't work with Boxes, because ownership of <code>B</code> is <em>shared</em>. Who
-should free it? If I drop list2, does it free B? With boxes we certainly would
-expect so!</p>
-<p>Functional languages -- and indeed almost every other language -- get away with
-this by using <em>garbage collection</em>. With the magic of garbage collection, B will
-be freed only after everyone stops looking at it. Hooray!</p>
-<p>Rust doesn't have anything like the garbage collectors these languages have.
-They have <em>tracing</em> GC, which will dig through all the memory that's sitting
-around at runtime and figure out what's garbage automatically. Instead, all
-Rust has today is <em>reference counting</em>. Reference counting can be thought of
-as a very simple GC. For many workloads, it has significantly less throughput
-than a tracing collector, and it completely falls over if you manage to
-build cycles. But hey, it's all we've got! Thankfully, for our usecase we'll never run into cycles
-(feel free to try to prove this to yourself -- I sure won't).</p>
-<p>So how do we do reference-counted garbage collection? <code>Rc</code>! Rc is just like
-Box, but we can duplicate it, and its memory will <em>only</em> be freed when <em>all</em>
-the Rc's derived from it are dropped. Unfortunately, this flexibility comes at
-a serious cost: we can only take a shared reference to its internals. This means
-we can't ever really get data out of one of our lists, nor can we mutate them.</p>
-<p>So what's our layout gonna look like? Well, previously we had:</p>
+<p>这对Boxes来说就是不行的，因为<code>B</code>的所有权是<em>共享</em>的。谁应该释放它？如果我放弃list2，
+它会释放B吗？对于盒子，我们当然希望如此。</p>
+<p>函数式语言--事实上几乎所有其他语言--都通过使用<em>垃圾回收</em>来解决这个问题。有了垃圾收集
+的魔力，只有在每个人都不再看它的时候，B才会被释放。万幸！</p>
+<p>Rust没有像这些语言那样的垃圾收集器。他们有<em>追踪</em>的GC，它将挖掘所有在运行时闲置的内
+存，并自动找出哪些是垃圾。相反，Rust现在有的只是<em>引用计数</em>。引用计数可以被认为是一个
+非常简单的GC。对于许多工作情况来说，它的吞吐量明显低于跟踪收集器，而且如果你设法建立
+循环，它就会完全崩溃。但是，这就是我们所能得到的一切了。值得庆幸的是，对于我们的用例
+来说，我们永远不会遇到周期问题（请随时尝试向自己证明这一点 -- 我肯定不会）。</p>
+<p>那么，我们如何进行引用计数的垃圾收集呢？<code>Rc</code>! Rc就像Box一样，但我们可以复制它，而且
+它的内存<em>只有</em>在<em>所有</em>从它派生出来的Rc被丢弃时才会被释放。不幸的是，这种灵活性有一个
+严重的代价：我们只能对其内部进行共享引用。这意味着我们永远不能从我们的一个列表中获取
+数据，也不能对它们进行变异。</p>
+<p>那么，我们的布局会是什么样子的呢？嗯，之前我们有：</p>
 <pre><code class="language-rust ignore">pub struct List&lt;T&gt; {
     head: Link&lt;T&gt;,
 }
@@ -195,7 +187,7 @@ struct Node&lt;T&gt; {
     next: Link&lt;T&gt;,
 }
 </code></pre>
-<p>Can we just change Box to Rc?</p>
+<p>我们能不能把Box改成Rc？</p>
 <pre><code class="language-rust ignore">// in third.rs
 
 pub struct List&lt;T&gt; {
@@ -221,9 +213,8 @@ help: possible candidate is found in another module, you can import it into scop
 1 | use std::rc::Rc;
   |
 </code></pre>
-<p>Oh dang, sick burn. Unlike everything we used for our mutable lists, Rc is so
-lame that it's not even implicitly imported into every single Rust program.
-<em>What a loser</em>.</p>
+<p>哦，该死，坏起来了。与我们用于可变列表的一切不同，Rc是如此蹩脚，以至于它甚至没有被
+隐含地导入到每一个Rust程序中。<em>真是个失败者。</em></p>
 <pre><code class="language-rust ignore">use std::rc::Rc;
 </code></pre>
 <pre><code class="language-text">cargo build
@@ -248,10 +239,10 @@ warning: field is never used: `next`
 11 |     next: Link&lt;T&gt;,
    |     ^^^^^^^^^^^^^
 </code></pre>
-<p>Seems legit. Rust continues to be <em>completely</em> trivial to write. I bet we can just
-find-and-replace Box with Rc and call it a day!</p>
+<p>似乎是合法的。Rust的编写仍然是<em>完全</em>微不足道的。我打赌我们可以用Rc查找和替换Box，然后
+就可以了。</p>
 <p>...</p>
-<p>No. No we can't.</p>
+<p>不，不，我们不能。</p>
 
                     </main>
 

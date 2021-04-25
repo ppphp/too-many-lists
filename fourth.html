@@ -145,14 +145,12 @@
 
                 <div id="content" class="content">
                     <main>
-                        <h1><a class="header" href="#a-bad-but-safe-doubly-linked-deque" id="a-bad-but-safe-doubly-linked-deque">A Bad but Safe Doubly-Linked Deque</a></h1>
-<p>Now that we've seen Rc and heard about interior mutability, this gives an
-interesting thought... maybe we <em>can</em> mutate through an Rc. And if <em>that's</em>
-the case, maybe we can implement a <em>doubly-linked</em> list totally safely!</p>
-<p>In the process we'll become familiar with <em>interior mutability</em>, and probably
-learn the hard way that safe doesn't mean <em>correct</em>. Doubly-linked lists are
-hard, and I always make a mistake somewhere.</p>
-<p>Let's add a new file called <code>fourth.rs</code>:</p>
+                        <h1><a class="header" href="#一个不好但是安全的双链双向队列" id="一个不好但是安全的双链双向队列">一个不好但是安全的双链双向队列</a></h1>
+<p>现在我们已经看到了Rc，并听说了内部可变性，这给我们一个有趣的想法......。也许我
+们<em>可以</em>通过Rc进行改变。如果<em>是这样</em>，也许我们可以完全安全地实现一个<em>双链表</em>！</p>
+<p>在这个过程中，我们将熟悉内部可变性，并可能了解到，安全并不意味着正确。双链表很
+难，我总是在某个地方犯错。</p>
+<p>让我们添加一个新的文件，叫做<code>fourth.rs</code>：</p>
 <pre><code class="language-rust ignore">// in lib.rs
 
 pub mod first;
@@ -160,9 +158,8 @@ pub mod second;
 pub mod third;
 pub mod fourth;
 </code></pre>
-<p>This will be another clean-room operation, though as usual we'll probably find
-some logic that applies verbatim again.</p>
-<p>Disclaimer: this chapter is basically a demonstration that this is a very bad idea.</p>
+<p>这将是另一个净室操作，尽管像往常一样，我们可能会发现一些逻辑再次逐字适用。</p>
+<p>免责声明：这一章基本上是一个示范，说明这是一个非常糟糕的主意。</p>
 
                     </main>
 

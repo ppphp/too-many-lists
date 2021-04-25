@@ -145,20 +145,20 @@
 
                 <div id="content" class="content">
                     <main>
-                        <h1><a class="header" href="#peeking" id="peeking">Peeking</a></h1>
-<p>Alright, we made it through <code>push</code> and <code>pop</code>. I'm not gonna lie, it got a
-bit emotional there. Compile-time correctness is a hell of a drug.</p>
-<p>Let's cool off by doing something simple: let's just implement <code>peek_front</code>.
-That was always really easy before. Gotta still be easy, right?</p>
-<p>Right?</p>
-<p>In fact, I think I can just copy-paste it!</p>
+                        <h1><a class="header" href="#选择" id="选择">选择</a></h1>
+<p>好了，我们用<code>push</code>和<code>pop</code>做。不瞒你说，我在那里有点情绪化了。编译时的正确性是
+一种可怕的毒药。</p>
+<p>让我们做一些简单的事情来冷静一下：让我们实现<code>peek_front</code>。这在以前是非常容易
+的。应该还是很容易的，对吗？</p>
+<p>对吗？</p>
+<p>事实上，我想我可以直接复制粘贴它！&quot;。</p>
 <pre><code class="language-rust ignore">pub fn peek_front(&amp;self) -&gt; Option&lt;&amp;T&gt; {
     self.head.as_ref().map(|node| {
         &amp;node.elem
     })
 }
 </code></pre>
-<p>Wait. Not this time.</p>
+<p>等等。不是这时候。</p>
 <pre><code class="language-rust ignore">pub fn peek_front(&amp;self) -&gt; Option&lt;&amp;T&gt; {
     self.head.as_ref().map(|node| {
         // BORROW!!!!
@@ -166,7 +166,7 @@ That was always really easy before. Gotta still be easy, right?</p>
     })
 }
 </code></pre>
-<p>HAH.</p>
+<p>哈。</p>
 <pre><code class="language-text">cargo build
 
 error[E0515]: cannot return value referencing temporary value
@@ -179,43 +179,34 @@ error[E0515]: cannot return value referencing temporary value
    |             |
    |             returns a value referencing data owned by the current function
 </code></pre>
-<p>Ok I'm just burning my computer.</p>
-<p>This is exactly the same logic as our singly-linked stack. Why are things
-different. WHY.</p>
-<p>The answer is really the whole moral of this chapter: RefCells make everything
-sadness. Up until now, RefCells have just been a nuisance. Now they're going to
-become a nightmare.</p>
-<p>So what's going on? To understand that, we need to go back to the definition of
-<code>borrow</code>:</p>
+<p>好吧，我只是在烧我的电脑。</p>
+<p>这与我们的单链栈的逻辑完全相同。为什么事情会不同。为什么。</p>
+<p>答案其实就是本章的全部寓意。RefCells使一切变得悲伤。到现在为止，RefCells只是一个讨
+厌的东西。现在它们将成为一场噩梦。</p>
+<p>那么发生了什么？为了理解这一点，我们需要回到<code>borrow</code>的定义上：</p>
 <pre><code class="language-rust ignore">fn borrow&lt;'a&gt;(&amp;'a self) -&gt; Ref&lt;'a, T&gt;
 fn borrow_mut&lt;'a&gt;(&amp;'a self) -&gt; RefMut&lt;'a, T&gt;
 </code></pre>
-<p>In the layout section we said:</p>
+<p>在布局部分，我们说：</p>
 <blockquote>
-<p>Rather than enforcing this statically, RefCell enforces them at runtime.
-If you break the rules, RefCell will just panic and crash the program.
-Why does it return these Ref and RefMut things? Well, they basically behave
-like <code>Rc</code>s but for borrowing. Also they keep the RefCell borrowed until they go out
-of scope. <strong>We'll get to that later.</strong></p>
+<p>RefCell不是静态地执行这些规则，而是在运行时执行它们。
+如果你违反了这些规则，RefCell就会惊慌失措，使程序崩溃。
+为什么它会返回这些Ref和RefMut的东西？好吧，它们的行为基本上和<code>Rc</code>s一样，只是用于借用。
+另外，它们保持RefCell的借用，直到它们超出范围。<strong>我们稍后会讨论这个问题。</strong></p>
 </blockquote>
-<p>It's later.</p>
-<p><code>Ref</code> and <code>RefMut</code> implement <code>Deref</code> and <code>DerefMut</code> respectively. So for most
-intents and purposes they behave <em>exactly</em> like <code>&amp;T</code> and <code>&amp;mut T</code>. However,
-because of how those traits work, the reference that's returned is connected
-to the lifetime of the Ref, and not the actual RefCell. This means that the Ref
-has to be sitting around as long as we keep the reference around.</p>
-<p>This is in fact necessary for correctness. When a Ref gets dropped, it tells
-the RefCell that it's not borrowed anymore. So if we <em>did</em> manage to hold onto our
-reference longer than the Ref existed, we could get a RefMut while a reference
-was kicking around and totally break Rust's type system in half.</p>
-<p>So where does that leave us? We only want to return a reference, but we need
-to keep this Ref thing around. But as soon as we return the reference from
-<code>peek</code>, the function is over and the <code>Ref</code> goes out of scope.</p>
+<p>现在就是那个稍后。</p>
+<p><code>Ref</code>和<code>RefMut</code>分别实现了<code>Deref</code>和<code>DerefMut</code>。因此，就大多数意图和目的而言，它们
+的行为与<code>&amp;T</code>和<code>&amp;mut T</code><em>完全</em>一样。然而，由于这些特性的工作方式，被返回的引用与引用
+的生命周期有关，而不是与实际的RefCell有关。这意味着，只要我们保留引用，Ref就必须一直
+存在。</p>
+<p>事实上，这对于正确性是必要的。当一个Ref被放弃时，它告诉RefCell它不再被借用。因此，如
+果我们<em>确实</em>设法保持我们的引用比引用存在的时间长，我们就可以在引用四处游荡时得到一个
+RefMut，并完全破坏Rust的类型系统的一半。</p>
+<p>那么，这让我们怎么办呢？我们只想返回一个引用，但我们需要保持这个引用的存在。但是一旦
+我们从<code>peek</code>中返回引用，函数就结束了，而<code>Ref</code>就出了范围。</p>
 <p>😖</p>
-<p>As far as I know, we're actually totally dead in the water here. You can't
-totally encapsulate the use of RefCells like that.</p>
-<p>But... what if we just give up on totally hiding our implementation details?
-What if we returns Refs?</p>
+<p>据我所知，我们在这里实际上已经完全陷入了困境。你不能像这样把RefCells的使用完全封装起来。</p>
+<p>但是......如果我们放弃了完全隐藏我们的实现细节呢？如果我们返回Refs呢？</p>
 <pre><code class="language-rust ignore">pub fn peek_front(&amp;self) -&gt; Option&lt;Ref&lt;T&gt;&gt; {
     self.head.as_ref().map(|node| {
         node.borrow()
@@ -236,7 +227,7 @@ help: possible candidates are found in other modules, you can import them into s
 1  | use std::cell::Ref;
    |
 </code></pre>
-<p>Blurp. Gotta import some stuff.</p>
+<p>啊这。要导入一些东西。</p>
 <pre><code class="language-rust ignore">use std::cell::{Ref, RefCell};
 </code></pre>
 <pre><code class="language-text">&gt; cargo build
@@ -252,25 +243,22 @@ error[E0308]: mismatched types
    = note: expected type `std::option::Option&lt;std::cell::Ref&lt;'_, T&gt;&gt;`
               found type `std::option::Option&lt;std::cell::Ref&lt;'_, fourth::Node&lt;T&gt;&gt;&gt;`
 </code></pre>
-<p>Hmm... that's right. We have a <code>Ref&lt;Node&lt;T&gt;&gt;</code>, but we want a <code>Ref&lt;T&gt;</code>. We could
-abandon all hope of encapsulation and just return that. We could also make
-things even more complicated and wrap <code>Ref&lt;Node&lt;T&gt;&gt;</code> in a new type to only
-expose access to an <code>&amp;T</code>.</p>
-<p>Both of those options are <em>kinda</em> lame.</p>
-<p>Instead, we're going to go deeper down. Let's
-have some <em>fun</em>. Our source of fun is <em>this beast</em>:</p>
+<p>嗯...这就对了。我们有一个<code>Ref&lt;Node&lt;T&gt;&gt;</code>，但是我们想要一个<code>Ref&lt;T&gt;</code>。我们可以放弃所
+有封装的希望，直接返回它。我们也可以把事情搞得更复杂，把<code>Ref&lt;Node&lt;T&gt;&gt;</code>包装成一个新
+的类型，只暴露对<code>&amp;T</code>的访问。</p>
+<p>这两种方法都<em>有点</em>蹩脚。</p>
+<p>相反，我们要更深入地去做。让我们找点<em>乐子</em>。我们的乐趣之源是这只<em>野兽</em>：</p>
 <pre><code class="language-rust ignore">map&lt;U, F&gt;(orig: Ref&lt;'b, T&gt;, f: F) -&gt; Ref&lt;'b, U&gt;
     where F: FnOnce(&amp;T) -&gt; &amp;U,
           U: ?Sized
 </code></pre>
 <blockquote>
-<p>Make a new Ref for a component of the borrowed data.</p>
+<p>为借来的数据的一个组成部分做一个新的参考。</p>
 </blockquote>
-<p>Yes: just like you can map over an Option, you can map over a Ref.</p>
-<p>I'm sure someone somewhere is really excited because <em>monads</em> or whatever but
-I don't care about any of that. Also I don't think it's a proper monad since
-there's no None-like case, but I digress.</p>
-<p>It's cool and that's all that matters to me. <em>I need this</em>.</p>
+<p>是的：就像你可以映射一个Option，你也可以映射一个Ref。</p>
+<p>我相信某些人真的很兴奋，因为<em>单体</em>或其他什么，但我并不关心这些。我也不认为这是一个合
+适的单体，因为没有None-like的情况，但我离题了。</p>
+<p>它很酷，这对我来说才是最重要的。<em>我需要这个</em>。</p>
 <pre><code class="language-rust ignore">pub fn peek_front(&amp;self) -&gt; Option&lt;Ref&lt;T&gt;&gt; {
     self.head.as_ref().map(|node| {
         Ref::map(node.borrow(), |node| &amp;node.elem)
@@ -279,9 +267,9 @@ there's no None-like case, but I digress.</p>
 </code></pre>
 <pre><code class="language-text">&gt; cargo build
 </code></pre>
-<p>Awww yissss</p>
-<p>Let's make sure this is working by munging up the test from our stack. We need
-to do some munging to deal with the fact that Refs don't implement comparisons.</p>
+<p>啊耶。</p>
+<p>让我们通过从我们的堆栈中插入测试来确保它的工作。我们需要做一些处理，以应对Refs不实
+现比较的事实。</p>
 <pre><code class="language-rust ignore">#[test]
 fn peek() {
     let mut list = List::new();
@@ -310,7 +298,7 @@ test third::test::iter ... ok
 test result: ok. 10 passed; 0 failed; 0 ignored; 0 measured
 
 </code></pre>
-<p>Great!</p>
+<p>棒！</p>
 
                     </main>
 
