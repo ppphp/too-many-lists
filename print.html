@@ -706,8 +706,7 @@ error[E0507]: cannot move out of borrowed content
 的Rust黑客Indiana Jones：</p>
 <p><img src="img/indy.gif" alt="Indy Prepares to mem::replace" /></p>
 <p>啊，对了，Indy建议使用<code>mem::replace</code>手法。这个非常有用的函数可以让我们通过用另一个值<em>替
-换</em>来从一个借用中偷取出来一个值。让我们在文件的顶部拉入<code>std::mem</code>，这样<code>mem</code>就在本地作
-用域内：</p>
+换</em>来从一个借用中偷取出来一个值。我们在文件的顶部拉入<code>std::mem</code>，让<code>mem</code>在本地作用域内：</p>
 <pre><code class="language-rust ignore">use std::mem;
 </code></pre>
 <p>并适当地使用它：</p>
@@ -737,7 +736,7 @@ error[E0507]: cannot move out of borrowed content
 型到底是什么，Option是如此的无处不在，以至于<em>每个人</em>都知道它。事实上，它是如此的基
 本，以至于在每个文件中都会隐式地导入到scope中，还有它的变体<code>Some</code>和<code>None</code>（所以我
 们不必说<code>Option::None</code>）。</p>
-<p><code>Option&lt;T&gt;</code>上的尖头表示Option实际上是在T上<code>通用</code>的，这意味着你可以为<code>任何</code>类型制
+<p><code>Option&lt;T&gt;</code>上的尖头表示Option实际上是在T上<em>通用</em>的，这意味着你可以为<em>任何</em>类型制
 作一个Option!</p>
 <p>那么，呃，我们有这个<code>Link</code>的东西，我们怎么知道它是空的还是有More的？模式匹配与
 <code>match</code>!</p>
@@ -812,7 +811,7 @@ note: move occurs because `node` has type `std::boxed::Box&lt;first::Node&gt;`, 
 为我们在这里没有拥有self的值。</p>
 <pre><code class="language-text">help: consider borrowing here: `&amp;self.head`
 </code></pre>
-<p>Rust说我们应该在<code>match</code>中添加一个引用来解决这个问题。🤷♀️让我们试试吧：</p>
+<p>Rust说我们应该在<code>match</code>中添加一个引用来解决这个问题。🤷‍♀️让我们试试吧：</p>
 <pre><code class="language-rust ignore">pub fn pop(&amp;mut self) -&gt; Option&lt;i32&gt; {
     match &amp;self.head {
         Link::Empty =&gt; {
@@ -850,8 +849,8 @@ warning: field is never used: `next`
    |     ^^^^^^^^^^
 </code></pre>
 <p>万岁，又能编译了! 现在让我们弄清楚这个逻辑。我们想做一个Option，所以让我们为它做一
-个变量。在Empty的情况下，我们需要返回None。在More的情况下，我们需要返回<code>Some(i32)</code>
-，并改变列表的头。那么，让我们试着基本做到这一点？</p>
+个变量。如果是Empty，我们需要返回None。如果是More，我们需要返回<code>Some(i32)</code>，并改
+变列表的头。那么，让我们试着简单做到这一点？</p>
 <pre><code class="language-rust ignore">pub fn pop(&amp;mut self) -&gt; Option&lt;i32&gt; {
     let result;
     match &amp;self.head {
@@ -877,8 +876,8 @@ error[E0507]: cannot move out of borrowed content
 </code></pre>
 <p><em>脑袋</em></p>
 <p><em>办公桌</em></p>
-<p>当我们只有一个共享引用的时候，我们正试图移出<code>node</code>。</p>
-<p>我们也许应该退一步，想想我们要做什么。我们想：</p>
+<p>我们正试图把东西移出<code>node</code>，但我们只有它的共享引用。</p>
+<p>我们也许应该退一步，想想我们现在到底想做什么。我们想做的是：</p>
 <ul>
 <li>检查列表是否为空。</li>
 <li>如果是空的，就返回None</li>
@@ -891,7 +890,7 @@ error[E0507]: cannot move out of borrowed content
 </ul>
 </li>
 </ul>
-<p>关键的见解是我们要<em>删除</em>事物，这意味着我们要<em>通过值</em>来获得列表的头部。我们当然不能通过我们通过
+<p>我们主要的想法是要<em>删除</em>事物，这意味着我们要<em>通过值</em>来获得列表的头部。我们当然不能通过我们通过
 <code>&amp;self.head</code>得到的共享引用来做到这一点。我们也&quot;只&quot;有一个对<code>self</code>的可变引用，所以我们移动东西
 的唯一方法就是<em>替换它</em>。看来我们又在跳Empty舞了！</p>
 <p>让我们试试吧：</p>
@@ -915,10 +914,10 @@ error[E0507]: cannot move out of borrowed content
 </code></pre>
 <p>O M G</p>
 <p>它在编译时没有<em>任何</em>警告!!!!!</p>
-<p>其实我在这里要套用一下我个人的套路：我们把这个<code>result</code>做成了返回，但其实我们根本
-不需要这么做！就像一个函数运算结果是它的最后一个表达式一样，每个块的运算结果也是
-它的最后一个表达式。通常我们会用分号阻止这种行为，这样反而会使块评估为空元组，
-<code>（）</code>。这实际上是不声明返回值的函数--比如<code>push</code>--返回的值。</p>
+<p>其实我在这里要套用一下我个人的套路：我们返回了这里的<code>result</code>，但其实我们根本不
+需要这么做！就像一个函数运算结果是它的最后一个表达式一样，每个块的运算结果也是它
+的最后一个表达式。通常我们会用分号阻止这种行为，这样反而会使代码块运算为空元组，
+<code>()</code>。这实际上是不声明返回值的函数--比如<code>push</code>--返回的值。</p>
 <p>因此，我们可以将<code>pop</code>写成：</p>
 <pre><code class="language-rust ignore">pub fn pop(&amp;mut self) -&gt; Option&lt;i32&gt; {
     match mem::replace(&amp;mut self.head, Link::Empty) {

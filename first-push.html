@@ -209,8 +209,7 @@ error[E0507]: cannot move out of borrowed content
 的Rust黑客Indiana Jones：</p>
 <p><img src="img/indy.gif" alt="Indy Prepares to mem::replace" /></p>
 <p>啊，对了，Indy建议使用<code>mem::replace</code>手法。这个非常有用的函数可以让我们通过用另一个值<em>替
-换</em>来从一个借用中偷取出来一个值。让我们在文件的顶部拉入<code>std::mem</code>，这样<code>mem</code>就在本地作
-用域内：</p>
+换</em>来从一个借用中偷取出来一个值。我们在文件的顶部拉入<code>std::mem</code>，让<code>mem</code>在本地作用域内：</p>
 <pre><code class="language-rust ignore">use std::mem;
 </code></pre>
 <p>并适当地使用它：</p>
