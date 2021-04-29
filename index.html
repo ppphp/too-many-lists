@@ -1,26 +1,40 @@
 <!DOCTYPE HTML>
-<html lang="en" class="sidebar-visible no-js">
+<html lang="en" class="sidebar-visible no-js light">
     <head>
         <!-- Book generated using mdBook -->
         <meta charset="UTF-8">
         <title>简介 - 用太多链表写法学习Rust</title>
         
+        
+
+
+        <!-- Custom HTML head -->
+        
+
 
         <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
         <meta name="description" content="用太多链表写法学习Rust">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="theme-color" content="#ffffff" />
 
+        
+        <link rel="icon" href="favicon.svg">
+        
+        
         <link rel="shortcut icon" href="favicon.png">
+        
         <link rel="stylesheet" href="css/variables.css">
         <link rel="stylesheet" href="css/general.css">
         <link rel="stylesheet" href="css/chrome.css">
+        
         <link rel="stylesheet" href="css/print.css" media="print">
+        
 
         <!-- Fonts -->
         <link rel="stylesheet" href="FontAwesome/css/font-awesome.css">
-        <link href="https://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800" rel="stylesheet" type="text/css">
-        <link href="https://fonts.googleapis.com/css?family=Source+Code+Pro:500" rel="stylesheet" type="text/css">
+        
+        <link rel="stylesheet" href="fonts/fonts.css">
+        
 
         <!-- Highlight.js Stylesheets -->
         <link rel="stylesheet" href="highlight.css">
@@ -32,11 +46,11 @@
 
         
     </head>
-    <body class="light">
+    <body>
         <!-- Provide site root to javascript -->
         <script type="text/javascript">
             var path_to_root = "";
-            var default_theme = "light";
+            var default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "navy" : "light";
         </script>
 
         <!-- Work around some values being stored in localStorage wrapped in quotes -->
@@ -60,8 +74,11 @@
             var theme;
             try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
             if (theme === null || theme === undefined) { theme = default_theme; }
-            document.body.className = theme;
-            document.querySelector('html').className = theme + ' js';
+            var html = document.querySelector('html');
+            html.classList.remove('no-js')
+            html.classList.remove('light')
+            html.classList.add(theme);
+            html.classList.add('js');
         </script>
 
         <!-- Hide / unhide sidebar before it is displayed -->
@@ -78,7 +95,7 @@
 
         <nav id="sidebar" class="sidebar" aria-label="Table of contents">
             <div class="sidebar-scrollbox">
-                <ol class="chapter"><li><a href="index.html" class="active"><strong aria-hidden="true">1.</strong> 简介</a></li><li><a href="first.html"><strong aria-hidden="true">2.</strong> 一个不好的栈</a></li><li><ol class="section"><li><a href="first-layout.html"><strong aria-hidden="true">2.1.</strong> 布局</a></li><li><a href="first-new.html"><strong aria-hidden="true">2.2.</strong> 新建</a></li><li><a href="first-ownership.html"><strong aria-hidden="true">2.3.</strong> 所有权101</a></li><li><a href="first-push.html"><strong aria-hidden="true">2.4.</strong> 推入</a></li><li><a href="first-pop.html"><strong aria-hidden="true">2.5.</strong> 弹出</a></li><li><a href="first-test.html"><strong aria-hidden="true">2.6.</strong> 测试</a></li><li><a href="first-drop.html"><strong aria-hidden="true">2.7.</strong> 丢弃</a></li><li><a href="first-final.html"><strong aria-hidden="true">2.8.</strong> 最终代码</a></li></ol></li><li><a href="second.html"><strong aria-hidden="true">3.</strong> 一个可以的栈</a></li><li><ol class="section"><li><a href="second-option.html"><strong aria-hidden="true">3.1.</strong> 选项</a></li><li><a href="second-generic.html"><strong aria-hidden="true">3.2.</strong> 泛型</a></li><li><a href="second-peek.html"><strong aria-hidden="true">3.3.</strong> 选择</a></li><li><a href="second-into-iter.html"><strong aria-hidden="true">3.4.</strong> 进入遍历</a></li><li><a href="second-iter.html"><strong aria-hidden="true">3.5.</strong> 遍历</a></li><li><a href="second-iter-mut.html"><strong aria-hidden="true">3.6.</strong> 可变遍历</a></li><li><a href="second-final.html"><strong aria-hidden="true">3.7.</strong> 最终代码</a></li></ol></li><li><a href="third.html"><strong aria-hidden="true">4.</strong> 一个持久化的栈</a></li><li><ol class="section"><li><a href="third-layout.html"><strong aria-hidden="true">4.1.</strong> 布局</a></li><li><a href="third-basics.html"><strong aria-hidden="true">4.2.</strong> 基本</a></li><li><a href="third-drop.html"><strong aria-hidden="true">4.3.</strong> 丢弃</a></li><li><a href="third-arc.html"><strong aria-hidden="true">4.4.</strong> Arc</a></li><li><a href="third-final.html"><strong aria-hidden="true">4.5.</strong> 最终代码</a></li></ol></li><li><a href="fourth.html"><strong aria-hidden="true">5.</strong> 一个不好的安全双向队列</a></li><li><ol class="section"><li><a href="fourth-layout.html"><strong aria-hidden="true">5.1.</strong> 布局</a></li><li><a href="fourth-building.html"><strong aria-hidden="true">5.2.</strong> 构建</a></li><li><a href="fourth-breaking.html"><strong aria-hidden="true">5.3.</strong> 打破</a></li><li><a href="fourth-peek.html"><strong aria-hidden="true">5.4.</strong> 选择</a></li><li><a href="fourth-symmetry.html"><strong aria-hidden="true">5.5.</strong> 对称情况</a></li><li><a href="fourth-iteration.html"><strong aria-hidden="true">5.6.</strong> 迭代</a></li><li><a href="fourth-final.html"><strong aria-hidden="true">5.7.</strong> 最终代码</a></li></ol></li><li><a href="fifth.html"><strong aria-hidden="true">6.</strong> 一个不安全的队列</a></li><li><ol class="section"><li><a href="fifth-layout.html"><strong aria-hidden="true">6.1.</strong> 布局</a></li><li><a href="fifth-unsafe.html"><strong aria-hidden="true">6.2.</strong> 不安全</a></li><li><a href="fifth-basics.html"><strong aria-hidden="true">6.3.</strong> 基础</a></li><li><a href="fifth-extras.html"><strong aria-hidden="true">6.4.</strong> 其他</a></li><li><a href="fifth-final.html"><strong aria-hidden="true">6.5.</strong> 最终代码</a></li></ol></li><li><a href="sixth.html"><strong aria-hidden="true">7.</strong> 一个可以的不安全的双向队列</a></li><li><a href="infinity.html"><strong aria-hidden="true">8.</strong> 一堆傻乎乎的链表</a></li><li><ol class="section"><li><a href="infinity-double-single.html"><strong aria-hidden="true">8.1.</strong> 双重单链</a></li></ol></li></ol>
+                <ol class="chapter"><li class="chapter-item expanded "><a href="index.html" class="active"><strong aria-hidden="true">1.</strong> 简介</a></li><li class="chapter-item expanded "><a href="first.html"><strong aria-hidden="true">2.</strong> 一个不好的栈</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="first-layout.html"><strong aria-hidden="true">2.1.</strong> 布局</a></li><li class="chapter-item expanded "><a href="first-new.html"><strong aria-hidden="true">2.2.</strong> 新建</a></li><li class="chapter-item expanded "><a href="first-ownership.html"><strong aria-hidden="true">2.3.</strong> 所有权101</a></li><li class="chapter-item expanded "><a href="first-push.html"><strong aria-hidden="true">2.4.</strong> 推入</a></li><li class="chapter-item expanded "><a href="first-pop.html"><strong aria-hidden="true">2.5.</strong> 弹出</a></li><li class="chapter-item expanded "><a href="first-test.html"><strong aria-hidden="true">2.6.</strong> 测试</a></li><li class="chapter-item expanded "><a href="first-drop.html"><strong aria-hidden="true">2.7.</strong> 丢弃</a></li><li class="chapter-item expanded "><a href="first-final.html"><strong aria-hidden="true">2.8.</strong> 最终代码</a></li></ol></li><li class="chapter-item expanded "><a href="second.html"><strong aria-hidden="true">3.</strong> 一个可以的栈</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="second-option.html"><strong aria-hidden="true">3.1.</strong> 选项</a></li><li class="chapter-item expanded "><a href="second-generic.html"><strong aria-hidden="true">3.2.</strong> 泛型</a></li><li class="chapter-item expanded "><a href="second-peek.html"><strong aria-hidden="true">3.3.</strong> 选择</a></li><li class="chapter-item expanded "><a href="second-into-iter.html"><strong aria-hidden="true">3.4.</strong> 进入遍历</a></li><li class="chapter-item expanded "><a href="second-iter.html"><strong aria-hidden="true">3.5.</strong> 遍历</a></li><li class="chapter-item expanded "><a href="second-iter-mut.html"><strong aria-hidden="true">3.6.</strong> 可变遍历</a></li><li class="chapter-item expanded "><a href="second-final.html"><strong aria-hidden="true">3.7.</strong> 最终代码</a></li></ol></li><li class="chapter-item expanded "><a href="third.html"><strong aria-hidden="true">4.</strong> 一个持久化的栈</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="third-layout.html"><strong aria-hidden="true">4.1.</strong> 布局</a></li><li class="chapter-item expanded "><a href="third-basics.html"><strong aria-hidden="true">4.2.</strong> 基本</a></li><li class="chapter-item expanded "><a href="third-drop.html"><strong aria-hidden="true">4.3.</strong> 丢弃</a></li><li class="chapter-item expanded "><a href="third-arc.html"><strong aria-hidden="true">4.4.</strong> Arc</a></li><li class="chapter-item expanded "><a href="third-final.html"><strong aria-hidden="true">4.5.</strong> 最终代码</a></li></ol></li><li class="chapter-item expanded "><a href="fourth.html"><strong aria-hidden="true">5.</strong> 一个不好的安全双向队列</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="fourth-layout.html"><strong aria-hidden="true">5.1.</strong> 布局</a></li><li class="chapter-item expanded "><a href="fourth-building.html"><strong aria-hidden="true">5.2.</strong> 构建</a></li><li class="chapter-item expanded "><a href="fourth-breaking.html"><strong aria-hidden="true">5.3.</strong> 打破</a></li><li class="chapter-item expanded "><a href="fourth-peek.html"><strong aria-hidden="true">5.4.</strong> 选择</a></li><li class="chapter-item expanded "><a href="fourth-symmetry.html"><strong aria-hidden="true">5.5.</strong> 对称情况</a></li><li class="chapter-item expanded "><a href="fourth-iteration.html"><strong aria-hidden="true">5.6.</strong> 迭代</a></li><li class="chapter-item expanded "><a href="fourth-final.html"><strong aria-hidden="true">5.7.</strong> 最终代码</a></li></ol></li><li class="chapter-item expanded "><a href="fifth.html"><strong aria-hidden="true">6.</strong> 一个不安全的队列</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="fifth-layout.html"><strong aria-hidden="true">6.1.</strong> 布局</a></li><li class="chapter-item expanded "><a href="fifth-unsafe.html"><strong aria-hidden="true">6.2.</strong> 不安全</a></li><li class="chapter-item expanded "><a href="fifth-basics.html"><strong aria-hidden="true">6.3.</strong> 基础</a></li><li class="chapter-item expanded "><a href="fifth-extras.html"><strong aria-hidden="true">6.4.</strong> 其他</a></li><li class="chapter-item expanded "><a href="fifth-final.html"><strong aria-hidden="true">6.5.</strong> 最终代码</a></li></ol></li><li class="chapter-item expanded "><a href="sixth.html"><strong aria-hidden="true">7.</strong> 一个可以的不安全的双向队列</a></li><li class="chapter-item expanded "><a href="infinity.html"><strong aria-hidden="true">8.</strong> 一堆傻乎乎的链表</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="infinity-double-single.html"><strong aria-hidden="true">8.1.</strong> 双重单链</a></li></ol></li></ol>
             </div>
             <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
         </nav>
@@ -87,37 +104,38 @@
 
             <div class="page">
                 
-                <div id="menu-bar" class="menu-bar">
-                    <div id="menu-bar-sticky-container">
-                        <div class="left-buttons">
-                            <button id="sidebar-toggle" class="icon-button" type="button" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
-                                <i class="fa fa-bars"></i>
-                            </button>
-                            <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
-                                <i class="fa fa-paint-brush"></i>
-                            </button>
-                            <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
-                                <li role="none"><button role="menuitem" class="theme" id="light">Light (default)</button></li>
-                                <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
-                                <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
-                                <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
-                                <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
-                            </ul>
-                            
-                            <button id="search-toggle" class="icon-button" type="button" title="Search. (Shortkey: s)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="S" aria-controls="searchbar">
-                                <i class="fa fa-search"></i>
-                            </button>
-                            
-                        </div>
+                <div id="menu-bar-hover-placeholder"></div>
+                <div id="menu-bar" class="menu-bar sticky bordered">
+                    <div class="left-buttons">
+                        <button id="sidebar-toggle" class="icon-button" type="button" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                            <i class="fa fa-bars"></i>
+                        </button>
+                        <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                            <i class="fa fa-paint-brush"></i>
+                        </button>
+                        <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="light">Light (default)</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
+                        </ul>
+                        
+                        <button id="search-toggle" class="icon-button" type="button" title="Search. (Shortkey: s)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="S" aria-controls="searchbar">
+                            <i class="fa fa-search"></i>
+                        </button>
+                        
+                    </div>
 
-                        <h1 class="menu-title">用太多链表写法学习Rust</h1>
+                    <h1 class="menu-title">用太多链表写法学习Rust</h1>
 
-                        <div class="right-buttons">
-                            <a href="print.html" title="Print this book" aria-label="Print this book">
-                                <i id="print-button" class="fa fa-print"></i>
-                            </a>
-                            
-                        </div>
+                    <div class="right-buttons">
+                        
+                        <a href="print.html" title="Print this book" aria-label="Print this book">
+                            <i id="print-button" class="fa fa-print"></i>
+                        </a>
+                        
+                        
                     </div>
                 </div>
 
@@ -145,7 +163,7 @@
 
                 <div id="content" class="content">
                     <main>
-                        <h1><a class="header" href="#用太多链表写法学习rust" id="用太多链表写法学习rust">用太多链表写法学习Rust</a></h1>
+                        <h1 id="用太多链表写法学习rust"><a class="header" href="#用太多链表写法学习rust">用太多链表写法学习Rust</a></h1>
 <blockquote>
 <p>有任何问题或想一次性查看所有最终代码吗？
 <a href="https://github.com/Gankro/too-many-lists">所有代码都在Github上！</a></p>
@@ -198,7 +216,7 @@ Rust普遍优秀的编译器错误和文档，这对于成为一个高效的Rust
 <p>我们的进度会很慢，而且老实说，整个过程中我不会很认真。我认为编程应该是有趣的，
 哇哈哈! 如果你是那种想要最大化信息密集、严肃、正式内容的人，这本书不适合你。我
 所做的一切都不适合你。你错了。</p>
-<h1><a class="header" href="#义务公益广告" id="义务公益广告">义务公益广告</a></h1>
+<h1 id="义务公益广告"><a class="header" href="#义务公益广告">义务公益广告</a></h1>
 <p>我们会完全100％清楚一件事：我就是讨厌链表。恨之入骨。链表是可怕的数据结构。
 当然，链表有几个很好的使用案例。</p>
 <ul>
@@ -223,18 +241,18 @@ Rust普遍优秀的编译器错误和文档，这对于成为一个高效的Rust
 例列表</em>中的一件事来反驳我的论点。就在第一段之后的那件事!</p>
 <p>为了让我可以直接链接到详细的论点，下面是我看到的几种反驳的尝试，以及我对它们的回应。
 如果你只是想学习一些Rust，欢迎跳到第一章!</p>
-<h2><a class="header" href="#性能并不总是重要的" id="性能并不总是重要的">性能并不总是重要的</a></h2>
+<h2 id="性能并不总是重要的"><a class="header" href="#性能并不总是重要的">性能并不总是重要的</a></h2>
 <p>是的! 也许你的应用程序是I/O瓶颈的，或者相关代码是在一些不重要的冷门的情况下。但这
 甚至不是一个使用链表的论点。这是一个使用<em>任何东西</em>的论点。为什么要使用链表呢？使用
 链接的哈希图吧!</p>
 <p>如果性能不重要，那么应用数组的自然默认值<em>肯定</em>是可以的。</p>
-<h2><a class="header" href="#如果你有一个指针在那里他们有o1的分割-追加-插入-删除" id="如果你有一个指针在那里他们有o1的分割-追加-插入-删除">如果你有一个指针在那里，他们有O(1)的分割-追加-插入-删除</a></h2>
+<h2 id="如果你有一个指针在那里他们有o1的分割-追加-插入-删除"><a class="header" href="#如果你有一个指针在那里他们有o1的分割-追加-插入-删除">如果你有一个指针在那里，他们有O(1)的分割-追加-插入-删除</a></h2>
 <p>没错! 不过正如<a href="https://www.youtube.com/watch?v=YQs6IC-vgmo">Bjarne Stroustrup</a>所指出的，如果获取指针所花费的时间与复制
 一个数组中所有元素所花费的时间完全相差无几的话，<em>这实际上并不重要</em>（这确实相当快）。</p>
 <p>除非你的工作负载是以拆分和合并成本为主要开销，否则其他每个操作由于缓存效应和代码复杂
 度所需要的惩罚会消除任何理论上的收益。</p>
 <p><em>但是是的，如果你剖析发现你的应用要花大量的时间在拆分和合并上，你可能从链表中获益。</em></p>
-<h2><a class="header" href="#我负担不起摊销" id="我负担不起摊销">我负担不起摊销</a></h2>
+<h2 id="我负担不起摊销"><a class="header" href="#我负担不起摊销">我负担不起摊销</a></h2>
 <p>你已经进入了一个相当小众的领域--大多数人都能承受摊销。不过，数组<em>在最坏的情况下</em>也是
 要摊销的。仅仅因为你使用的是一个数组，并不意味着你有摊销的成本。如果你能预测你要存储
 多少元素（甚至有一个上限），你就可以预留所有你需要的空间。根据我的经验，能够预测你需
@@ -244,7 +262,7 @@ Rust普遍优秀的编译器错误和文档，这对于成为一个高效的Rust
 一个指针偏移，写入字节，然后递增一个整数。不需要使用任何类型的分配器。</p>
 <p>这对低延迟来说如何？</p>
 <p><em>但是，是的，如果你不能预测你的负载，那么可以节省在最坏的情况下的延迟!</em></p>
-<h2><a class="header" href="#链表浪费的空间更少" id="链表浪费的空间更少">链表浪费的空间更少</a></h2>
+<h2 id="链表浪费的空间更少"><a class="header" href="#链表浪费的空间更少">链表浪费的空间更少</a></h2>
 <p>嗯，这很复杂。一个“标准”的数组大小调整策略是增长或缩小，使最多一半的数组为空。这确实
 浪费了很多空间。特别是在Rust中，我们不会自动收缩集合（如果你只是要把它重新填满，那就
 太浪费了），所以浪费的空间可能会接近无穷大!</p>
@@ -259,7 +277,7 @@ Rust普遍优秀的编译器错误和文档，这对于成为一个高效的Rust
 而损失内存。</p>
 <p><em>但是是的，如果你有巨大的元素，不能预测你的负载，并且有一个像样的分配器，就可以节省内
 存。</em></p>
-<h2><a class="header" href="#我在函数式语言中一直使用链表" id="我在函数式语言中一直使用链表">我在&lt;函数式语言&gt;中一直使用链表。</a></h2>
+<h2 id="我在函数式语言中一直使用链表"><a class="header" href="#我在函数式语言中一直使用链表">我在&lt;函数式语言&gt;中一直使用链表。</a></h2>
 <p>很好! 在函数式语言中使用链表是超级优雅的，因为你可以在没有任何改变的情况下对它们进行
 操作，可以递归地描述它们，而且由于惰性的魔力，还可以使用无限列表。</p>
 <p>具体来说，链表是不错的，因为它们代表了一个迭代，而不需要任何可变的状态。下一步只是访
@@ -280,24 +298,24 @@ Rust普遍优秀的编译器错误和文档，这对于成为一个高效的Rust
 <p>即使是在函数式语言中，当你真正需要数据结构时，你也应该努力为任务使用合适的数据结构。
 是的，单链表是你控制数据流的主要工具，但它们对于实际存储一堆数据和查询数据来说是一种
 非常糟糕的方式。</p>
-<h2><a class="header" href="#链表是构建并发数据结构的好方法" id="链表是构建并发数据结构的好方法">链表是构建并发数据结构的好方法!</a></h2>
+<h2 id="链表是构建并发数据结构的好方法"><a class="header" href="#链表是构建并发数据结构的好方法">链表是构建并发数据结构的好方法!</a></h2>
 <p>是的! 虽然编写一个并发数据结构真的是一个完全不同的野兽，而且不是一件值得轻视的事情。
 当然也不是很多人都会考虑去做的事情。一旦写好了一个，你也不是真的选择使用链表。你是选
 择使用MPSC队列什么的。在这种情况下，实现策略是相当遥远的!</p>
 <p><em>但没错，链表是无锁并发的黑暗世界中的不折不扣的英雄。</em></p>
-<h2><a class="header" href="#咕哝咕哝的内核嵌入了一些干扰性的东西" id="咕哝咕哝的内核嵌入了一些干扰性的东西">咕哝咕哝的内核嵌入了一些干扰性的东西。</a></h2>
+<h2 id="咕哝咕哝的内核嵌入了一些干扰性的东西"><a class="header" href="#咕哝咕哝的内核嵌入了一些干扰性的东西">咕哝咕哝的内核嵌入了一些干扰性的东西。</a></h2>
 <p>这很小众。你说的是一种情况，你甚至没有使用你的语言的<em>运行时</em>。这难道不是一个危险的
 信号，你在做一些奇怪的事情吗？</p>
 <p>这也是非常不安全的。</p>
 <p><em>但是肯定的。要在栈上构建你那令人敬畏的零分配列表。</em></p>
-<h2><a class="header" href="#迭代器不会因为无关的插入删除而失效" id="迭代器不会因为无关的插入删除而失效">迭代器不会因为无关的插入/删除而失效。</a></h2>
+<h2 id="迭代器不会因为无关的插入删除而失效"><a class="header" href="#迭代器不会因为无关的插入删除而失效">迭代器不会因为无关的插入/删除而失效。</a></h2>
 <p>你这舞跳得可真微妙。特别是当你没有垃圾回收器的时候。我可能会说，你的控制流和所有
 权模式可能有点太纠结了，这取决于细节。</p>
 <p><em>但是是的，你可以用光标做一些非常酷的疯狂的事情。</em></p>
-<h2><a class="header" href="#它们很简单而且很适合教学" id="它们很简单而且很适合教学">它们很简单，而且很适合教学</a></h2>
+<h2 id="它们很简单而且很适合教学"><a class="header" href="#它们很简单而且很适合教学">它们很简单，而且很适合教学</a></h2>
 <p>嗯，是的。你正在读一本专门针对这个前提的书。好吧，单链表是非常简单的。双链表可能会
 变得有点粗糙，我们会看到。</p>
-<h1><a class="header" href="#深呼吸" id="深呼吸">深呼吸</a></h1>
+<h1 id="深呼吸"><a class="header" href="#深呼吸">深呼吸</a></h1>
 <p>好吧，那就不说了。让我们写一个亿万个链表。</p>
 <p>现在开始第一章！</p>
 <p><a href="first.html">On to the first chapter!</a></p>
@@ -323,7 +341,7 @@ Rust普遍优秀的编译器错误和文档，这对于成为一个高效的Rust
                 
 
                 
-                    <a href="first.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                    <a rel="next" href="first.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
                         <i class="fa fa-angle-right"></i>
                     </a>
                 
@@ -333,6 +351,14 @@ Rust普遍优秀的编译器错误和文档，这对于成为一个高效的Rust
 
         
 
+        
+
+        
+
+        
+        <script type="text/javascript">
+            window.playground_copyable = true;
+        </script>
         
 
         

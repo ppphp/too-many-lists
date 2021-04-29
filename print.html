@@ -1,5 +1,5 @@
 <!DOCTYPE HTML>
-<html lang="en" class="sidebar-visible no-js">
+<html lang="en" class="sidebar-visible no-js light">
     <head>
         <!-- Book generated using mdBook -->
         <meta charset="UTF-8">
@@ -7,22 +7,36 @@
         
         <meta name="robots" content="noindex" />
         
+        
+
+
+        <!-- Custom HTML head -->
+        
+
 
         <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
         <meta name="description" content="用太多链表写法学习Rust">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="theme-color" content="#ffffff" />
 
+        
+        <link rel="icon" href="favicon.svg">
+        
+        
         <link rel="shortcut icon" href="favicon.png">
+        
         <link rel="stylesheet" href="css/variables.css">
         <link rel="stylesheet" href="css/general.css">
         <link rel="stylesheet" href="css/chrome.css">
+        
         <link rel="stylesheet" href="css/print.css" media="print">
+        
 
         <!-- Fonts -->
         <link rel="stylesheet" href="FontAwesome/css/font-awesome.css">
-        <link href="https://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800" rel="stylesheet" type="text/css">
-        <link href="https://fonts.googleapis.com/css?family=Source+Code+Pro:500" rel="stylesheet" type="text/css">
+        
+        <link rel="stylesheet" href="fonts/fonts.css">
+        
 
         <!-- Highlight.js Stylesheets -->
         <link rel="stylesheet" href="highlight.css">
@@ -34,11 +48,11 @@
 
         
     </head>
-    <body class="light">
+    <body>
         <!-- Provide site root to javascript -->
         <script type="text/javascript">
             var path_to_root = "";
-            var default_theme = "light";
+            var default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "navy" : "light";
         </script>
 
         <!-- Work around some values being stored in localStorage wrapped in quotes -->
@@ -62,8 +76,11 @@
             var theme;
             try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
             if (theme === null || theme === undefined) { theme = default_theme; }
-            document.body.className = theme;
-            document.querySelector('html').className = theme + ' js';
+            var html = document.querySelector('html');
+            html.classList.remove('no-js')
+            html.classList.remove('light')
+            html.classList.add(theme);
+            html.classList.add('js');
         </script>
 
         <!-- Hide / unhide sidebar before it is displayed -->
@@ -80,7 +97,7 @@
 
         <nav id="sidebar" class="sidebar" aria-label="Table of contents">
             <div class="sidebar-scrollbox">
-                <ol class="chapter"><li><a href="index.html"><strong aria-hidden="true">1.</strong> 简介</a></li><li><a href="first.html"><strong aria-hidden="true">2.</strong> 一个不好的栈</a></li><li><ol class="section"><li><a href="first-layout.html"><strong aria-hidden="true">2.1.</strong> 布局</a></li><li><a href="first-new.html"><strong aria-hidden="true">2.2.</strong> 新建</a></li><li><a href="first-ownership.html"><strong aria-hidden="true">2.3.</strong> 所有权101</a></li><li><a href="first-push.html"><strong aria-hidden="true">2.4.</strong> 推入</a></li><li><a href="first-pop.html"><strong aria-hidden="true">2.5.</strong> 弹出</a></li><li><a href="first-test.html"><strong aria-hidden="true">2.6.</strong> 测试</a></li><li><a href="first-drop.html"><strong aria-hidden="true">2.7.</strong> 丢弃</a></li><li><a href="first-final.html"><strong aria-hidden="true">2.8.</strong> 最终代码</a></li></ol></li><li><a href="second.html"><strong aria-hidden="true">3.</strong> 一个可以的栈</a></li><li><ol class="section"><li><a href="second-option.html"><strong aria-hidden="true">3.1.</strong> 选项</a></li><li><a href="second-generic.html"><strong aria-hidden="true">3.2.</strong> 泛型</a></li><li><a href="second-peek.html"><strong aria-hidden="true">3.3.</strong> 选择</a></li><li><a href="second-into-iter.html"><strong aria-hidden="true">3.4.</strong> 进入遍历</a></li><li><a href="second-iter.html"><strong aria-hidden="true">3.5.</strong> 遍历</a></li><li><a href="second-iter-mut.html"><strong aria-hidden="true">3.6.</strong> 可变遍历</a></li><li><a href="second-final.html"><strong aria-hidden="true">3.7.</strong> 最终代码</a></li></ol></li><li><a href="third.html"><strong aria-hidden="true">4.</strong> 一个持久化的栈</a></li><li><ol class="section"><li><a href="third-layout.html"><strong aria-hidden="true">4.1.</strong> 布局</a></li><li><a href="third-basics.html"><strong aria-hidden="true">4.2.</strong> 基本</a></li><li><a href="third-drop.html"><strong aria-hidden="true">4.3.</strong> 丢弃</a></li><li><a href="third-arc.html"><strong aria-hidden="true">4.4.</strong> Arc</a></li><li><a href="third-final.html"><strong aria-hidden="true">4.5.</strong> 最终代码</a></li></ol></li><li><a href="fourth.html"><strong aria-hidden="true">5.</strong> 一个不好的安全双向队列</a></li><li><ol class="section"><li><a href="fourth-layout.html"><strong aria-hidden="true">5.1.</strong> 布局</a></li><li><a href="fourth-building.html"><strong aria-hidden="true">5.2.</strong> 构建</a></li><li><a href="fourth-breaking.html"><strong aria-hidden="true">5.3.</strong> 打破</a></li><li><a href="fourth-peek.html"><strong aria-hidden="true">5.4.</strong> 选择</a></li><li><a href="fourth-symmetry.html"><strong aria-hidden="true">5.5.</strong> 对称情况</a></li><li><a href="fourth-iteration.html"><strong aria-hidden="true">5.6.</strong> 迭代</a></li><li><a href="fourth-final.html"><strong aria-hidden="true">5.7.</strong> 最终代码</a></li></ol></li><li><a href="fifth.html"><strong aria-hidden="true">6.</strong> 一个不安全的队列</a></li><li><ol class="section"><li><a href="fifth-layout.html"><strong aria-hidden="true">6.1.</strong> 布局</a></li><li><a href="fifth-unsafe.html"><strong aria-hidden="true">6.2.</strong> 不安全</a></li><li><a href="fifth-basics.html"><strong aria-hidden="true">6.3.</strong> 基础</a></li><li><a href="fifth-extras.html"><strong aria-hidden="true">6.4.</strong> 其他</a></li><li><a href="fifth-final.html"><strong aria-hidden="true">6.5.</strong> 最终代码</a></li></ol></li><li><a href="sixth.html"><strong aria-hidden="true">7.</strong> 一个可以的不安全的双向队列</a></li><li><a href="infinity.html"><strong aria-hidden="true">8.</strong> 一堆傻乎乎的链表</a></li><li><ol class="section"><li><a href="infinity-double-single.html"><strong aria-hidden="true">8.1.</strong> 双重单链</a></li></ol></li></ol>
+                <ol class="chapter"><li class="chapter-item expanded "><a href="index.html"><strong aria-hidden="true">1.</strong> 简介</a></li><li class="chapter-item expanded "><a href="first.html"><strong aria-hidden="true">2.</strong> 一个不好的栈</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="first-layout.html"><strong aria-hidden="true">2.1.</strong> 布局</a></li><li class="chapter-item expanded "><a href="first-new.html"><strong aria-hidden="true">2.2.</strong> 新建</a></li><li class="chapter-item expanded "><a href="first-ownership.html"><strong aria-hidden="true">2.3.</strong> 所有权101</a></li><li class="chapter-item expanded "><a href="first-push.html"><strong aria-hidden="true">2.4.</strong> 推入</a></li><li class="chapter-item expanded "><a href="first-pop.html"><strong aria-hidden="true">2.5.</strong> 弹出</a></li><li class="chapter-item expanded "><a href="first-test.html"><strong aria-hidden="true">2.6.</strong> 测试</a></li><li class="chapter-item expanded "><a href="first-drop.html"><strong aria-hidden="true">2.7.</strong> 丢弃</a></li><li class="chapter-item expanded "><a href="first-final.html"><strong aria-hidden="true">2.8.</strong> 最终代码</a></li></ol></li><li class="chapter-item expanded "><a href="second.html"><strong aria-hidden="true">3.</strong> 一个可以的栈</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="second-option.html"><strong aria-hidden="true">3.1.</strong> 选项</a></li><li class="chapter-item expanded "><a href="second-generic.html"><strong aria-hidden="true">3.2.</strong> 泛型</a></li><li class="chapter-item expanded "><a href="second-peek.html"><strong aria-hidden="true">3.3.</strong> 选择</a></li><li class="chapter-item expanded "><a href="second-into-iter.html"><strong aria-hidden="true">3.4.</strong> 进入遍历</a></li><li class="chapter-item expanded "><a href="second-iter.html"><strong aria-hidden="true">3.5.</strong> 遍历</a></li><li class="chapter-item expanded "><a href="second-iter-mut.html"><strong aria-hidden="true">3.6.</strong> 可变遍历</a></li><li class="chapter-item expanded "><a href="second-final.html"><strong aria-hidden="true">3.7.</strong> 最终代码</a></li></ol></li><li class="chapter-item expanded "><a href="third.html"><strong aria-hidden="true">4.</strong> 一个持久化的栈</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="third-layout.html"><strong aria-hidden="true">4.1.</strong> 布局</a></li><li class="chapter-item expanded "><a href="third-basics.html"><strong aria-hidden="true">4.2.</strong> 基本</a></li><li class="chapter-item expanded "><a href="third-drop.html"><strong aria-hidden="true">4.3.</strong> 丢弃</a></li><li class="chapter-item expanded "><a href="third-arc.html"><strong aria-hidden="true">4.4.</strong> Arc</a></li><li class="chapter-item expanded "><a href="third-final.html"><strong aria-hidden="true">4.5.</strong> 最终代码</a></li></ol></li><li class="chapter-item expanded "><a href="fourth.html"><strong aria-hidden="true">5.</strong> 一个不好的安全双向队列</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="fourth-layout.html"><strong aria-hidden="true">5.1.</strong> 布局</a></li><li class="chapter-item expanded "><a href="fourth-building.html"><strong aria-hidden="true">5.2.</strong> 构建</a></li><li class="chapter-item expanded "><a href="fourth-breaking.html"><strong aria-hidden="true">5.3.</strong> 打破</a></li><li class="chapter-item expanded "><a href="fourth-peek.html"><strong aria-hidden="true">5.4.</strong> 选择</a></li><li class="chapter-item expanded "><a href="fourth-symmetry.html"><strong aria-hidden="true">5.5.</strong> 对称情况</a></li><li class="chapter-item expanded "><a href="fourth-iteration.html"><strong aria-hidden="true">5.6.</strong> 迭代</a></li><li class="chapter-item expanded "><a href="fourth-final.html"><strong aria-hidden="true">5.7.</strong> 最终代码</a></li></ol></li><li class="chapter-item expanded "><a href="fifth.html"><strong aria-hidden="true">6.</strong> 一个不安全的队列</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="fifth-layout.html"><strong aria-hidden="true">6.1.</strong> 布局</a></li><li class="chapter-item expanded "><a href="fifth-unsafe.html"><strong aria-hidden="true">6.2.</strong> 不安全</a></li><li class="chapter-item expanded "><a href="fifth-basics.html"><strong aria-hidden="true">6.3.</strong> 基础</a></li><li class="chapter-item expanded "><a href="fifth-extras.html"><strong aria-hidden="true">6.4.</strong> 其他</a></li><li class="chapter-item expanded "><a href="fifth-final.html"><strong aria-hidden="true">6.5.</strong> 最终代码</a></li></ol></li><li class="chapter-item expanded "><a href="sixth.html"><strong aria-hidden="true">7.</strong> 一个可以的不安全的双向队列</a></li><li class="chapter-item expanded "><a href="infinity.html"><strong aria-hidden="true">8.</strong> 一堆傻乎乎的链表</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="infinity-double-single.html"><strong aria-hidden="true">8.1.</strong> 双重单链</a></li></ol></li></ol>
             </div>
             <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
         </nav>
@@ -89,37 +106,38 @@
 
             <div class="page">
                 
-                <div id="menu-bar" class="menu-bar">
-                    <div id="menu-bar-sticky-container">
-                        <div class="left-buttons">
-                            <button id="sidebar-toggle" class="icon-button" type="button" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
-                                <i class="fa fa-bars"></i>
-                            </button>
-                            <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
-                                <i class="fa fa-paint-brush"></i>
-                            </button>
-                            <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
-                                <li role="none"><button role="menuitem" class="theme" id="light">Light (default)</button></li>
-                                <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
-                                <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
-                                <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
-                                <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
-                            </ul>
-                            
-                            <button id="search-toggle" class="icon-button" type="button" title="Search. (Shortkey: s)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="S" aria-controls="searchbar">
-                                <i class="fa fa-search"></i>
-                            </button>
-                            
-                        </div>
+                <div id="menu-bar-hover-placeholder"></div>
+                <div id="menu-bar" class="menu-bar sticky bordered">
+                    <div class="left-buttons">
+                        <button id="sidebar-toggle" class="icon-button" type="button" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                            <i class="fa fa-bars"></i>
+                        </button>
+                        <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                            <i class="fa fa-paint-brush"></i>
+                        </button>
+                        <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="light">Light (default)</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
+                        </ul>
+                        
+                        <button id="search-toggle" class="icon-button" type="button" title="Search. (Shortkey: s)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="S" aria-controls="searchbar">
+                            <i class="fa fa-search"></i>
+                        </button>
+                        
+                    </div>
 
-                        <h1 class="menu-title">用太多链表写法学习Rust</h1>
+                    <h1 class="menu-title">用太多链表写法学习Rust</h1>
 
-                        <div class="right-buttons">
-                            <a href="print.html" title="Print this book" aria-label="Print this book">
-                                <i id="print-button" class="fa fa-print"></i>
-                            </a>
-                            
-                        </div>
+                    <div class="right-buttons">
+                        
+                        <a href="print.html" title="Print this book" aria-label="Print this book">
+                            <i id="print-button" class="fa fa-print"></i>
+                        </a>
+                        
+                        
                     </div>
                 </div>
 
@@ -147,7 +165,7 @@
 
                 <div id="content" class="content">
                     <main>
-                        <h1><a class="header" href="#用太多链表写法学习rust" id="用太多链表写法学习rust">用太多链表写法学习Rust</a></h1>
+                        <h1 id="用太多链表写法学习rust"><a class="header" href="#用太多链表写法学习rust">用太多链表写法学习Rust</a></h1>
 <blockquote>
 <p>有任何问题或想一次性查看所有最终代码吗？
 <a href="https://github.com/Gankro/too-many-lists">所有代码都在Github上！</a></p>
@@ -200,7 +218,7 @@ Rust普遍优秀的编译器错误和文档，这对于成为一个高效的Rust
 <p>我们的进度会很慢，而且老实说，整个过程中我不会很认真。我认为编程应该是有趣的，
 哇哈哈! 如果你是那种想要最大化信息密集、严肃、正式内容的人，这本书不适合你。我
 所做的一切都不适合你。你错了。</p>
-<h1><a class="header" href="#义务公益广告" id="义务公益广告">义务公益广告</a></h1>
+<h1 id="义务公益广告"><a class="header" href="#义务公益广告">义务公益广告</a></h1>
 <p>我们会完全100％清楚一件事：我就是讨厌链表。恨之入骨。链表是可怕的数据结构。
 当然，链表有几个很好的使用案例。</p>
 <ul>
@@ -225,18 +243,18 @@ Rust普遍优秀的编译器错误和文档，这对于成为一个高效的Rust
 例列表</em>中的一件事来反驳我的论点。就在第一段之后的那件事!</p>
 <p>为了让我可以直接链接到详细的论点，下面是我看到的几种反驳的尝试，以及我对它们的回应。
 如果你只是想学习一些Rust，欢迎跳到第一章!</p>
-<h2><a class="header" href="#性能并不总是重要的" id="性能并不总是重要的">性能并不总是重要的</a></h2>
+<h2 id="性能并不总是重要的"><a class="header" href="#性能并不总是重要的">性能并不总是重要的</a></h2>
 <p>是的! 也许你的应用程序是I/O瓶颈的，或者相关代码是在一些不重要的冷门的情况下。但这
 甚至不是一个使用链表的论点。这是一个使用<em>任何东西</em>的论点。为什么要使用链表呢？使用
 链接的哈希图吧!</p>
 <p>如果性能不重要，那么应用数组的自然默认值<em>肯定</em>是可以的。</p>
-<h2><a class="header" href="#如果你有一个指针在那里他们有o1的分割-追加-插入-删除" id="如果你有一个指针在那里他们有o1的分割-追加-插入-删除">如果你有一个指针在那里，他们有O(1)的分割-追加-插入-删除</a></h2>
+<h2 id="如果你有一个指针在那里他们有o1的分割-追加-插入-删除"><a class="header" href="#如果你有一个指针在那里他们有o1的分割-追加-插入-删除">如果你有一个指针在那里，他们有O(1)的分割-追加-插入-删除</a></h2>
 <p>没错! 不过正如<a href="https://www.youtube.com/watch?v=YQs6IC-vgmo">Bjarne Stroustrup</a>所指出的，如果获取指针所花费的时间与复制
 一个数组中所有元素所花费的时间完全相差无几的话，<em>这实际上并不重要</em>（这确实相当快）。</p>
 <p>除非你的工作负载是以拆分和合并成本为主要开销，否则其他每个操作由于缓存效应和代码复杂
 度所需要的惩罚会消除任何理论上的收益。</p>
 <p><em>但是是的，如果你剖析发现你的应用要花大量的时间在拆分和合并上，你可能从链表中获益。</em></p>
-<h2><a class="header" href="#我负担不起摊销" id="我负担不起摊销">我负担不起摊销</a></h2>
+<h2 id="我负担不起摊销"><a class="header" href="#我负担不起摊销">我负担不起摊销</a></h2>
 <p>你已经进入了一个相当小众的领域--大多数人都能承受摊销。不过，数组<em>在最坏的情况下</em>也是
 要摊销的。仅仅因为你使用的是一个数组，并不意味着你有摊销的成本。如果你能预测你要存储
 多少元素（甚至有一个上限），你就可以预留所有你需要的空间。根据我的经验，能够预测你需
@@ -246,7 +264,7 @@ Rust普遍优秀的编译器错误和文档，这对于成为一个高效的Rust
 一个指针偏移，写入字节，然后递增一个整数。不需要使用任何类型的分配器。</p>
 <p>这对低延迟来说如何？</p>
 <p><em>但是，是的，如果你不能预测你的负载，那么可以节省在最坏的情况下的延迟!</em></p>
-<h2><a class="header" href="#链表浪费的空间更少" id="链表浪费的空间更少">链表浪费的空间更少</a></h2>
+<h2 id="链表浪费的空间更少"><a class="header" href="#链表浪费的空间更少">链表浪费的空间更少</a></h2>
 <p>嗯，这很复杂。一个“标准”的数组大小调整策略是增长或缩小，使最多一半的数组为空。这确实
 浪费了很多空间。特别是在Rust中，我们不会自动收缩集合（如果你只是要把它重新填满，那就
 太浪费了），所以浪费的空间可能会接近无穷大!</p>
@@ -261,7 +279,7 @@ Rust普遍优秀的编译器错误和文档，这对于成为一个高效的Rust
 而损失内存。</p>
 <p><em>但是是的，如果你有巨大的元素，不能预测你的负载，并且有一个像样的分配器，就可以节省内
 存。</em></p>
-<h2><a class="header" href="#我在函数式语言中一直使用链表" id="我在函数式语言中一直使用链表">我在&lt;函数式语言&gt;中一直使用链表。</a></h2>
+<h2 id="我在函数式语言中一直使用链表"><a class="header" href="#我在函数式语言中一直使用链表">我在&lt;函数式语言&gt;中一直使用链表。</a></h2>
 <p>很好! 在函数式语言中使用链表是超级优雅的，因为你可以在没有任何改变的情况下对它们进行
 操作，可以递归地描述它们，而且由于惰性的魔力，还可以使用无限列表。</p>
 <p>具体来说，链表是不错的，因为它们代表了一个迭代，而不需要任何可变的状态。下一步只是访
@@ -282,28 +300,28 @@ Rust普遍优秀的编译器错误和文档，这对于成为一个高效的Rust
 <p>即使是在函数式语言中，当你真正需要数据结构时，你也应该努力为任务使用合适的数据结构。
 是的，单链表是你控制数据流的主要工具，但它们对于实际存储一堆数据和查询数据来说是一种
 非常糟糕的方式。</p>
-<h2><a class="header" href="#链表是构建并发数据结构的好方法" id="链表是构建并发数据结构的好方法">链表是构建并发数据结构的好方法!</a></h2>
+<h2 id="链表是构建并发数据结构的好方法"><a class="header" href="#链表是构建并发数据结构的好方法">链表是构建并发数据结构的好方法!</a></h2>
 <p>是的! 虽然编写一个并发数据结构真的是一个完全不同的野兽，而且不是一件值得轻视的事情。
 当然也不是很多人都会考虑去做的事情。一旦写好了一个，你也不是真的选择使用链表。你是选
 择使用MPSC队列什么的。在这种情况下，实现策略是相当遥远的!</p>
 <p><em>但没错，链表是无锁并发的黑暗世界中的不折不扣的英雄。</em></p>
-<h2><a class="header" href="#咕哝咕哝的内核嵌入了一些干扰性的东西" id="咕哝咕哝的内核嵌入了一些干扰性的东西">咕哝咕哝的内核嵌入了一些干扰性的东西。</a></h2>
+<h2 id="咕哝咕哝的内核嵌入了一些干扰性的东西"><a class="header" href="#咕哝咕哝的内核嵌入了一些干扰性的东西">咕哝咕哝的内核嵌入了一些干扰性的东西。</a></h2>
 <p>这很小众。你说的是一种情况，你甚至没有使用你的语言的<em>运行时</em>。这难道不是一个危险的
 信号，你在做一些奇怪的事情吗？</p>
 <p>这也是非常不安全的。</p>
 <p><em>但是肯定的。要在栈上构建你那令人敬畏的零分配列表。</em></p>
-<h2><a class="header" href="#迭代器不会因为无关的插入删除而失效" id="迭代器不会因为无关的插入删除而失效">迭代器不会因为无关的插入/删除而失效。</a></h2>
+<h2 id="迭代器不会因为无关的插入删除而失效"><a class="header" href="#迭代器不会因为无关的插入删除而失效">迭代器不会因为无关的插入/删除而失效。</a></h2>
 <p>你这舞跳得可真微妙。特别是当你没有垃圾回收器的时候。我可能会说，你的控制流和所有
 权模式可能有点太纠结了，这取决于细节。</p>
 <p><em>但是是的，你可以用光标做一些非常酷的疯狂的事情。</em></p>
-<h2><a class="header" href="#它们很简单而且很适合教学" id="它们很简单而且很适合教学">它们很简单，而且很适合教学</a></h2>
+<h2 id="它们很简单而且很适合教学"><a class="header" href="#它们很简单而且很适合教学">它们很简单，而且很适合教学</a></h2>
 <p>嗯，是的。你正在读一本专门针对这个前提的书。好吧，单链表是非常简单的。双链表可能会
 变得有点粗糙，我们会看到。</p>
-<h1><a class="header" href="#深呼吸" id="深呼吸">深呼吸</a></h1>
+<h1 id="深呼吸"><a class="header" href="#深呼吸">深呼吸</a></h1>
 <p>好吧，那就不说了。让我们写一个亿万个链表。</p>
 <p>现在开始第一章！</p>
 <p><a href="first.html">On to the first chapter!</a></p>
-<h1><a class="header" href="#一个不好的单链栈" id="一个不好的单链栈">一个不好的单链栈</a></h1>
+<h1 id="一个不好的单链栈"><a class="header" href="#一个不好的单链栈">一个不好的单链栈</a></h1>
 <p>这章将是<em>至今</em>最长的一章，因为我们需要介绍所有Rust的基础知识，而且将以“艰难的方式”构建一些东西来
 更好地理解这门语言。</p>
 <p>我们将把我们的第一个链表放在<code>src/first.rs</code>。我们需要告诉Rust<code>first.rs</code>是我们的库用的东西。需
@@ -311,7 +329,7 @@ Rust普遍优秀的编译器错误和文档，这对于成为一个高效的Rust
 <pre><code class="language-rust ignore">// in lib.rs
 pub mod first;
 </code></pre>
-<h1><a class="header" href="#基本数据布局" id="基本数据布局">基本数据布局</a></h1>
+<h1 id="基本数据布局"><a class="header" href="#基本数据布局">基本数据布局</a></h1>
 <p>好吧，那么什么是链表呢？基本上，它是一堆在堆上的数据片(嘘，内核的人!)，它们依次
 指向对方。链表是程序员不应该碰的东西，而函数式程序员却用它来做所有事情。那么，我
 们应该向函数式程序员询问链表的定义，这似乎很公平。他们可能会给你类似下面的定义：</p>
@@ -368,18 +386,19 @@ error[E0072]: recursive type `first::List` has infinite size
 <p><code>let x = Box::new(5);</code></p>
 <p>创建一个递归数据结构：</p>
 </blockquote>
-<pre><pre class="playpen"><code class="language-rust">
-# #![allow(unused_variables)]
-#fn main() {
-#[derive(Debug)]
+<pre><pre class="playground"><code class="language-rust">
+<span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>#[derive(Debug)]
 enum List&lt;T&gt; {
     Cons(T, Box&lt;List&lt;T&gt;&gt;),
     Nil,
 }
-#}</code></pre></pre>
+<span class="boring">}
+</span></code></pre></pre>
 <blockquote>
 </blockquote>
-<pre><pre class="playpen"><code class="language-rust">fn main() {
+<pre><pre class="playground"><code class="language-rust">fn main() {
     let list: List&lt;i32&gt; = List::Cons(1, Box::new(List::Cons(2, Box::new(List::Nil))));
     println!(&quot;{:?}&quot;, list);
 }
@@ -584,7 +603,7 @@ warning: field is never used: `next`
 <p>好了，这下编译好了！Rust很生气，因为据它所知，我们写的所有东西都是完全无用的：我们从
 来没有用过<code>head</code>，使用我们库的人也不能用，因为它是私有的。反过来说，这意味着<code>Link</code>和
 <code>Node</code>也是无用的。所以我们来解决这个问题吧! 让我们为我们的List实现一些代码吧!</p>
-<h1><a class="header" href="#新建" id="新建">新建</a></h1>
+<h1 id="新建"><a class="header" href="#新建">新建</a></h1>
 <p>我们使用了<code>impl</code>块，将实际的代码与类型联系起来：</p>
 <pre><code class="language-rust ignore">impl List {
     // TODO, make code happen
@@ -613,7 +632,7 @@ warning: field is never used: `next`
 <li>一个函数的最后一个表达式是隐式返回的。这使得简单的函数变得更加整洁。你仍然可以
 像其他类C语言一样，使用return来提前返回。</li>
 </ul>
-<h1><a class="header" href="#所有权101" id="所有权101">所有权101</a></h1>
+<h1 id="所有权101"><a class="header" href="#所有权101">所有权101</a></h1>
 <p>现在我们可以构造一个列表，如果能用它<code>做</code>一些事情就更好了。我们用“普通”(非静态)方
 法来做这些事情。在Rust中，方法是函数的一种特殊情况，因为<code>self</code>参数没有声明类型：</p>
 <pre><code class="language-rust ignore">fn foo(self, arg2: Type2) -&gt; ReturnType {
@@ -642,7 +661,7 @@ warning: field is never used: `next`
 <p>后面我们会看到，在某些情况下，关于改变的规则是可以绕过的。这就是为什么共享引用不叫
 <em>不可变引用</em>的原因。真的，可改变的引用可以被称为<em>唯一</em>引用，但我们发现，将所有权与
 可改变性联系起来，99%的时候都能给出正确的直觉。</p>
-<h1><a class="header" href="#推入" id="推入">推入</a></h1>
+<h1 id="推入"><a class="header" href="#推入">推入</a></h1>
 <p><code>push</code>会使链表发生<em>改变</em>，所以我们需要使用<code>&amp;mut self</code>。我们还需要取一个i32
 来推入：</p>
 <pre><code class="language-rust ignore">impl List {
@@ -723,7 +742,7 @@ error[E0507]: cannot move out of borrowed content
 我不会撒谎：这是一件非常不幸的事情。很遗憾，我们必须这么做（目前）。</p>
 <p>但是，嘿，<code>push</code>全部完成! 可能吧。我们也许应该测试一下，说实话。现在，最简单的方法
 可能是写<code>pop</code>，并确保它产生正确的结果。</p>
-<h1><a class="header" href="#弹出" id="弹出">弹出</a></h1>
+<h1 id="弹出"><a class="header" href="#弹出">弹出</a></h1>
 <p>和<code>push</code>一样，<code>pop</code>想要改变列表。与<code>push</code>不同的是，我们实际上想返回一些东西。
 但<code>pop</code>还需要处理一个棘手的角落情况：如果链表是空的怎么办？为了表示这种情况，
 我们使用可靠的<code>Option</code>类型：</p>
@@ -936,13 +955,13 @@ error[E0507]: cannot move out of borrowed content
    Finished dev [unoptimized + debuginfo] target(s) in 0.22s
 </code></pre>
 <p>好，仍能运行！</p>
-<h1><a class="header" href="#测试" id="测试">测试</a></h1>
-<p>好了，我们已经写好了<code>推入</code>和<code>弹出</code>，现在我们可以真正测试出我们的堆栈了!Rust和cargo
-支持测试作为一级功能，所以这将是超级简单的。我们要做的就是写一个函数，然后用
-<code>#[test]</code>来注释它。</p>
+<h1 id="测试"><a class="header" href="#测试">测试</a></h1>
+<p>好了，我们已经写好了<code>push</code>和<code>pop</code>，现在我们可以真正测试我们的堆栈了!Rust和cargo支
+持测试作为一级功能，所以这将是超级简单的。我们要做的就是写一个函数，然后用<code>#[test]</code>
+来对它注解。</p>
 <p>一般来说，在Rust社区中，我们尽量把测试放在它测试的代码旁边。然而我们通常会为测试做
 一个新的命名空间，以避免与&quot;真正的&quot;代码冲突。就像我们使用<code>mod</code>来指定<code>first.rs</code>应该
-包含在<code>lib.rs</code>中一样，我们可以使用<code>mod</code>来简单得创建一个全新的<em>内联</em>文件。</p>
+包含在<code>lib.rs</code>中一样，我们可以使用<code>mod</code>来简单地创建一个全新的<em>内联</em>文件：</p>
 <pre><code class="language-rust ignore">// in first.rs
 
 mod test {
@@ -1008,8 +1027,7 @@ error[E0433]: failed to resolve: use of undeclared type or module `List`
 
 
 </code></pre>
-<p>糟糕！因为我们做了一个新的模块，所以我们需要明确地拉入List来使用。因为我们做了一个
-新的模块，所以我们需要显式拉入List来使用。</p>
+<p>糟糕！因为我们做了一个新的模块，所以我们需要明确地拉入List来使用。</p>
 <pre><code class="language-rust ignore">mod test {
     use super::List;
     // everything else the same
@@ -1034,7 +1052,7 @@ test first::test::basics ... ok
 test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out
 ; 0 filtered out
 </code></pre>
-<p>呀！</p>
+<p>耶！</p>
 <p>不过那个警告是怎么回事...? 我们在测试中明明用的是List!</p>
 <p>...但只在测试时使用! 为了安抚编译器(并对我们的消费者友好)，我们应该说明整个测试模块只有
 在运行测试时才应该被编译。</p>
@@ -1045,8 +1063,8 @@ mod test {
 }
 </code></pre>
 <p>这就是测试的一切!</p>
-<h1><a class="header" href="#丢弃" id="丢弃">丢弃</a></h1>
-<p>我们可以做一个堆栈，推入，弹出，我们甚至已经测试过，这一切都正确！</p>
+<h1 id="丢弃"><a class="header" href="#丢弃">丢弃</a></h1>
+<p>我们可以做一个堆栈，对它推入，弹出，我们甚至已经测试过，这一切都正确！</p>
 <p>我们需要担心清理我们的列表吗？从技术上讲，不，完全不需要！Rust和C++一样，使用
 destructors来自动清理列表。像C++一样，Rust使用析构器来自动清理资源。如果一个
 类型实现了一个叫做Drop的<em>特质</em>，它就有一个析构器。特质是Rust对接口的花哨称呼。
@@ -1055,7 +1073,7 @@ Drop特质有以下接口：</p>
     fn drop(&amp;mut self);
 }
 </code></pre>
-<p>基本上，&quot;当你离开作用域时，我会给你一点时间来清理你的事务&quot;。</p>
+<p>基本上就是，“当你离开作用域时，我会给你一点时间来清理你的事务”。</p>
 <p>如果你包含了实现Drop的类型，你其实并不需要实现Drop，你要做的只是调用<em>它们</em>的析构函
 数。在List的情况下，它所要做的就是丢弃它的头部，而头部又<em>可能</em>会尝试丢弃一个
 <code>Box&lt;Node&gt;</code>。所有这些都会自动为我们处理......但有一个问题。</p>
@@ -1128,20 +1146,20 @@ test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured
 <p>棒！</p>
 <hr />
 <p><span style="float:left"><img src="img/profbee.gif" alt="Bonus" /></span></p>
-<h2><a class="header" href="#提前优化的奖励部分" id="提前优化的奖励部分">提前优化的奖励部分！</a></h2>
+<h2 id="提前优化的奖励部分"><a class="header" href="#提前优化的奖励部分">提前优化的奖励部分！</a></h2>
 <p>我们对drop的实现其实和<code>while let Some(_) = self.pop() { }</code><em>很</em>相似，当然更简单。
 它有什么不同，一旦我们开始泛化我们的列表来存储整数以外的东西，会导致什么性能问题？</p>
 <details>
   <summary>Click to expand for answer</summary>
-<p>Pop返回<code>Option&lt;i32&gt;</code>，而我们的实现只操作Links（<code>Box&lt;Node&gt;</code>）。所以我们的实现只移动节点的指针，而基于pop的实现将移动我们存储在节点中的值。如果我们通用我们的列表，有人用它来存储很大的有丢弃实现的东西(VBTWADI)的实例，这可能会非常昂贵。Box能够在原地运行其内容的drop实现，所以它不会受到这个问题的影响。由于VBTWADI正是实际上使用linked-list比使用数组更可取，所以在这种情况下表现不佳会让人有点失望。</p>
+<p>Pop返回<code>Option&lt;i32&gt;</code>，而我们的实现只操作Links（<code>Box&lt;Node&gt;</code>）。所以我们的实现只移动节点的指针，而基于pop的实现将移动我们存储在节点中的值。如果我们通用我们的列表，有人用它来存储很大的有丢弃实现的东西(VBTWADI)的实例，这可能会非常昂贵。Box能够在原地运行其内容的drop实现，所以它不会受到这个问题的影响。由于VBTWADI正是实际上使用链表比使用数组更可取，所以在这种情况下表现不佳会让人有点失望。</p>
 <p>如果你希望同时拥有两种实现的优点，你可以添加一个新的方法，<code>fn pop_node(&amp;mut self) -&gt; Link</code>，<code>pop</code>和<code>drop</code>都可以干净利落地从它派生出来。</p>
 </details>
-<h1><a class="header" href="#the-final-code" id="the-final-code">The Final Code</a></h1>
-<p>好吧，6000字后，这里是我们设法写下的所有代码：</p>
-<pre><pre class="playpen"><code class="language-rust">
-# #![allow(unused_variables)]
-#fn main() {
-use std::mem;
+<h1 id="the-final-code"><a class="header" href="#the-final-code">The Final Code</a></h1>
+<p>好吧，6000字后，这里是我们写下的所有代码：</p>
+<pre><pre class="playground"><code class="language-rust">
+<span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>use std::mem;
 
 pub struct List {
     head: Link,
@@ -1225,16 +1243,17 @@ mod test {
         assert_eq!(list.pop(), None);
     }
 }
-#}</code></pre></pre>
+<span class="boring">}
+</span></code></pre></pre>
 <p>天啊，80行，一半是测试！80行，其中一半是测试! 好吧，我说过这第一篇要花点时间的!</p>
-<h1><a class="header" href="#一个好的单链栈" id="一个好的单链栈">一个好的单链栈</a></h1>
+<h1 id="一个好的单链栈"><a class="header" href="#一个好的单链栈">一个好的单链栈</a></h1>
 <p>在上一章中，我们写了一个最小可行的单链栈。然而，有几个设计决定使它变得有点糟
 糕。让我们把它变得不那么糟糕。在这样做的时候，我们将：</p>
 <ul>
 <li>取消发明轮子</li>
-<li>使我们的列表能够处理任何元素类型</li>
+<li>使我们的链表能够处理任何元素类型</li>
 <li>增加选择功能</li>
-<li>使我们的列表可迭代</li>
+<li>使我们的链表可迭代</li>
 </ul>
 <p>在这个过程中，我们将了解到</p>
 <ul>
@@ -1250,7 +1269,7 @@ pub mod first;
 pub mod second;
 </code></pre>
 <p>并将<code>first.rs</code>中的所有内容复制到其中。</p>
-<h1><a class="header" href="#使用option" id="使用option">使用Option</a></h1>
+<h1 id="使用option"><a class="header" href="#使用option">使用Option</a></h1>
 <p>细心的读者可能已经注意到，我们实际上重新发明了一个非常糟糕的Option版本：</p>
 <pre><code class="language-rust ignore">enum Link {
     Empty,
@@ -1259,7 +1278,7 @@ pub mod second;
 </code></pre>
 <p>Link只是<code>Option&lt;Box&lt;Node&gt;&gt;</code>。现在，可以不用到处写<code>Option&lt;Box&lt;Node&gt;&gt;</code>了，
 真不错。而且与<code>pop</code>不同的是，我们并没有把它暴露给外部世界，所以也许这很好。
-然而Option有一些<em>非常好</em>的方法，我们一直在手动实现。我们<em>不要</em>这样做，用
+然而Option有一些<em>非常好</em>的方法，我们一直在手动实现。我们<em>不要</em>这样做，而是用
 Options代替一切。首先，我们要做的是简单地使用Some和None重命名所有的东西：</p>
 <pre><code class="language-rust ignore">use std::mem;
 
@@ -1267,7 +1286,7 @@ pub struct List {
     head: Link,
 }
 
-// yay type aliases!
+// 耶，类型别名！
 type Link = Option&lt;Box&lt;Node&gt;&gt;;
 
 struct Node {
@@ -1309,7 +1328,7 @@ impl Drop for List {
     }
 }
 </code></pre>
-<p>这稍微好一点，但最大的胜利来自于 Option 的方法。</p>
+<p>这稍微好一点，但最大的胜利来自于Option的方法。</p>
 <p>首先，<code>mem::replace(&amp;mut option, None)</code>是一个非常常见的习语，Option实际上只是把它
 作为一个方法：<code>take</code>。</p>
 <pre><code class="language-rust ignore">pub struct List {
@@ -1371,7 +1390,7 @@ impl Drop for List {
     })
 }
 </code></pre>
-<p>啊，好多了。让我们确保我们没有打破任何东西：</p>
+<p>啊，好多了。让我们确保我们没有破坏任何东西：</p>
 <pre><code class="language-text">&gt; cargo test
 
      Running target/debug/lists-5c71138492ad4b4a
@@ -1384,7 +1403,7 @@ test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured
 
 </code></pre>
 <p>很好! 让我们继续实际改进代码的<em>行为</em>。</p>
-<h1><a class="header" href="#让他全变成泛型" id="让他全变成泛型">让他全变成泛型</a></h1>
+<h1 id="让他全变成泛型"><a class="header" href="#让他全变成泛型">让他全变成泛型</a></h1>
 <p>我们已经用 Option 和 Box 触及了一些泛型。然而到目前为止，我们一直设法避免声明任
 何新的类型，这些类型实际上是对任意元素的泛型。</p>
 <p>事实证明，这其实很容易。让我们现在就把我们所有的类型都变成泛型：</p>
@@ -1399,8 +1418,8 @@ struct Node&lt;T&gt; {
     next: Link&lt;T&gt;,
 }
 </code></pre>
-<p>你只要把所有的东西都变得更尖角一点，突然间你的代码就会变得很通用。当然，我们不
-能<em>就</em>这样做，否则编译器就会变得超级疯狂。</p>
+<p>你只要把所有的东西都加上两个尖角，你的代码就会突然间变得很通用。当然，我们不能
+<em>仅仅</em>这样做，否则编译器就会变得超级疯狂。</p>
 <pre><code class="language-text">&gt; cargo test
 
 error[E0107]: wrong number of type arguments: expected 1, found 0
@@ -1416,10 +1435,10 @@ error[E0107]: wrong number of type arguments: expected 1, found 0
    |               ^^^^ expected 1 type argument
 
 </code></pre>
-<p>问题很明显：我们在谈论这个<code>List</code>的事情，但那已经不是真的了。像 Option 和 Box 一样，
-我们现在总是要谈论 <code>List&lt;Something&gt;</code>。</p>
-<p>但是我们在所有这些暗示中使用的Something是什么？就像List一样，我们希望我们的实现能与
-<em>所有</em>的T一起工作。所以，就像List一样，让我们的<code>impls</code>变得尖尖的：</p>
+<p>问题很明显：我们一直在谈论这个<code>List</code>的事情，但那已经不是真的了。像 Option 和 Box 
+一样，我们现在必须要谈论 <code>List&lt;Something&gt;</code>。</p>
+<p>但是我们在所有这些impl中使用的Something是什么？就像List一样，我们希望我们的实现能与
+<em>所有</em>的T一起工作。所以，就像List一样，让我们的<code>impl</code>变得尖尖的：</p>
 <pre><code class="language-rust ignore">impl&lt;T&gt; List&lt;T&gt; {
     pub fn new() -&gt; Self {
         List { head: None }
@@ -1473,7 +1492,7 @@ test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured
 链表的实例时，我们并没有写 <code>List&lt;T&gt;</code>。这一部分是根据我们从一个期望有 <code>List&lt;T&gt;</code>
 的函数中返回的事实来推断的。</p>
 <p>好了，让我们继续讨论全新的<em>行为</em>吧！</p>
-<h1><a class="header" href="#选择" id="选择">选择</a></h1>
+<h1 id="选择"><a class="header" href="#选择">选择</a></h1>
 <p>有一件事我们上次甚至懒得实施，就是选择。让我们继续做这个。我们所要做的就是返回一
 个对列表头部元素的引用，如果它存在的话。听起来很简单，让我们试试吧：</p>
 <pre><code class="language-rust ignore">pub fn peek(&amp;self) -&gt; Option&lt;&amp;T&gt; {
@@ -1499,7 +1518,7 @@ error[E0507]: cannot move out of borrowed content
 
 </code></pre>
 <p><em>叹息</em>。现在怎么办，Rust？</p>
-<p>地图通过值来获取<code>self</code>，这将会把Option移出它所在的地方。以前这很好，因为我们只是把它
+<p>map通过值来获取<code>self</code>，这将会把Option移出它所在的地方。以前这很好，因为我们只是把它
 取出来，但是现在我们实际上想把它留在原处。处理这个问题的<em>正确</em>方法是使用Option的
 <code>as_ref</code>方法，它的定义如下：</p>
 <pre><code class="language-rust ignore">impl&lt;T&gt; Option&lt;T&gt; {
@@ -1507,7 +1526,7 @@ error[E0507]: cannot move out of borrowed content
 }
 </code></pre>
 <p>它将 Option<T> 降级为对其内部的引用的 Option。我们可以通过显式匹配来实现这一点，但
-是<em>不行</em>。这确实意味着我们需要做一个额外的析构来切断额外的指示，但幸运的是<code>.</code>操作符
+是<em>不行</em>。这确实意味着我们需要做一个额外的取引用来切断额外的指示，但幸运的是<code>.</code>操作符
 为我们处理了这个问题。</p>
 <pre><code class="language-rust ignore">pub fn peek(&amp;self) -&gt; Option&lt;&amp;T&gt; {
     self.head.as_ref().map(|node| {
@@ -1624,15 +1643,15 @@ test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured
 
 </code></pre>
 <p>好多了！</p>
-<h1><a class="header" href="#进入遍历" id="进入遍历">进入遍历</a></h1>
+<h1 id="进入遍历"><a class="header" href="#进入遍历">进入遍历</a></h1>
 <p>在Rust中使用<em>Iterator</em>特性对集合进行迭代。这比<code>Drop</code>要复杂一点：</p>
 <pre><code class="language-rust ignore">pub trait Iterator {
     type Item;
     fn next(&amp;mut self) -&gt; Option&lt;Self::Item&gt;;
 }
 </code></pre>
-<p>块里的新东西是<code>type Item</code>。这宣告了每个迭代器的实现都有一个<em>相关的类型</em>，叫做Item。
-在这种情况下，当你调用<code>next</code>时，它可以吐出这个类型。</p>
+<p>块里的新东西是<code>type Item</code>。这声明了每个迭代器的实现都有一个<em>关联类型</em>，叫做Item。在
+这种情况下，当你调用<code>next</code>时，它可以吐出这个类型。</p>
 <p>Iterator产生<code>Option&lt;Self::Item&gt;</code>的原因是该接口集成了<code>has_next</code>和<code>get_next</code>的概念。
 当你有下一个值时，你产生<code>Some(value)</code>，而当你没有时，你产生<code>None</code>。这使得API在使用
 和实现上更加符合人体工程学和安全，同时避免了<code>has_next</code>和<code>get_next</code>之间多余的检查和
@@ -1691,12 +1710,12 @@ test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured
 
 </code></pre>
 <p>棒！</p>
-<h1><a class="header" href="#遍历" id="遍历">遍历</a></h1>
+<h1 id="遍历"><a class="header" href="#遍历">遍历</a></h1>
 <p>好吧，让我们试着实现Iter。这一次，我们将不能依靠List提供我们想要的所有功能。我
-们需要推出我们自己的。我们想要的基本逻辑是持有一个指向当前节点的指针，我们想要
-产生下一个节点。因为这个节点可能不存在（列表是空的或者我们已经完成了迭代），我
-们希望这个引用是一个 Option。当我们产生一个元素时，我们希望继续到当前节点的下一
-个节点。</p>
+们需要靠我们自己。我们想要的基本逻辑是持有一个指向当前节点的指针，我们想要产生
+下一个节点。因为这个节点可能不存在（列表是空的或者我们已经完成了迭代），我们希
+望这个引用是一个 Option。当我们产出一个元素时，我们希望继续到当前节点的下一个
+节点。</p>
 <p>好吧，我们来试试：</p>
 <pre><code class="language-rust ignore">pub struct Iter&lt;T&gt; {
     next: Option&lt;&amp;Node&lt;T&gt;&gt;,
@@ -1819,31 +1838,31 @@ error[E0063]: missing field `next` in initializer of `second::Iter&lt;'_, _&gt;`
 </code></pre>
 <p>哦，上帝。我们搞坏了Rust。</p>
 <p>也许我们应该搞清楚这个<code>'a</code>生命周期到底是什么意思。</p>
-<p>生命周期会吓跑很多人，因为它是对我们从编程之初就知道并喜爱的东西的改变。到目前为止
-，我们实际上已经成功地避开了生命周期，尽管它们一直在我们的程序中纠缠不清。</p>
-<p>生命周期在垃圾收集语言中是不必要的，因为垃圾收集器会确保所有的东西都能神奇地活到它
-需要的时间。Rust中的大多数数据都是<em>人工</em>管理的，所以这些数据需要另一种解决方案。C
-和C++给了我们一个清晰的例子，如果你只是让人们在堆栈上拿指针去随机数据会发生什么：
-普遍的不可管理的不安全。这可以粗略地分为两类错误：</p>
+<p>生命期会吓跑很多人，因为它是对我们从编程之初就知道并喜爱的东西的改变。到目前为止，
+我们实际上已经成功地避开了生命期，尽管它们一直在我们的程序中纠缠不清。</p>
+<p>生命期在垃圾收集语言中是不必要的，因为垃圾收集器会确保所有的东西都能神奇地活到它需
+要的时间。Rust中的大多数数据都是<em>人工</em>管理的，所以这些数据需要另一种解决方案。C和
+C++给了我们一个清晰的例子，如果你只是让人们在堆栈上拿指针去随机数据会发生什么：普
+遍的不可管理的不安全。这可以粗略地分为两类错误：</p>
 <ul>
 <li>持有一个超出范围的东西的指针</li>
 <li>持有一个指向被改变的东西的指针</li>
 </ul>
-<p>生命周期可以解决这两个问题，而且99%的情况下，它们是以一种完全透明的方式进行的。</p>
-<p>那么什么是生命周期呢？</p>
-<p>很简单，生命周期是程序中某个区域（~块/范围）代码的名称。就是这样。当一个引用被标记
-为生命周期时，我们是说它必须对<em>整个</em>区域有效。不同的东西对一个引用必须和可以在多长时
-间内有效提出了要求。整个生命周期系统又只是一个约束解决系统，它试图最小化每个引用的区
-域。如果它成功地找到了一组满足所有约束条件的生命周期，你的程序就可以编译了！否则你就
-会得到一个错误反馈，说什么东西的生命周期不够长。</p>
-<p>在一个函数体中，你一般不能谈论生命周期，而且也不想谈论。编译器有完整的信息，可以推断
-出所有的限制条件来找到最小的生命周期。然而在类型和API层面，编译器<em>并没有</em>所有的信息。
-它需要你告诉它不同生命周期之间的关系，这样它才能弄清楚你在做什么。</p>
-<p>原则上说，这些生命周期也<em>可以</em>不写，但这样一来，检查所有的借用将是一个巨大的全程序分
-析，会产生令人难以置信的非本地错误。Rust的系统意味着所有的借用检查都可以在每个函数体
-中独立完成，你的所有错误都应该是相当局部的（或者你的类型有错误的签名）。</p>
+<p>生命期可以解决这两个问题，而且99%的情况下，它们是以一种完全透明的方式进行的。</p>
+<p>那么什么是生命期呢？</p>
+<p>很简单，生命期是程序中某个区域（~块/范围）代码的名称。就是这样。当一个引用被标记为生
+命期时，我们是说它必须对<em>整个</em>区域有效。不同的东西对一个引用必须和可以在多长时间内有
+效提出了要求。整个生命期系统又只是一个约束解决系统，它试图最小化每个引用的区域。如果
+它成功地找到了一组满足所有约束条件的生命期，你的程序就可以编译了！否则你就会得到一个
+错误反馈，说什么东西的生命期不够长。</p>
+<p>在一个函数体中，你一般不能谈论生命期，而且也不想谈论。编译器有完整的信息，可以推断出
+所有的限制条件来找到最小的生命期。然而在类型和API层面，编译器<em>并没有</em>所有的信息。它需
+要你告诉它不同生命期之间的关系，这样它才能弄清楚你在做什么。</p>
+<p>原则上说，这些生命期也<em>可以</em>不写，但这样一来，检查所有的借用将是一个巨大的全程序分析
+，会产生令人难以置信的非本地错误。Rust的系统意味着所有的借用检查都可以在每个函数体中
+独立完成，你的所有错误都应该是相当局部的（或者你的类型有错误的签名）。</p>
 <p>但是我们以前也在函数签名中写过引用，而且很好！为什么？这是因为有一些情况非常普遍，
-Rust会自动为你挑选生命周期。这就是<em>寿命消除</em>。</p>
+Rust会自动为你挑选生命期。这就是<em>寿命消除</em>。</p>
 <p>特别地：</p>
 <pre><code class="language-rust ignore">// Only one reference in input, so the output must be derived from that input
 fn foo(&amp;A) -&gt; &amp;B; // sugar for:
@@ -1857,13 +1876,13 @@ fn foo&lt;'a, 'b, 'c&gt;(&amp;'a A, &amp;'b B, &amp;'c C);
 fn foo(&amp;self, &amp;B, &amp;C) -&gt; &amp;D; // sugar for:
 fn foo&lt;'a, 'b, 'c&gt;(&amp;'a self, &amp;'b B, &amp;'c C) -&gt; &amp;'a D;
 </code></pre>
-<p>那么，<code>fn foo&lt;'a&gt;(&amp;'a A)-&gt;&amp;'a B</code>是什么<em>意思</em>？在实践中，它的意思是，输入必须至少与输
-出一样长。因此，如果你把输出保留很长一段时间，这将扩大输入必须有效的区域。一旦你停止使
-用输出，编译器就会知道输入也可以变得无效了。</p>
-<p>有了这个系统的设置，Rust可以确保在free之后没有任何东西被使用，而且在未完成的引用存在时
+<p>那么，<code>fn foo&lt;'a&gt;(&amp;'a A)-&gt;&amp;'a B</code>是什么<em>意思</em>？在实践中，它的意思是，输入必须至少活得
+与输出一样长。因此，如果你把输出保留很长一段时间，这将扩大输入必须有效的区域。一旦你
+停止使用输出，编译器就会知道输入也可以变得无效了。</p>
+<p>由于这个系统的设置，Rust可以确保没有东西会在释放之后被使用，而且在未完成的引用存在时
 没有任何东西被改变。它只是确保这些约束条件都能得到解决。</p>
 <p>好的。那么。Iter。</p>
-<p>让我们回到没有生命周期的状态：</p>
+<p>让我们回到没有生命期的状态：</p>
 <pre><code class="language-rust ignore">pub struct Iter&lt;T&gt; {
     next: Option&lt;&amp;Node&lt;T&gt;&gt;,
 }
@@ -1884,7 +1903,7 @@ impl&lt;T&gt; Iterator for Iter&lt;T&gt; {
     }
 }
 </code></pre>
-<p>我们只需要在函数和类型签名中添加生命期：</p>
+<p>我们只需要在函数和类型的签名中添加生命期：</p>
 <pre><code class="language-rust ignore">// Iter is generic over *some* lifetime, it doesn't care
 pub struct Iter&lt;'a, T&gt; {
     next: Option&lt;&amp;'a Node&lt;T&gt;&gt;,
@@ -1937,7 +1956,7 @@ error[E0308]: mismatched types
               found type `std::option::Option&lt;&amp;std::boxed::Box&lt;second::Node&lt;T&gt;&gt;&gt;`
 </code></pre>
 <p>(╯°□°)╯︵ ┻━┻</p>
-<p>好的。所以。我们修复了我们的生命周期错误，但现在我们得到了一些新的类型错误。</p>
+<p>好的。所以。我们修复了我们的生命期错误，但现在我们得到了一些新的类型错误。</p>
 <p>我们想存储<code>&amp;Node</code>的，但我们得到的是<code>&amp;Box&lt;Node&gt;</code>的。好吧，这很容易，我们只需
 要在引用之前取消对Box的引用：</p>
 <pre><code class="language-rust ignore">impl&lt;T&gt; List&lt;T&gt; {
@@ -1983,8 +2002,8 @@ error[E0507]: cannot move out of borrowed content
    |                         ^^^^^^^^^ cannot move out of borrowed content
 </code></pre>
 <p>(ﾉಥ益ಥ）ﾉ﻿ ┻━┻</p>
-<p>我们忘记了<code>as_ref</code>，所以我们要把盒子移到<code>map</code>里，这意味着它将被丢弃，这意味着我
-们的引用将被悬空：</p>
+<p>我们忘记了要<code>as_ref</code>，所以我们要把盒子移到<code>map</code>里，这意味着它将被丢弃，这意味着
+我们的引用将被悬空：</p>
 <pre><code class="language-rust ignore">pub struct Iter&lt;'a, T&gt; {
     next: Option&lt;&amp;'a Node&lt;T&gt;&gt;,
 }
@@ -2054,14 +2073,14 @@ impl&lt;'a, T&gt; Iterator for Iter&lt;'a, T&gt; {
 
 </code></pre>
 <p>🎉 🎉 🎉</p>
-<p>as_deref和as-derf_mut函数在Rust 1.40中已经稳定。在此之前，你需要做<code>map(|node| &amp;**node)</code>
+<p>as_deref和as_deref_mut函数在Rust 1.40中已经稳定。在此之前，你需要做<code>map(|node| &amp;**node)</code>
 和<code>map(|node| &amp;mut**node)</code>。你可能会想&quot;哇，那个<code>&amp;**</code>的东西真的很古怪&quot;，你没有错，但就像美
 酒一样，Rust会随着时间的推移变得更好，我们不再需要这样做。通常情况下，Rust非常善于隐式地进
-行这种转换，通过一个叫做<em>deref coercion</em>的过程，基本上它可以在你的代码中插入*，使其进行类
-型检查。它可以做到这一点，因为我们有借贷检查器来确保我们不会弄乱指针！</p>
-<p>但是在这种情况下，闭合与我们有一个<code>Option&lt;&amp;T&gt;</code>而不是<code>&amp;T</code>的事实相结合，对它来说有点太复杂了，
-所以我们需要通过明确的方式来帮助它。值得庆幸的是，根据我的经验，这种情况相当少见。</p>
-<p>为了完整起见，我们<em>可以</em>用<em>Turbofish</em>给它一个<em>不同</em>的提示：</p>
+行这种转换，通过一个叫做<em>解引用强制转换</em>的过程，基本上它可以在你的代码中插入*，使其进行类
+型检查。它可以做到这一点，因为我们有借用检查器来确保我们不会弄乱指针！</p>
+<p>但是闭包同时结合了我们有一个<code>Option&lt;&amp;T&gt;</code>而不是<code>&amp;T</code>的情况，对它来说有点太复杂了，所以我们需
+要通过显式的方式来帮助它。值得庆幸的是，根据我的经验，这种情况相当少见。</p>
+<p>为了完整起见，我们<em>可以</em>用<em>涡轮鱼</em>给它一个<em>不同</em>的提示：</p>
 <pre><code class="language-rust ignore">    self.next = node.next.as_ref().map::&lt;&amp;Node&lt;T&gt;, _&gt;(|node| &amp;node);
 </code></pre>
 <p>看，map是一个泛型函数：</p>
@@ -2099,8 +2118,8 @@ test second::test::peek ... ok
 test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured
 
 </code></pre>
-<p>赫赫有名。</p>
-<p>最后，应该指出的是，我们实际上可以在这里应用生命周期消除：</p>
+<p>全对。</p>
+<p>最后，应该指出的是，我们实际上可以在这里应用生命期消除：</p>
 <pre><code class="language-rust ignore">impl&lt;T&gt; List&lt;T&gt; {
     pub fn iter&lt;'a&gt;(&amp;'a self) -&gt; Iter&lt;'a, T&gt; {
         Iter { next: self.head.as_deref() }
@@ -2115,18 +2134,18 @@ test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured
 }
 </code></pre>
 <p>更少的生命期!</p>
-<p>或者，如果你不愿意&quot;隐藏&quot;一个结构包含一个生命周期，你可以使用Rust 2018的“
-明确删除生命周期”语法，<code>'_</code>：</p>
+<p>或者，如果你不愿意&quot;隐藏&quot;一个结构包含一个生命期，你可以使用Rust 2018的“
+显式省略生命期”语法，<code>'_</code>：</p>
 <pre><code class="language-rust ignore">impl&lt;T&gt; List&lt;T&gt; {
     pub fn iter(&amp;self) -&gt; Iter&lt;'_, T&gt; {
         Iter { next: self.head.as_deref() }
     }
 }
 </code></pre>
-<h1><a class="header" href="#可变遍历" id="可变遍历">可变遍历</a></h1>
+<h1 id="可变遍历"><a class="header" href="#可变遍历">可变遍历</a></h1>
 <p>老实说，可变遍历是很疯狂的。这本身就像是一个疯狂的说法；它肯定与Iter相同！</p>
-<p>从语义上讲，是的，但是共享和可变引用的本质意味着Iter是&quot;微不足道的&quot;，而
-IterMut是合法的巫师魔法。</p>
+<p>从语义上讲，是的，但是当IterMut是合法的巫师魔法时，共享和可变引用的本质意
+味着Iter是&quot;微不足道的&quot;。</p>
 <p>关键的洞察力来自于我们对Iter的Iterator的实现：</p>
 <pre><code class="language-rust ignore">impl&lt;'a, T&gt; Iterator for Iter&lt;'a, T&gt; {
     type Item = &amp;'a T;
@@ -2141,8 +2160,8 @@ IterMut是合法的巫师魔法。</p>
     fn next&lt;'b&gt;(&amp;'b mut self) -&gt; Option&lt;&amp;'a T&gt; { /* stuff */ }
 }
 </code></pre>
-<p><code>next</code>的签名在输入和输出的生命周期之间<em>没有</em>建立任何约束! 我们为什么要关心这
-个？这意味着我们可以无条件地一次又一次地调用<code>next</code>!</p>
+<p><code>next</code>的签名在输入和输出的生命期之间<em>没有</em>建立任何约束! 我们为什么要关心这个？
+这意味着我们可以无条件地一次又一次地调用<code>next</code>!</p>
 <pre><code class="language-rust ignore">let mut list = List::new();
 list.push(1); list.push(2); list.push(3);
 
@@ -2152,7 +2171,7 @@ let y = iter.next().unwrap();
 let z = iter.next().unwrap();
 </code></pre>
 <p>酷！</p>
-<p>这对共享引用来说<em>绝对是好的</em>，因为整个要点是你可以同时拥有大量的引用。然而，易变的
+<p>这对共享引用来说<em>绝对是好的</em>，因为整个要点是你可以同时拥有大量的引用。然而，可变的
 引用<em>不能</em>共存。重点是它们是排他性的。</p>
 <p>最终的结果是，使用安全的代码来编写IterMut是非常困难的（我们还没有深入了解这意味着
 什么......）。令人惊讶的是，IterMut实际上可以完全安全地实现许多结构!</p>
@@ -2194,7 +2213,7 @@ error[E0507]: cannot move out of borrowed content
     |         ^^^^^^^^^ cannot move out of borrowed content
 </code></pre>
 <p>好吧，看起来我们在这里有两个不同的错误。第一个错误看起来非常清楚，它甚至告诉我们如何解决它！你
-不能把一个共享的引用升级为一个可变的引用，所以<code>iter_mut</code>需要把<code>&amp;mut self</code>。只是一个愚蠢的复制
+不能把一个共享的引用升级为一个可变的引用，所以<code>iter_mut</code>需要用<code>&amp;mut self</code>。只是一个愚蠢的复制
 粘贴错误。</p>
 <pre><code class="language-rust ignore">pub fn iter_mut(&amp;mut self) -&gt; IterMut&lt;'_, T&gt; {
     IterMut { next: self.head.as_deref_mut() }
@@ -2259,9 +2278,9 @@ test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured
 <p>什么。</p>
 <p>好吧，我的意思是它实际上<em>是</em>应该工作的，但通常会有一些愚蠢的东西挡住了它的去路! 让
 我们在这里说清楚：</p>
-<p>我们刚刚实现了一段代码，它接收了一个单链的列表，并且最多返回一次列表中每个元素的可变
-引用。而且它是经过静态验证的，可以做到这一点。它是完全安全的。我们不需要做任何疯狂的
-事情。</p>
+<p>我们刚刚实现了一段代码，它接收了一个单链表，并且返回链表中每个元素的可变引用各最多一
+次。而且它是经过静态验证的，可以做到这一点。它是完全安全的。我们不需要做任何疯狂的事
+情。</p>
 <p>如果你问我，这是件大事。有几个原因可以说明这一点：</p>
 <ul>
 <li>我们<code>take</code> <code>Option&lt;&amp;mut&gt;</code>，所以我们可以独占地访问可变的引用。不需要担心有人会再看
@@ -2270,14 +2289,14 @@ test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured
 而且它们肯定是不相干的。</li>
 </ul>
 <p>事实证明，你也可以应用这个基本逻辑来为数组或树获得一个安全的IterMut！你甚至可以把迭代
-器变成一个安全的迭代器。你甚至可以让迭代器变成DoubleEnded，这样你就可以同时从前面和后
-面消耗迭代器了。呜呼!</p>
-<h1><a class="header" href="#final-code" id="final-code">Final Code</a></h1>
+器变成一个安全的迭代器。你甚至可以让迭代器变成DoubleEnded，这样你就可以同时从前面<em>和</em>
+后面消耗迭代器了。呜呼!</p>
+<h1 id="final-code"><a class="header" href="#final-code">Final Code</a></h1>
 <p>好了，第二份清单就到此为止；这是最后的代码！</p>
-<pre><pre class="playpen"><code class="language-rust">
-# #![allow(unused_variables)]
-#fn main() {
-pub struct List&lt;T&gt; {
+<pre><pre class="playground"><code class="language-rust">
+<span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>pub struct List&lt;T&gt; {
     head: Link&lt;T&gt;,
 }
 
@@ -2468,15 +2487,16 @@ mod test {
     }
 }
 
-#}</code></pre></pre>
+<span class="boring">}
+</span></code></pre></pre>
 <p>越来越强壮了!</p>
-<h1><a class="header" href="#一个持久化的单链栈" id="一个持久化的单链栈">一个持久化的单链栈</a></h1>
+<h1 id="一个持久化的单链栈"><a class="header" href="#一个持久化的单链栈">一个持久化的单链栈</a></h1>
 <p>好了，我们已经掌握了可变单链堆栈的艺术。</p>
-<p>让我们通过编写一个<em>持久化的</em>不可变的单链接列表，从<em>单一</em>所有权转向<em>共享</em>所有权。
-这将是函数式程序员所熟悉和喜爱的列表。你可以得到头或尾，把别人的头放在别人的尾
+<p>让我们通过编写一个<em>持久化的</em>不可变的单链表，从<em>单一</em>所有权转向<em>共享</em>所有权。这
+将是函数式程序员所熟悉和喜爱的列表。你可以得到头或尾，把别人的头放在别人的尾
 上......而且......基本上就是这样了。不变性是一种地狱般的毒药。</p>
-<p>在这个过程中，我们很大程度上只是熟悉了Rc和Arc，但这将为我们下一个<em>改变游戏</em>的清
-单做准备。</p>
+<p>在这个过程中，我们很大程度上只是熟悉了Rc和Arc，但这将为我们下一个<em>改变游戏</em>的链
+表做准备。</p>
 <p>让我们添加一个名为<code>third.rs</code>的新文件：</p>
 <pre><code class="language-rust ignore">// in lib.rs
 
@@ -2485,7 +2505,7 @@ pub mod second;
 pub mod third;
 </code></pre>
 <p>这次没有复制--粘帖。这是一个净室操作。</p>
-<h1><a class="header" href="#布局" id="布局">布局</a></h1>
+<h1 id="布局"><a class="header" href="#布局">布局</a></h1>
 <p>好了，回到布局的画板上。</p>
 <p>持久列表最重要的一点是，你基本上可以没有成本地操作列表的尾部：</p>
 <p>例如，在持久性列表中，这并不是一个不常见的工作量：</p>
@@ -2583,7 +2603,7 @@ warning: field is never used: `next`
 就可以了。</p>
 <p>...</p>
 <p>不，不，我们不能。</p>
-<h1><a class="header" href="#基本" id="基本">基本</a></h1>
+<h1 id="基本"><a class="header" href="#基本">基本</a></h1>
 <p>我们现在已经知道了很多Rust的基础知识，所以我们可以再次做很多简单的事情。</p>
 <p>对于构造函数，我们又可以直接复制粘贴了：</p>
 <pre><code class="language-rust ignore">impl&lt;T&gt; List&lt;T&gt; {
@@ -2761,7 +2781,7 @@ test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured
 <p>谁曾说过动态类型更容易？</p>
 <p>(笨蛋说的)</p>
 <p>注意，我们不能为这个类型实现IntoIter或IterMut。我们只有对元素的共享访问。</p>
-<h1><a class="header" href="#丢弃-1" id="丢弃-1">丢弃</a></h1>
+<h1 id="丢弃-1"><a class="header" href="#丢弃-1">丢弃</a></h1>
 <p>像可变列表一样，我们有一个递归的析构器问题。诚然，对于不可变的列表来说，这并不是一
 个糟糕的问题：如果我们遇到<em>某处</em>另一个节点是另一个列表的头，我们就不会递归地放弃它。
 然而，这仍然是一个我们应该关心的问题，而且如何处理并不那么明确。下面是我们之前解决这
@@ -2815,7 +2835,7 @@ test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out
 </code></pre>
 <p>好!
 棒。</p>
-<h1><a class="header" href="#arc" id="arc">Arc</a></h1>
+<h1 id="arc"><a class="header" href="#arc">Arc</a></h1>
 <p>使用不可变链表的一个原因是跨线程共享数据。毕竟，共享可变的状态是所有邪恶的根源，
 解决这个问题的一个方法是永远杀死<em>可变</em>的部分。</p>
 <p>只是我们的列表根本就不是线程安全的。为了实现线程安全，我们需要<em>原子化</em>地处理引用
@@ -2854,13 +2874,13 @@ Arc中而神奇地使它成为线程安全的。Arc只能像其他类型一样�
 <p>我真的真的不想讨论原子内存模型或非派生Send实现的更多细节。不用说，当你深入了解Rust的线
 程安全故事时，事情会变得更加复杂。作为一个高级消费者，这一切都<em>只是在工作</em>，你真的不需
 要考虑它。</p>
-<h1><a class="header" href="#final-code-1" id="final-code-1">Final Code</a></h1>
+<h1 id="final-code-1"><a class="header" href="#final-code-1">Final Code</a></h1>
 <p>That's all I really have to say on the immutable stack. We're getting pretty
 good at implementing lists now!</p>
-<pre><pre class="playpen"><code class="language-rust">
-# #![allow(unused_variables)]
-#fn main() {
-use std::rc::Rc;
+<pre><pre class="playground"><code class="language-rust">
+<span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>use std::rc::Rc;
 
 pub struct List&lt;T&gt; {
     head: Link&lt;T&gt;,
@@ -2962,8 +2982,9 @@ mod test {
         assert_eq!(iter.next(), Some(&amp;1));
     }
 }
-#}</code></pre></pre>
-<h1><a class="header" href="#一个不好但是安全的双链双向队列" id="一个不好但是安全的双链双向队列">一个不好但是安全的双链双向队列</a></h1>
+<span class="boring">}
+</span></code></pre></pre>
+<h1 id="一个不好但是安全的双链双向队列"><a class="header" href="#一个不好但是安全的双链双向队列">一个不好但是安全的双链双向队列</a></h1>
 <p>现在我们已经看到了Rc，并听说了内部可变性，这给我们一个有趣的想法......。也许我
 们<em>可以</em>通过Rc进行改变。如果<em>是这样</em>，也许我们可以完全安全地实现一个<em>双链表</em>！</p>
 <p>在这个过程中，我们将熟悉内部可变性，并可能了解到，安全并不意味着正确。双链表很
@@ -2978,7 +2999,7 @@ pub mod fourth;
 </code></pre>
 <p>这将是另一个净室操作，尽管像往常一样，我们可能会发现一些逻辑再次逐字适用。</p>
 <p>免责声明：这一章基本上是一个示范，说明这是一个非常糟糕的主意。</p>
-<h1><a class="header" href="#布局-1" id="布局-1">布局</a></h1>
+<h1 id="布局-1"><a class="header" href="#布局-1">布局</a></h1>
 <p>我们设计的关键是<code>RefCell</code>类型。RefCell的核心是一对方法：</p>
 <pre><code class="language-rust ignore">fn borrow(&amp;self) -&gt; Ref&lt;'_, T&gt;;
 fn borrow_mut(&amp;self) -&gt; RefMut&lt;'_, T&gt;;
@@ -3046,7 +3067,7 @@ warning: field is never used: `prev`
    |     ^^^^^^^^^^^^^
 </code></pre>
 <p>嘿，它建好了! 很多死代码的警告，但它构建了！让我们试着使用它。</p>
-<h1><a class="header" href="#构建" id="构建">构建</a></h1>
+<h1 id="构建"><a class="header" href="#构建">构建</a></h1>
 <p>好吧，我们先从建立链表开始。在这个新的系统中，这是很直接的事情。<code>new</code>仍然简单，
 所有的字段都是None。另外，因为它变得有点不方便，我们也来做一个Node构造函数：</p>
 <pre><code class="language-rust ignore">impl&lt;T&gt; Node&lt;T&gt; {
@@ -3136,7 +3157,7 @@ error[E0609]: no field `next` on type `std::rc::Rc&lt;std::cell::RefCell&lt;four
 而不像Rust的本地引用类型那样完全是在编译时静态跟踪的。因为<code>RefCell&lt;T&gt;</code>的借用是
 动态的，所以有可能试图借用一个已经被变异借用的值；当这种情况发生时，会导致线程恐
 慌。</p>
-<h1><a class="header" href="#何时选择内部可变性" id="何时选择内部可变性">何时选择内部可变性</a></h1>
+<h1 id="何时选择内部可变性"><a class="header" href="#何时选择内部可变性">何时选择内部可变性</a></h1>
 <p>更常见的继承可变性，即必须有唯一的访问权才能改变一个值，这是一个关键的语言元素，
 使Rust能够强有力地推理指针别名，静态地防止崩溃的错误。正因为如此，继承的可变性是
 首选，而内部可变性是最后的手段。由于单元格类型能够在原本不允许的地方进行改变，所
@@ -3146,7 +3167,7 @@ error[E0609]: no field `next` on type `std::rc::Rc&lt;std::cell::RefCell&lt;four
 <li>逻辑上不可变的方法的实现细节。</li>
 <li><code>Clone</code>的可变实现。</li>
 </ul>
-<h2><a class="header" href="#为共享类型引入继承的可变性根基" id="为共享类型引入继承的可变性根基">为共享类型引入继承的可变性根基</a></h2>
+<h2 id="为共享类型引入继承的可变性根基"><a class="header" href="#为共享类型引入继承的可变性根基">为共享类型引入继承的可变性根基</a></h2>
 <p>共享的智能指针类型，包括<code>Rc&lt;T&gt;</code>和<code>Arc&lt;T&gt;</code>，提供了可以在多方之间克隆和共享的容器
 。因为所包含的值可能是多重别名的，所以它们只能作为共享引用被借用，而不是可变型引用
 。如果没有单元格，就根本不可能对共享盒内的数据进行变异！</p>
@@ -3198,7 +3219,7 @@ warning: field is never used: `elem`
    = note: #[warn(dead_code)] on by default
 </code></pre>
 <p>嘿，它构建了！文档又赢了。</p>
-<h1><a class="header" href="#崩溃" id="崩溃">崩溃</a></h1>
+<h1 id="崩溃"><a class="header" href="#崩溃">崩溃</a></h1>
 <p><code>pop_front</code>应该是与<code>push_front</code>相同的基本逻辑，但要倒过来。我们来试试：</p>
 <pre><code class="language-rust ignore">pub fn pop_front(&amp;mut self) -&gt; Option&lt;T&gt; {
     // need to take the old head, ensuring it's -2
@@ -3388,7 +3409,7 @@ test result: ok. 9 passed; 0 failed; 0 ignored; 0 measured
 <p>(我们实际上可以用我们的可变堆栈做到这一点，但捷径是给那些理解事物的人的！)</p>
 <p>我们可以考虑实现<code>push</code>和<code>pop</code>的<code>_back</code>版本，但这只是复制粘贴的工作，我们将在本章的
 后面进行讨论。现在，让我们看看更有趣的事情吧！</p>
-<h1><a class="header" href="#选择-1" id="选择-1">选择</a></h1>
+<h1 id="选择-1"><a class="header" href="#选择-1">选择</a></h1>
 <p>好了，我们用<code>push</code>和<code>pop</code>做。不瞒你说，我在那里有点情绪化了。编译时的正确性是
 一种可怕的毒药。</p>
 <p>让我们做一些简单的事情来冷静一下：让我们实现<code>peek_front</code>。这在以前是非常容易
@@ -3542,7 +3563,7 @@ test result: ok. 10 passed; 0 failed; 0 ignored; 0 measured
 
 </code></pre>
 <p>棒！</p>
-<h1><a class="header" href="#对称的垃圾" id="对称的垃圾">对称的垃圾</a></h1>
+<h1 id="对称的垃圾"><a class="header" href="#对称的垃圾">对称的垃圾</a></h1>
 <p>好了，让我们把所有的组合对称性问题都解决了。</p>
 <p>我们所要做的就是一些基本的文本替换：</p>
 <pre><code class="language-text">tail &lt;-&gt; head
@@ -3692,9 +3713,9 @@ test result: ok. 10 passed; 0 failed; 0 ignored; 0 measured
 
 </code></pre>
 <p>不错。复制-粘贴是最好的编程方式。</p>
-<h1><a class="header" href="#迭代" id="迭代">迭代</a></h1>
+<h1 id="迭代"><a class="header" href="#迭代">迭代</a></h1>
 <p>让我们来试着迭代这个坏小子。</p>
-<h2><a class="header" href="#intoiter" id="intoiter">IntoIter</a></h2>
+<h2 id="intoiter"><a class="header" href="#intoiter">IntoIter</a></h2>
 <p>IntoIter和往常一样，是最简单的。只是包装了栈并调用<code>pop</code>：</p>
 <pre><code class="language-rust ignore">pub struct IntoIter&lt;T&gt;(List&lt;T&gt;);
 
@@ -3764,7 +3785,7 @@ test result: ok. 11 passed; 0 failed; 0 ignored; 0 measured
 
 </code></pre>
 <p>好。</p>
-<h2><a class="header" href="#iter" id="iter">Iter</a></h2>
+<h2 id="iter"><a class="header" href="#iter">Iter</a></h2>
 <p>Iter的宽容度会低一些。我们将不得不再次处理那些可怕的<code>Ref</code>的东西 由于Refs的存在，
 我们不能像以前那样存储<code>&amp;Nodes</code>。相反，让我们尝试存储<code>Ref&lt;Node&gt;</code>s：</p>
 <pre><code class="language-rust ignore">pub struct Iter&lt;'a, T&gt;(Option&lt;Ref&lt;'a, Node&lt;T&gt;&gt;&gt;);
@@ -3888,10 +3909,10 @@ error[E0521]: borrowed data escapes outside of closure
 <p>我不认为我们在这里有什么可以做的。这是个死胡同。让我们试着离开RefCell。</p>
 <p>那我们的<code>Rc</code>s呢？谁说我们甚至需要存储引用？为什么我们不能克隆整个Rc，以获得一个漂亮的
 自己的解决方案到列表的中间？</p>
-<pre><pre class="playpen"><code class="language-rust">
-# #![allow(unused_variables)]
-#fn main() {
-pub struct Iter&lt;T&gt;(Option&lt;Rc&lt;Node&lt;T&gt;&gt;&gt;);
+<pre><pre class="playground"><code class="language-rust">
+<span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>pub struct Iter&lt;T&gt;(Option&lt;Rc&lt;Node&lt;T&gt;&gt;&gt;);
 
 impl&lt;T&gt; List&lt;T&gt; {
     pub fn iter(&amp;self) -&gt; Iter&lt;T&gt; {
@@ -3901,7 +3922,8 @@ impl&lt;T&gt; List&lt;T&gt; {
 
 impl&lt;T&gt; Iterator for Iter&lt;T&gt; {
     type Item =
-#}</code></pre></pre>
+<span class="boring">}
+</span></code></pre></pre>
 <p>呃......等等，我们现在返回什么？ <code>&amp;T</code>？<code>Ref&lt;T&gt;</code>？</p>
 <p>不，这些都不行......我们的Iter已经没有生命周期了！<code>&amp;T</code>和<code>Ref&lt;T&gt;</code>都要求我们在进
 入下一步之前先声明一些生命周期。但是我们设法从Rc中得到的任何东西都会借用迭代
@@ -3933,7 +3955,7 @@ impl&lt;T&gt; Iterator for Iter&lt;T&gt; {
 <p>实际上，这种设计更适合于内部数据结构，因为它永远不会让API的消费者看到。内部可变性对
 于编写安全的<em>应用程序</em>是很好的。但对于安全的<em>库</em>来说就不是那么回事了。</p>
 <p>总之，我放弃了Iter和IterMut。我们可以做它们，但是<em>唉</em>。</p>
-<h1><a class="header" href="#最终代码" id="最终代码">最终代码</a></h1>
+<h1 id="最终代码"><a class="header" href="#最终代码">最终代码</a></h1>
 <p>好了，这就是在Rust中实现了一个100%安全的双链接列表。它的实现是一场噩梦，泄露了实现细
 节，而且不支持几个基本操作。</p>
 <p>但是，它存在。</p>
@@ -3942,10 +3964,10 @@ impl&lt;T&gt; Iterator for Iter&lt;T&gt; {
 查实际上是必要的。双重链接的列表有一个可怕的纠缠不清的别名和所有权的故事!</p>
 <p>不过，这也是我们可以做的事情。特别是如果我们不关心向消费者暴露内部数据结构的话。</p>
 <p>从这里开始，我们将专注于这个硬币的另一面：通过使我们的实现<em>不安全</em>来夺回所有控制权。</p>
-<pre><pre class="playpen"><code class="language-rust">
-# #![allow(unused_variables)]
-#fn main() {
-use std::rc::Rc;
+<pre><pre class="playground"><code class="language-rust">
+<span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>use std::rc::Rc;
 use std::cell::{Ref, RefMut, RefCell};
 
 pub struct List&lt;T&gt; {
@@ -4176,8 +4198,9 @@ mod test {
         assert_eq!(iter.next(), None);
     }
 }
-#}</code></pre></pre>
-<h1><a class="header" href="#一个不安全的单连接队列" id="一个不安全的单连接队列">一个不安全的单连接队列</a></h1>
+<span class="boring">}
+</span></code></pre></pre>
+<h1 id="一个不安全的单连接队列"><a class="header" href="#一个不安全的单连接队列">一个不安全的单连接队列</a></h1>
 <p>好吧，那个引用计算的内部可变性的东西有点失控了。当然，Rust并不希望你在一般
 情况下做这样的事情？嗯，是的，也不是。Rc和Refcell可以很好地处理简单的情况，
 但它们可能会变得不方便。特别是如果你想隐藏它的发生。一定会有更好的方法!</p>
@@ -4194,7 +4217,7 @@ pub mod fifth;
 </code></pre>
 <p>我们的代码主要来自second.rs，因为队列在链表的世界里主要是对堆栈的一种增强。不过，
 我们还是要从头开始，因为我们要解决一些关于布局和其他方面的基本问题。</p>
-<h1><a class="header" href="#布局-2" id="布局-2">布局</a></h1>
+<h1 id="布局-2"><a class="header" href="#布局-2">布局</a></h1>
 <p>那么，单链队列是什么样的呢？好吧，当我们有一个单链接的堆栈时，我们推到列表的一端，
 然后从同一端弹出。栈和队列的唯一区别是，队列会从<em>另</em>一端弹出。所以从我们的堆栈实现
 来看，我们有：</p>
@@ -4586,7 +4609,7 @@ struct Node&lt;T&gt; {
 <p>让我们都成为C语言。让我们整天都是C。</p>
 <p>我回来了。我准备好了。</p>
 <p>你好，<code>unsafe</code>。</p>
-<h1><a class="header" href="#不安全的rust" id="不安全的rust">不安全的Rust</a></h1>
+<h1 id="不安全的rust"><a class="header" href="#不安全的rust">不安全的Rust</a></h1>
 <p>这是一个严肃、巨大、复杂和危险的话题。它是如此严重，以至于关于它，我写了
 <a href="https://doc.rust-lang.org/nightly/nomicon/">一整本书</a>。</p>
 <p>长话短说，只要你允许调用其他语言，<em>每一种</em>语言实际上都是不安全的，因为你可以让C做任
@@ -4611,7 +4634,7 @@ struct Node&lt;T&gt; {
 <code>*mut</code>。尽管如果你实际上没有权限去改变指针的引用，你会有一个糟糕的时间。</p>
 <p>总之，当我们写一些代码时，我们会对此有更好的感觉。现在，
 <code>*mut T == &amp;unchecked mut T</code>！</p>
-<h1><a class="header" href="#基础" id="基础">基础</a></h1>
+<h1 id="基础"><a class="header" href="#基础">基础</a></h1>
 <p>好了，回到基本的问题上。我们如何构建我们的链表？</p>
 <p>之前我们只是做了：</p>
 <pre><code class="language-rust ignore">impl&lt;T&gt; List&lt;T&gt; {
@@ -4880,7 +4903,7 @@ test third::test::iter ... ok
 test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured
 </code></pre>
 <p>完美！</p>
-<h1><a class="header" href="#额外的废品" id="额外的废品">额外的废品</a></h1>
+<h1 id="额外的废品"><a class="header" href="#额外的废品">额外的废品</a></h1>
 <p>现在<code>push</code>和<code>pop</code>已经写好了，其他的都和栈的情况完全一样。只有那些改变列表长度
 的操作才需要真正担心尾部指针的问题。</p>
 <p>所以让我们从我们的第二个列表中窃取所有的东西（一定要把预期的测试输出倒过来）：</p>
@@ -5036,14 +5059,14 @@ test result: ok. 11 passed; 0 failed; 0 ignored; 0 measured
 </code></pre>
 <p>向复制-粘贴编程致敬。</p>
 <p>起初我以为我们要用IntoIter来捣乱，但我们还是很方便地按迭代顺序弹出了！</p>
-<h1><a class="header" href="#最终代码-1" id="最终代码-1">最终代码</a></h1>
+<h1 id="最终代码-1"><a class="header" href="#最终代码-1">最终代码</a></h1>
 <p>好了，通过一个小小的不安全因素，我们成功地在时间上比简单的安全队列有了线性的改
 善，而且我们成功地重用了安全堆栈中几乎所有的逻辑！</p>
 <p>我们也<em>没有</em>写任何疯狂的Rc或RefCell的东西。</p>
-<pre><pre class="playpen"><code class="language-rust">
-# #![allow(unused_variables)]
-#fn main() {
-use std::ptr;
+<pre><pre class="playground"><code class="language-rust">
+<span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>use std::ptr;
 
 pub struct List&lt;T&gt; {
     head: Link&lt;T&gt;,
@@ -5244,11 +5267,12 @@ mod test {
         assert_eq!(iter.next(), None);
     }
 }
-#}</code></pre></pre>
-<h1><a class="header" href="#一个好的不安全的双链双向队列" id="一个好的不安全的双链双向队列">一个好的不安全的双链双向队列</a></h1>
+<span class="boring">}
+</span></code></pre></pre>
+<h1 id="一个好的不安全的双链双向队列"><a class="header" href="#一个好的不安全的双链双向队列">一个好的不安全的双链双向队列</a></h1>
 <p>不，还是没有写这篇! 它真的只是没有那么多的指导意义。</p>
 <p>如果你真的想了解更多，请阅读[Rustonomicon][]和<a href="https://github.com/rust-lang/rust/blob/master/library/alloc/src/collections/linked_list.rs">std::collections::LinkedList</a>的源代码！</p>
-<h1><a class="header" href="#一堆笨链表" id="一堆笨链表">一堆笨链表</a></h1>
+<h1 id="一堆笨链表"><a class="header" href="#一堆笨链表">一堆笨链表</a></h1>
 <p>好了。就这样吧。我们做了所有的列表。</p>
 <p>啊哈哈哈哈</p>
 <p>不</p>
@@ -5266,7 +5290,7 @@ they interact with Rust.</p>
 <li>TODO: SkipList?</li>
 <li>TODO: std::channel? -- 这就像另一个完整的章节。或者是3。</li>
 </ol>
-<h1><a class="header" href="#双重单链表" id="双重单链表">双重单链表</a></h1>
+<h1 id="双重单链表"><a class="header" href="#双重单链表">双重单链表</a></h1>
 <p>我们在处理双链表时很纠结，因为它们有纠结的所有权语义：没有一个节点严格地拥有任
 何其他节点。然而，我们对此感到挣扎，因为我们带来了我们对什么<em>是</em>链表的先入为主
 的概念。也就是说，我们假设所有的链接都在同一个方向。</p>
@@ -5495,6 +5519,14 @@ test result: ok. 16 passed; 0 failed; 0 ignored; 0 measured
 
         
 
+        
+
+        
+
+        
+        <script type="text/javascript">
+            window.playground_copyable = true;
+        </script>
         
 
         

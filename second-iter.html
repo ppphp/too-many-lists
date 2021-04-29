@@ -1,26 +1,40 @@
 <!DOCTYPE HTML>
-<html lang="en" class="sidebar-visible no-js">
+<html lang="en" class="sidebar-visible no-js light">
     <head>
         <!-- Book generated using mdBook -->
         <meta charset="UTF-8">
         <title>遍历 - 用太多链表写法学习Rust</title>
         
+        
+
+
+        <!-- Custom HTML head -->
+        
+
 
         <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
         <meta name="description" content="用太多链表写法学习Rust">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="theme-color" content="#ffffff" />
 
+        
+        <link rel="icon" href="favicon.svg">
+        
+        
         <link rel="shortcut icon" href="favicon.png">
+        
         <link rel="stylesheet" href="css/variables.css">
         <link rel="stylesheet" href="css/general.css">
         <link rel="stylesheet" href="css/chrome.css">
+        
         <link rel="stylesheet" href="css/print.css" media="print">
+        
 
         <!-- Fonts -->
         <link rel="stylesheet" href="FontAwesome/css/font-awesome.css">
-        <link href="https://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800" rel="stylesheet" type="text/css">
-        <link href="https://fonts.googleapis.com/css?family=Source+Code+Pro:500" rel="stylesheet" type="text/css">
+        
+        <link rel="stylesheet" href="fonts/fonts.css">
+        
 
         <!-- Highlight.js Stylesheets -->
         <link rel="stylesheet" href="highlight.css">
@@ -32,11 +46,11 @@
 
         
     </head>
-    <body class="light">
+    <body>
         <!-- Provide site root to javascript -->
         <script type="text/javascript">
             var path_to_root = "";
-            var default_theme = "light";
+            var default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "navy" : "light";
         </script>
 
         <!-- Work around some values being stored in localStorage wrapped in quotes -->
@@ -60,8 +74,11 @@
             var theme;
             try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
             if (theme === null || theme === undefined) { theme = default_theme; }
-            document.body.className = theme;
-            document.querySelector('html').className = theme + ' js';
+            var html = document.querySelector('html');
+            html.classList.remove('no-js')
+            html.classList.remove('light')
+            html.classList.add(theme);
+            html.classList.add('js');
         </script>
 
         <!-- Hide / unhide sidebar before it is displayed -->
@@ -78,7 +95,7 @@
 
         <nav id="sidebar" class="sidebar" aria-label="Table of contents">
             <div class="sidebar-scrollbox">
-                <ol class="chapter"><li><a href="index.html"><strong aria-hidden="true">1.</strong> 简介</a></li><li><a href="first.html"><strong aria-hidden="true">2.</strong> 一个不好的栈</a></li><li><ol class="section"><li><a href="first-layout.html"><strong aria-hidden="true">2.1.</strong> 布局</a></li><li><a href="first-new.html"><strong aria-hidden="true">2.2.</strong> 新建</a></li><li><a href="first-ownership.html"><strong aria-hidden="true">2.3.</strong> 所有权101</a></li><li><a href="first-push.html"><strong aria-hidden="true">2.4.</strong> 推入</a></li><li><a href="first-pop.html"><strong aria-hidden="true">2.5.</strong> 弹出</a></li><li><a href="first-test.html"><strong aria-hidden="true">2.6.</strong> 测试</a></li><li><a href="first-drop.html"><strong aria-hidden="true">2.7.</strong> 丢弃</a></li><li><a href="first-final.html"><strong aria-hidden="true">2.8.</strong> 最终代码</a></li></ol></li><li><a href="second.html"><strong aria-hidden="true">3.</strong> 一个可以的栈</a></li><li><ol class="section"><li><a href="second-option.html"><strong aria-hidden="true">3.1.</strong> 选项</a></li><li><a href="second-generic.html"><strong aria-hidden="true">3.2.</strong> 泛型</a></li><li><a href="second-peek.html"><strong aria-hidden="true">3.3.</strong> 选择</a></li><li><a href="second-into-iter.html"><strong aria-hidden="true">3.4.</strong> 进入遍历</a></li><li><a href="second-iter.html" class="active"><strong aria-hidden="true">3.5.</strong> 遍历</a></li><li><a href="second-iter-mut.html"><strong aria-hidden="true">3.6.</strong> 可变遍历</a></li><li><a href="second-final.html"><strong aria-hidden="true">3.7.</strong> 最终代码</a></li></ol></li><li><a href="third.html"><strong aria-hidden="true">4.</strong> 一个持久化的栈</a></li><li><ol class="section"><li><a href="third-layout.html"><strong aria-hidden="true">4.1.</strong> 布局</a></li><li><a href="third-basics.html"><strong aria-hidden="true">4.2.</strong> 基本</a></li><li><a href="third-drop.html"><strong aria-hidden="true">4.3.</strong> 丢弃</a></li><li><a href="third-arc.html"><strong aria-hidden="true">4.4.</strong> Arc</a></li><li><a href="third-final.html"><strong aria-hidden="true">4.5.</strong> 最终代码</a></li></ol></li><li><a href="fourth.html"><strong aria-hidden="true">5.</strong> 一个不好的安全双向队列</a></li><li><ol class="section"><li><a href="fourth-layout.html"><strong aria-hidden="true">5.1.</strong> 布局</a></li><li><a href="fourth-building.html"><strong aria-hidden="true">5.2.</strong> 构建</a></li><li><a href="fourth-breaking.html"><strong aria-hidden="true">5.3.</strong> 打破</a></li><li><a href="fourth-peek.html"><strong aria-hidden="true">5.4.</strong> 选择</a></li><li><a href="fourth-symmetry.html"><strong aria-hidden="true">5.5.</strong> 对称情况</a></li><li><a href="fourth-iteration.html"><strong aria-hidden="true">5.6.</strong> 迭代</a></li><li><a href="fourth-final.html"><strong aria-hidden="true">5.7.</strong> 最终代码</a></li></ol></li><li><a href="fifth.html"><strong aria-hidden="true">6.</strong> 一个不安全的队列</a></li><li><ol class="section"><li><a href="fifth-layout.html"><strong aria-hidden="true">6.1.</strong> 布局</a></li><li><a href="fifth-unsafe.html"><strong aria-hidden="true">6.2.</strong> 不安全</a></li><li><a href="fifth-basics.html"><strong aria-hidden="true">6.3.</strong> 基础</a></li><li><a href="fifth-extras.html"><strong aria-hidden="true">6.4.</strong> 其他</a></li><li><a href="fifth-final.html"><strong aria-hidden="true">6.5.</strong> 最终代码</a></li></ol></li><li><a href="sixth.html"><strong aria-hidden="true">7.</strong> 一个可以的不安全的双向队列</a></li><li><a href="infinity.html"><strong aria-hidden="true">8.</strong> 一堆傻乎乎的链表</a></li><li><ol class="section"><li><a href="infinity-double-single.html"><strong aria-hidden="true">8.1.</strong> 双重单链</a></li></ol></li></ol>
+                <ol class="chapter"><li class="chapter-item expanded "><a href="index.html"><strong aria-hidden="true">1.</strong> 简介</a></li><li class="chapter-item expanded "><a href="first.html"><strong aria-hidden="true">2.</strong> 一个不好的栈</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="first-layout.html"><strong aria-hidden="true">2.1.</strong> 布局</a></li><li class="chapter-item expanded "><a href="first-new.html"><strong aria-hidden="true">2.2.</strong> 新建</a></li><li class="chapter-item expanded "><a href="first-ownership.html"><strong aria-hidden="true">2.3.</strong> 所有权101</a></li><li class="chapter-item expanded "><a href="first-push.html"><strong aria-hidden="true">2.4.</strong> 推入</a></li><li class="chapter-item expanded "><a href="first-pop.html"><strong aria-hidden="true">2.5.</strong> 弹出</a></li><li class="chapter-item expanded "><a href="first-test.html"><strong aria-hidden="true">2.6.</strong> 测试</a></li><li class="chapter-item expanded "><a href="first-drop.html"><strong aria-hidden="true">2.7.</strong> 丢弃</a></li><li class="chapter-item expanded "><a href="first-final.html"><strong aria-hidden="true">2.8.</strong> 最终代码</a></li></ol></li><li class="chapter-item expanded "><a href="second.html"><strong aria-hidden="true">3.</strong> 一个可以的栈</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="second-option.html"><strong aria-hidden="true">3.1.</strong> 选项</a></li><li class="chapter-item expanded "><a href="second-generic.html"><strong aria-hidden="true">3.2.</strong> 泛型</a></li><li class="chapter-item expanded "><a href="second-peek.html"><strong aria-hidden="true">3.3.</strong> 选择</a></li><li class="chapter-item expanded "><a href="second-into-iter.html"><strong aria-hidden="true">3.4.</strong> 进入遍历</a></li><li class="chapter-item expanded "><a href="second-iter.html" class="active"><strong aria-hidden="true">3.5.</strong> 遍历</a></li><li class="chapter-item expanded "><a href="second-iter-mut.html"><strong aria-hidden="true">3.6.</strong> 可变遍历</a></li><li class="chapter-item expanded "><a href="second-final.html"><strong aria-hidden="true">3.7.</strong> 最终代码</a></li></ol></li><li class="chapter-item expanded "><a href="third.html"><strong aria-hidden="true">4.</strong> 一个持久化的栈</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="third-layout.html"><strong aria-hidden="true">4.1.</strong> 布局</a></li><li class="chapter-item expanded "><a href="third-basics.html"><strong aria-hidden="true">4.2.</strong> 基本</a></li><li class="chapter-item expanded "><a href="third-drop.html"><strong aria-hidden="true">4.3.</strong> 丢弃</a></li><li class="chapter-item expanded "><a href="third-arc.html"><strong aria-hidden="true">4.4.</strong> Arc</a></li><li class="chapter-item expanded "><a href="third-final.html"><strong aria-hidden="true">4.5.</strong> 最终代码</a></li></ol></li><li class="chapter-item expanded "><a href="fourth.html"><strong aria-hidden="true">5.</strong> 一个不好的安全双向队列</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="fourth-layout.html"><strong aria-hidden="true">5.1.</strong> 布局</a></li><li class="chapter-item expanded "><a href="fourth-building.html"><strong aria-hidden="true">5.2.</strong> 构建</a></li><li class="chapter-item expanded "><a href="fourth-breaking.html"><strong aria-hidden="true">5.3.</strong> 打破</a></li><li class="chapter-item expanded "><a href="fourth-peek.html"><strong aria-hidden="true">5.4.</strong> 选择</a></li><li class="chapter-item expanded "><a href="fourth-symmetry.html"><strong aria-hidden="true">5.5.</strong> 对称情况</a></li><li class="chapter-item expanded "><a href="fourth-iteration.html"><strong aria-hidden="true">5.6.</strong> 迭代</a></li><li class="chapter-item expanded "><a href="fourth-final.html"><strong aria-hidden="true">5.7.</strong> 最终代码</a></li></ol></li><li class="chapter-item expanded "><a href="fifth.html"><strong aria-hidden="true">6.</strong> 一个不安全的队列</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="fifth-layout.html"><strong aria-hidden="true">6.1.</strong> 布局</a></li><li class="chapter-item expanded "><a href="fifth-unsafe.html"><strong aria-hidden="true">6.2.</strong> 不安全</a></li><li class="chapter-item expanded "><a href="fifth-basics.html"><strong aria-hidden="true">6.3.</strong> 基础</a></li><li class="chapter-item expanded "><a href="fifth-extras.html"><strong aria-hidden="true">6.4.</strong> 其他</a></li><li class="chapter-item expanded "><a href="fifth-final.html"><strong aria-hidden="true">6.5.</strong> 最终代码</a></li></ol></li><li class="chapter-item expanded "><a href="sixth.html"><strong aria-hidden="true">7.</strong> 一个可以的不安全的双向队列</a></li><li class="chapter-item expanded "><a href="infinity.html"><strong aria-hidden="true">8.</strong> 一堆傻乎乎的链表</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="infinity-double-single.html"><strong aria-hidden="true">8.1.</strong> 双重单链</a></li></ol></li></ol>
             </div>
             <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
         </nav>
@@ -87,37 +104,38 @@
 
             <div class="page">
                 
-                <div id="menu-bar" class="menu-bar">
-                    <div id="menu-bar-sticky-container">
-                        <div class="left-buttons">
-                            <button id="sidebar-toggle" class="icon-button" type="button" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
-                                <i class="fa fa-bars"></i>
-                            </button>
-                            <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
-                                <i class="fa fa-paint-brush"></i>
-                            </button>
-                            <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
-                                <li role="none"><button role="menuitem" class="theme" id="light">Light (default)</button></li>
-                                <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
-                                <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
-                                <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
-                                <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
-                            </ul>
-                            
-                            <button id="search-toggle" class="icon-button" type="button" title="Search. (Shortkey: s)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="S" aria-controls="searchbar">
-                                <i class="fa fa-search"></i>
-                            </button>
-                            
-                        </div>
+                <div id="menu-bar-hover-placeholder"></div>
+                <div id="menu-bar" class="menu-bar sticky bordered">
+                    <div class="left-buttons">
+                        <button id="sidebar-toggle" class="icon-button" type="button" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                            <i class="fa fa-bars"></i>
+                        </button>
+                        <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                            <i class="fa fa-paint-brush"></i>
+                        </button>
+                        <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="light">Light (default)</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
+                        </ul>
+                        
+                        <button id="search-toggle" class="icon-button" type="button" title="Search. (Shortkey: s)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="S" aria-controls="searchbar">
+                            <i class="fa fa-search"></i>
+                        </button>
+                        
+                    </div>
 
-                        <h1 class="menu-title">用太多链表写法学习Rust</h1>
+                    <h1 class="menu-title">用太多链表写法学习Rust</h1>
 
-                        <div class="right-buttons">
-                            <a href="print.html" title="Print this book" aria-label="Print this book">
-                                <i id="print-button" class="fa fa-print"></i>
-                            </a>
-                            
-                        </div>
+                    <div class="right-buttons">
+                        
+                        <a href="print.html" title="Print this book" aria-label="Print this book">
+                            <i id="print-button" class="fa fa-print"></i>
+                        </a>
+                        
+                        
                     </div>
                 </div>
 
@@ -145,12 +163,12 @@
 
                 <div id="content" class="content">
                     <main>
-                        <h1><a class="header" href="#遍历" id="遍历">遍历</a></h1>
+                        <h1 id="遍历"><a class="header" href="#遍历">遍历</a></h1>
 <p>好吧，让我们试着实现Iter。这一次，我们将不能依靠List提供我们想要的所有功能。我
-们需要推出我们自己的。我们想要的基本逻辑是持有一个指向当前节点的指针，我们想要
-产生下一个节点。因为这个节点可能不存在（列表是空的或者我们已经完成了迭代），我
-们希望这个引用是一个 Option。当我们产生一个元素时，我们希望继续到当前节点的下一
-个节点。</p>
+们需要靠我们自己。我们想要的基本逻辑是持有一个指向当前节点的指针，我们想要产生
+下一个节点。因为这个节点可能不存在（列表是空的或者我们已经完成了迭代），我们希
+望这个引用是一个 Option。当我们产出一个元素时，我们希望继续到当前节点的下一个
+节点。</p>
 <p>好吧，我们来试试：</p>
 <pre><code class="language-rust ignore">pub struct Iter&lt;T&gt; {
     next: Option&lt;&amp;Node&lt;T&gt;&gt;,
@@ -273,31 +291,31 @@ error[E0063]: missing field `next` in initializer of `second::Iter&lt;'_, _&gt;`
 </code></pre>
 <p>哦，上帝。我们搞坏了Rust。</p>
 <p>也许我们应该搞清楚这个<code>'a</code>生命周期到底是什么意思。</p>
-<p>生命周期会吓跑很多人，因为它是对我们从编程之初就知道并喜爱的东西的改变。到目前为止
-，我们实际上已经成功地避开了生命周期，尽管它们一直在我们的程序中纠缠不清。</p>
-<p>生命周期在垃圾收集语言中是不必要的，因为垃圾收集器会确保所有的东西都能神奇地活到它
-需要的时间。Rust中的大多数数据都是<em>人工</em>管理的，所以这些数据需要另一种解决方案。C
-和C++给了我们一个清晰的例子，如果你只是让人们在堆栈上拿指针去随机数据会发生什么：
-普遍的不可管理的不安全。这可以粗略地分为两类错误：</p>
+<p>生命期会吓跑很多人，因为它是对我们从编程之初就知道并喜爱的东西的改变。到目前为止，
+我们实际上已经成功地避开了生命期，尽管它们一直在我们的程序中纠缠不清。</p>
+<p>生命期在垃圾收集语言中是不必要的，因为垃圾收集器会确保所有的东西都能神奇地活到它需
+要的时间。Rust中的大多数数据都是<em>人工</em>管理的，所以这些数据需要另一种解决方案。C和
+C++给了我们一个清晰的例子，如果你只是让人们在堆栈上拿指针去随机数据会发生什么：普
+遍的不可管理的不安全。这可以粗略地分为两类错误：</p>
 <ul>
 <li>持有一个超出范围的东西的指针</li>
 <li>持有一个指向被改变的东西的指针</li>
 </ul>
-<p>生命周期可以解决这两个问题，而且99%的情况下，它们是以一种完全透明的方式进行的。</p>
-<p>那么什么是生命周期呢？</p>
-<p>很简单，生命周期是程序中某个区域（~块/范围）代码的名称。就是这样。当一个引用被标记
-为生命周期时，我们是说它必须对<em>整个</em>区域有效。不同的东西对一个引用必须和可以在多长时
-间内有效提出了要求。整个生命周期系统又只是一个约束解决系统，它试图最小化每个引用的区
-域。如果它成功地找到了一组满足所有约束条件的生命周期，你的程序就可以编译了！否则你就
-会得到一个错误反馈，说什么东西的生命周期不够长。</p>
-<p>在一个函数体中，你一般不能谈论生命周期，而且也不想谈论。编译器有完整的信息，可以推断
-出所有的限制条件来找到最小的生命周期。然而在类型和API层面，编译器<em>并没有</em>所有的信息。
-它需要你告诉它不同生命周期之间的关系，这样它才能弄清楚你在做什么。</p>
-<p>原则上说，这些生命周期也<em>可以</em>不写，但这样一来，检查所有的借用将是一个巨大的全程序分
-析，会产生令人难以置信的非本地错误。Rust的系统意味着所有的借用检查都可以在每个函数体
-中独立完成，你的所有错误都应该是相当局部的（或者你的类型有错误的签名）。</p>
+<p>生命期可以解决这两个问题，而且99%的情况下，它们是以一种完全透明的方式进行的。</p>
+<p>那么什么是生命期呢？</p>
+<p>很简单，生命期是程序中某个区域（~块/范围）代码的名称。就是这样。当一个引用被标记为生
+命期时，我们是说它必须对<em>整个</em>区域有效。不同的东西对一个引用必须和可以在多长时间内有
+效提出了要求。整个生命期系统又只是一个约束解决系统，它试图最小化每个引用的区域。如果
+它成功地找到了一组满足所有约束条件的生命期，你的程序就可以编译了！否则你就会得到一个
+错误反馈，说什么东西的生命期不够长。</p>
+<p>在一个函数体中，你一般不能谈论生命期，而且也不想谈论。编译器有完整的信息，可以推断出
+所有的限制条件来找到最小的生命期。然而在类型和API层面，编译器<em>并没有</em>所有的信息。它需
+要你告诉它不同生命期之间的关系，这样它才能弄清楚你在做什么。</p>
+<p>原则上说，这些生命期也<em>可以</em>不写，但这样一来，检查所有的借用将是一个巨大的全程序分析
+，会产生令人难以置信的非本地错误。Rust的系统意味着所有的借用检查都可以在每个函数体中
+独立完成，你的所有错误都应该是相当局部的（或者你的类型有错误的签名）。</p>
 <p>但是我们以前也在函数签名中写过引用，而且很好！为什么？这是因为有一些情况非常普遍，
-Rust会自动为你挑选生命周期。这就是<em>寿命消除</em>。</p>
+Rust会自动为你挑选生命期。这就是<em>寿命消除</em>。</p>
 <p>特别地：</p>
 <pre><code class="language-rust ignore">// Only one reference in input, so the output must be derived from that input
 fn foo(&amp;A) -&gt; &amp;B; // sugar for:
@@ -311,13 +329,13 @@ fn foo&lt;'a, 'b, 'c&gt;(&amp;'a A, &amp;'b B, &amp;'c C);
 fn foo(&amp;self, &amp;B, &amp;C) -&gt; &amp;D; // sugar for:
 fn foo&lt;'a, 'b, 'c&gt;(&amp;'a self, &amp;'b B, &amp;'c C) -&gt; &amp;'a D;
 </code></pre>
-<p>那么，<code>fn foo&lt;'a&gt;(&amp;'a A)-&gt;&amp;'a B</code>是什么<em>意思</em>？在实践中，它的意思是，输入必须至少与输
-出一样长。因此，如果你把输出保留很长一段时间，这将扩大输入必须有效的区域。一旦你停止使
-用输出，编译器就会知道输入也可以变得无效了。</p>
-<p>有了这个系统的设置，Rust可以确保在free之后没有任何东西被使用，而且在未完成的引用存在时
+<p>那么，<code>fn foo&lt;'a&gt;(&amp;'a A)-&gt;&amp;'a B</code>是什么<em>意思</em>？在实践中，它的意思是，输入必须至少活得
+与输出一样长。因此，如果你把输出保留很长一段时间，这将扩大输入必须有效的区域。一旦你
+停止使用输出，编译器就会知道输入也可以变得无效了。</p>
+<p>由于这个系统的设置，Rust可以确保没有东西会在释放之后被使用，而且在未完成的引用存在时
 没有任何东西被改变。它只是确保这些约束条件都能得到解决。</p>
 <p>好的。那么。Iter。</p>
-<p>让我们回到没有生命周期的状态：</p>
+<p>让我们回到没有生命期的状态：</p>
 <pre><code class="language-rust ignore">pub struct Iter&lt;T&gt; {
     next: Option&lt;&amp;Node&lt;T&gt;&gt;,
 }
@@ -338,7 +356,7 @@ impl&lt;T&gt; Iterator for Iter&lt;T&gt; {
     }
 }
 </code></pre>
-<p>我们只需要在函数和类型签名中添加生命期：</p>
+<p>我们只需要在函数和类型的签名中添加生命期：</p>
 <pre><code class="language-rust ignore">// Iter is generic over *some* lifetime, it doesn't care
 pub struct Iter&lt;'a, T&gt; {
     next: Option&lt;&amp;'a Node&lt;T&gt;&gt;,
@@ -391,7 +409,7 @@ error[E0308]: mismatched types
               found type `std::option::Option&lt;&amp;std::boxed::Box&lt;second::Node&lt;T&gt;&gt;&gt;`
 </code></pre>
 <p>(╯°□°)╯︵ ┻━┻</p>
-<p>好的。所以。我们修复了我们的生命周期错误，但现在我们得到了一些新的类型错误。</p>
+<p>好的。所以。我们修复了我们的生命期错误，但现在我们得到了一些新的类型错误。</p>
 <p>我们想存储<code>&amp;Node</code>的，但我们得到的是<code>&amp;Box&lt;Node&gt;</code>的。好吧，这很容易，我们只需
 要在引用之前取消对Box的引用：</p>
 <pre><code class="language-rust ignore">impl&lt;T&gt; List&lt;T&gt; {
@@ -437,8 +455,8 @@ error[E0507]: cannot move out of borrowed content
    |                         ^^^^^^^^^ cannot move out of borrowed content
 </code></pre>
 <p>(ﾉಥ益ಥ）ﾉ﻿ ┻━┻</p>
-<p>我们忘记了<code>as_ref</code>，所以我们要把盒子移到<code>map</code>里，这意味着它将被丢弃，这意味着我
-们的引用将被悬空：</p>
+<p>我们忘记了要<code>as_ref</code>，所以我们要把盒子移到<code>map</code>里，这意味着它将被丢弃，这意味着
+我们的引用将被悬空：</p>
 <pre><code class="language-rust ignore">pub struct Iter&lt;'a, T&gt; {
     next: Option&lt;&amp;'a Node&lt;T&gt;&gt;,
 }
@@ -508,14 +526,14 @@ impl&lt;'a, T&gt; Iterator for Iter&lt;'a, T&gt; {
 
 </code></pre>
 <p>🎉 🎉 🎉</p>
-<p>as_deref和as-derf_mut函数在Rust 1.40中已经稳定。在此之前，你需要做<code>map(|node| &amp;**node)</code>
+<p>as_deref和as_deref_mut函数在Rust 1.40中已经稳定。在此之前，你需要做<code>map(|node| &amp;**node)</code>
 和<code>map(|node| &amp;mut**node)</code>。你可能会想&quot;哇，那个<code>&amp;**</code>的东西真的很古怪&quot;，你没有错，但就像美
 酒一样，Rust会随着时间的推移变得更好，我们不再需要这样做。通常情况下，Rust非常善于隐式地进
-行这种转换，通过一个叫做<em>deref coercion</em>的过程，基本上它可以在你的代码中插入*，使其进行类
-型检查。它可以做到这一点，因为我们有借贷检查器来确保我们不会弄乱指针！</p>
-<p>但是在这种情况下，闭合与我们有一个<code>Option&lt;&amp;T&gt;</code>而不是<code>&amp;T</code>的事实相结合，对它来说有点太复杂了，
-所以我们需要通过明确的方式来帮助它。值得庆幸的是，根据我的经验，这种情况相当少见。</p>
-<p>为了完整起见，我们<em>可以</em>用<em>Turbofish</em>给它一个<em>不同</em>的提示：</p>
+行这种转换，通过一个叫做<em>解引用强制转换</em>的过程，基本上它可以在你的代码中插入*，使其进行类
+型检查。它可以做到这一点，因为我们有借用检查器来确保我们不会弄乱指针！</p>
+<p>但是闭包同时结合了我们有一个<code>Option&lt;&amp;T&gt;</code>而不是<code>&amp;T</code>的情况，对它来说有点太复杂了，所以我们需
+要通过显式的方式来帮助它。值得庆幸的是，根据我的经验，这种情况相当少见。</p>
+<p>为了完整起见，我们<em>可以</em>用<em>涡轮鱼</em>给它一个<em>不同</em>的提示：</p>
 <pre><code class="language-rust ignore">    self.next = node.next.as_ref().map::&lt;&amp;Node&lt;T&gt;, _&gt;(|node| &amp;node);
 </code></pre>
 <p>看，map是一个泛型函数：</p>
@@ -553,8 +571,8 @@ test second::test::peek ... ok
 test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured
 
 </code></pre>
-<p>赫赫有名。</p>
-<p>最后，应该指出的是，我们实际上可以在这里应用生命周期消除：</p>
+<p>全对。</p>
+<p>最后，应该指出的是，我们实际上可以在这里应用生命期消除：</p>
 <pre><code class="language-rust ignore">impl&lt;T&gt; List&lt;T&gt; {
     pub fn iter&lt;'a&gt;(&amp;'a self) -&gt; Iter&lt;'a, T&gt; {
         Iter { next: self.head.as_deref() }
@@ -569,8 +587,8 @@ test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured
 }
 </code></pre>
 <p>更少的生命期!</p>
-<p>或者，如果你不愿意&quot;隐藏&quot;一个结构包含一个生命周期，你可以使用Rust 2018的“
-明确删除生命周期”语法，<code>'_</code>：</p>
+<p>或者，如果你不愿意&quot;隐藏&quot;一个结构包含一个生命期，你可以使用Rust 2018的“
+显式省略生命期”语法，<code>'_</code>：</p>
 <pre><code class="language-rust ignore">impl&lt;T&gt; List&lt;T&gt; {
     pub fn iter(&amp;self) -&gt; Iter&lt;'_, T&gt; {
         Iter { next: self.head.as_deref() }
@@ -601,13 +619,13 @@ test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured
 
             <nav class="nav-wide-wrapper" aria-label="Page navigation">
                 
-                    <a href="second-into-iter.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                    <a rel="prev" href="second-into-iter.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
                         <i class="fa fa-angle-left"></i>
                     </a>
                 
 
                 
-                    <a href="second-iter-mut.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                    <a rel="next" href="second-iter-mut.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
                         <i class="fa fa-angle-right"></i>
                     </a>
                 
@@ -617,6 +635,14 @@ test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured
 
         
 
+        
+
+        
+
+        
+        <script type="text/javascript">
+            window.playground_copyable = true;
+        </script>
         
 
         

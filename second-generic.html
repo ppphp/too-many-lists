@@ -1,26 +1,40 @@
 <!DOCTYPE HTML>
-<html lang="en" class="sidebar-visible no-js">
+<html lang="en" class="sidebar-visible no-js light">
     <head>
         <!-- Book generated using mdBook -->
         <meta charset="UTF-8">
         <title>泛型 - 用太多链表写法学习Rust</title>
         
+        
+
+
+        <!-- Custom HTML head -->
+        
+
 
         <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
         <meta name="description" content="用太多链表写法学习Rust">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="theme-color" content="#ffffff" />
 
+        
+        <link rel="icon" href="favicon.svg">
+        
+        
         <link rel="shortcut icon" href="favicon.png">
+        
         <link rel="stylesheet" href="css/variables.css">
         <link rel="stylesheet" href="css/general.css">
         <link rel="stylesheet" href="css/chrome.css">
+        
         <link rel="stylesheet" href="css/print.css" media="print">
+        
 
         <!-- Fonts -->
         <link rel="stylesheet" href="FontAwesome/css/font-awesome.css">
-        <link href="https://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800" rel="stylesheet" type="text/css">
-        <link href="https://fonts.googleapis.com/css?family=Source+Code+Pro:500" rel="stylesheet" type="text/css">
+        
+        <link rel="stylesheet" href="fonts/fonts.css">
+        
 
         <!-- Highlight.js Stylesheets -->
         <link rel="stylesheet" href="highlight.css">
@@ -32,11 +46,11 @@
 
         
     </head>
-    <body class="light">
+    <body>
         <!-- Provide site root to javascript -->
         <script type="text/javascript">
             var path_to_root = "";
-            var default_theme = "light";
+            var default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "navy" : "light";
         </script>
 
         <!-- Work around some values being stored in localStorage wrapped in quotes -->
@@ -60,8 +74,11 @@
             var theme;
             try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
             if (theme === null || theme === undefined) { theme = default_theme; }
-            document.body.className = theme;
-            document.querySelector('html').className = theme + ' js';
+            var html = document.querySelector('html');
+            html.classList.remove('no-js')
+            html.classList.remove('light')
+            html.classList.add(theme);
+            html.classList.add('js');
         </script>
 
         <!-- Hide / unhide sidebar before it is displayed -->
@@ -78,7 +95,7 @@
 
         <nav id="sidebar" class="sidebar" aria-label="Table of contents">
             <div class="sidebar-scrollbox">
-                <ol class="chapter"><li><a href="index.html"><strong aria-hidden="true">1.</strong> 简介</a></li><li><a href="first.html"><strong aria-hidden="true">2.</strong> 一个不好的栈</a></li><li><ol class="section"><li><a href="first-layout.html"><strong aria-hidden="true">2.1.</strong> 布局</a></li><li><a href="first-new.html"><strong aria-hidden="true">2.2.</strong> 新建</a></li><li><a href="first-ownership.html"><strong aria-hidden="true">2.3.</strong> 所有权101</a></li><li><a href="first-push.html"><strong aria-hidden="true">2.4.</strong> 推入</a></li><li><a href="first-pop.html"><strong aria-hidden="true">2.5.</strong> 弹出</a></li><li><a href="first-test.html"><strong aria-hidden="true">2.6.</strong> 测试</a></li><li><a href="first-drop.html"><strong aria-hidden="true">2.7.</strong> 丢弃</a></li><li><a href="first-final.html"><strong aria-hidden="true">2.8.</strong> 最终代码</a></li></ol></li><li><a href="second.html"><strong aria-hidden="true">3.</strong> 一个可以的栈</a></li><li><ol class="section"><li><a href="second-option.html"><strong aria-hidden="true">3.1.</strong> 选项</a></li><li><a href="second-generic.html" class="active"><strong aria-hidden="true">3.2.</strong> 泛型</a></li><li><a href="second-peek.html"><strong aria-hidden="true">3.3.</strong> 选择</a></li><li><a href="second-into-iter.html"><strong aria-hidden="true">3.4.</strong> 进入遍历</a></li><li><a href="second-iter.html"><strong aria-hidden="true">3.5.</strong> 遍历</a></li><li><a href="second-iter-mut.html"><strong aria-hidden="true">3.6.</strong> 可变遍历</a></li><li><a href="second-final.html"><strong aria-hidden="true">3.7.</strong> 最终代码</a></li></ol></li><li><a href="third.html"><strong aria-hidden="true">4.</strong> 一个持久化的栈</a></li><li><ol class="section"><li><a href="third-layout.html"><strong aria-hidden="true">4.1.</strong> 布局</a></li><li><a href="third-basics.html"><strong aria-hidden="true">4.2.</strong> 基本</a></li><li><a href="third-drop.html"><strong aria-hidden="true">4.3.</strong> 丢弃</a></li><li><a href="third-arc.html"><strong aria-hidden="true">4.4.</strong> Arc</a></li><li><a href="third-final.html"><strong aria-hidden="true">4.5.</strong> 最终代码</a></li></ol></li><li><a href="fourth.html"><strong aria-hidden="true">5.</strong> 一个不好的安全双向队列</a></li><li><ol class="section"><li><a href="fourth-layout.html"><strong aria-hidden="true">5.1.</strong> 布局</a></li><li><a href="fourth-building.html"><strong aria-hidden="true">5.2.</strong> 构建</a></li><li><a href="fourth-breaking.html"><strong aria-hidden="true">5.3.</strong> 打破</a></li><li><a href="fourth-peek.html"><strong aria-hidden="true">5.4.</strong> 选择</a></li><li><a href="fourth-symmetry.html"><strong aria-hidden="true">5.5.</strong> 对称情况</a></li><li><a href="fourth-iteration.html"><strong aria-hidden="true">5.6.</strong> 迭代</a></li><li><a href="fourth-final.html"><strong aria-hidden="true">5.7.</strong> 最终代码</a></li></ol></li><li><a href="fifth.html"><strong aria-hidden="true">6.</strong> 一个不安全的队列</a></li><li><ol class="section"><li><a href="fifth-layout.html"><strong aria-hidden="true">6.1.</strong> 布局</a></li><li><a href="fifth-unsafe.html"><strong aria-hidden="true">6.2.</strong> 不安全</a></li><li><a href="fifth-basics.html"><strong aria-hidden="true">6.3.</strong> 基础</a></li><li><a href="fifth-extras.html"><strong aria-hidden="true">6.4.</strong> 其他</a></li><li><a href="fifth-final.html"><strong aria-hidden="true">6.5.</strong> 最终代码</a></li></ol></li><li><a href="sixth.html"><strong aria-hidden="true">7.</strong> 一个可以的不安全的双向队列</a></li><li><a href="infinity.html"><strong aria-hidden="true">8.</strong> 一堆傻乎乎的链表</a></li><li><ol class="section"><li><a href="infinity-double-single.html"><strong aria-hidden="true">8.1.</strong> 双重单链</a></li></ol></li></ol>
+                <ol class="chapter"><li class="chapter-item expanded "><a href="index.html"><strong aria-hidden="true">1.</strong> 简介</a></li><li class="chapter-item expanded "><a href="first.html"><strong aria-hidden="true">2.</strong> 一个不好的栈</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="first-layout.html"><strong aria-hidden="true">2.1.</strong> 布局</a></li><li class="chapter-item expanded "><a href="first-new.html"><strong aria-hidden="true">2.2.</strong> 新建</a></li><li class="chapter-item expanded "><a href="first-ownership.html"><strong aria-hidden="true">2.3.</strong> 所有权101</a></li><li class="chapter-item expanded "><a href="first-push.html"><strong aria-hidden="true">2.4.</strong> 推入</a></li><li class="chapter-item expanded "><a href="first-pop.html"><strong aria-hidden="true">2.5.</strong> 弹出</a></li><li class="chapter-item expanded "><a href="first-test.html"><strong aria-hidden="true">2.6.</strong> 测试</a></li><li class="chapter-item expanded "><a href="first-drop.html"><strong aria-hidden="true">2.7.</strong> 丢弃</a></li><li class="chapter-item expanded "><a href="first-final.html"><strong aria-hidden="true">2.8.</strong> 最终代码</a></li></ol></li><li class="chapter-item expanded "><a href="second.html"><strong aria-hidden="true">3.</strong> 一个可以的栈</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="second-option.html"><strong aria-hidden="true">3.1.</strong> 选项</a></li><li class="chapter-item expanded "><a href="second-generic.html" class="active"><strong aria-hidden="true">3.2.</strong> 泛型</a></li><li class="chapter-item expanded "><a href="second-peek.html"><strong aria-hidden="true">3.3.</strong> 选择</a></li><li class="chapter-item expanded "><a href="second-into-iter.html"><strong aria-hidden="true">3.4.</strong> 进入遍历</a></li><li class="chapter-item expanded "><a href="second-iter.html"><strong aria-hidden="true">3.5.</strong> 遍历</a></li><li class="chapter-item expanded "><a href="second-iter-mut.html"><strong aria-hidden="true">3.6.</strong> 可变遍历</a></li><li class="chapter-item expanded "><a href="second-final.html"><strong aria-hidden="true">3.7.</strong> 最终代码</a></li></ol></li><li class="chapter-item expanded "><a href="third.html"><strong aria-hidden="true">4.</strong> 一个持久化的栈</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="third-layout.html"><strong aria-hidden="true">4.1.</strong> 布局</a></li><li class="chapter-item expanded "><a href="third-basics.html"><strong aria-hidden="true">4.2.</strong> 基本</a></li><li class="chapter-item expanded "><a href="third-drop.html"><strong aria-hidden="true">4.3.</strong> 丢弃</a></li><li class="chapter-item expanded "><a href="third-arc.html"><strong aria-hidden="true">4.4.</strong> Arc</a></li><li class="chapter-item expanded "><a href="third-final.html"><strong aria-hidden="true">4.5.</strong> 最终代码</a></li></ol></li><li class="chapter-item expanded "><a href="fourth.html"><strong aria-hidden="true">5.</strong> 一个不好的安全双向队列</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="fourth-layout.html"><strong aria-hidden="true">5.1.</strong> 布局</a></li><li class="chapter-item expanded "><a href="fourth-building.html"><strong aria-hidden="true">5.2.</strong> 构建</a></li><li class="chapter-item expanded "><a href="fourth-breaking.html"><strong aria-hidden="true">5.3.</strong> 打破</a></li><li class="chapter-item expanded "><a href="fourth-peek.html"><strong aria-hidden="true">5.4.</strong> 选择</a></li><li class="chapter-item expanded "><a href="fourth-symmetry.html"><strong aria-hidden="true">5.5.</strong> 对称情况</a></li><li class="chapter-item expanded "><a href="fourth-iteration.html"><strong aria-hidden="true">5.6.</strong> 迭代</a></li><li class="chapter-item expanded "><a href="fourth-final.html"><strong aria-hidden="true">5.7.</strong> 最终代码</a></li></ol></li><li class="chapter-item expanded "><a href="fifth.html"><strong aria-hidden="true">6.</strong> 一个不安全的队列</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="fifth-layout.html"><strong aria-hidden="true">6.1.</strong> 布局</a></li><li class="chapter-item expanded "><a href="fifth-unsafe.html"><strong aria-hidden="true">6.2.</strong> 不安全</a></li><li class="chapter-item expanded "><a href="fifth-basics.html"><strong aria-hidden="true">6.3.</strong> 基础</a></li><li class="chapter-item expanded "><a href="fifth-extras.html"><strong aria-hidden="true">6.4.</strong> 其他</a></li><li class="chapter-item expanded "><a href="fifth-final.html"><strong aria-hidden="true">6.5.</strong> 最终代码</a></li></ol></li><li class="chapter-item expanded "><a href="sixth.html"><strong aria-hidden="true">7.</strong> 一个可以的不安全的双向队列</a></li><li class="chapter-item expanded "><a href="infinity.html"><strong aria-hidden="true">8.</strong> 一堆傻乎乎的链表</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="infinity-double-single.html"><strong aria-hidden="true">8.1.</strong> 双重单链</a></li></ol></li></ol>
             </div>
             <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
         </nav>
@@ -87,37 +104,38 @@
 
             <div class="page">
                 
-                <div id="menu-bar" class="menu-bar">
-                    <div id="menu-bar-sticky-container">
-                        <div class="left-buttons">
-                            <button id="sidebar-toggle" class="icon-button" type="button" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
-                                <i class="fa fa-bars"></i>
-                            </button>
-                            <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
-                                <i class="fa fa-paint-brush"></i>
-                            </button>
-                            <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
-                                <li role="none"><button role="menuitem" class="theme" id="light">Light (default)</button></li>
-                                <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
-                                <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
-                                <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
-                                <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
-                            </ul>
-                            
-                            <button id="search-toggle" class="icon-button" type="button" title="Search. (Shortkey: s)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="S" aria-controls="searchbar">
-                                <i class="fa fa-search"></i>
-                            </button>
-                            
-                        </div>
+                <div id="menu-bar-hover-placeholder"></div>
+                <div id="menu-bar" class="menu-bar sticky bordered">
+                    <div class="left-buttons">
+                        <button id="sidebar-toggle" class="icon-button" type="button" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                            <i class="fa fa-bars"></i>
+                        </button>
+                        <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                            <i class="fa fa-paint-brush"></i>
+                        </button>
+                        <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="light">Light (default)</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
+                        </ul>
+                        
+                        <button id="search-toggle" class="icon-button" type="button" title="Search. (Shortkey: s)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="S" aria-controls="searchbar">
+                            <i class="fa fa-search"></i>
+                        </button>
+                        
+                    </div>
 
-                        <h1 class="menu-title">用太多链表写法学习Rust</h1>
+                    <h1 class="menu-title">用太多链表写法学习Rust</h1>
 
-                        <div class="right-buttons">
-                            <a href="print.html" title="Print this book" aria-label="Print this book">
-                                <i id="print-button" class="fa fa-print"></i>
-                            </a>
-                            
-                        </div>
+                    <div class="right-buttons">
+                        
+                        <a href="print.html" title="Print this book" aria-label="Print this book">
+                            <i id="print-button" class="fa fa-print"></i>
+                        </a>
+                        
+                        
                     </div>
                 </div>
 
@@ -145,7 +163,7 @@
 
                 <div id="content" class="content">
                     <main>
-                        <h1><a class="header" href="#让他全变成泛型" id="让他全变成泛型">让他全变成泛型</a></h1>
+                        <h1 id="让他全变成泛型"><a class="header" href="#让他全变成泛型">让他全变成泛型</a></h1>
 <p>我们已经用 Option 和 Box 触及了一些泛型。然而到目前为止，我们一直设法避免声明任
 何新的类型，这些类型实际上是对任意元素的泛型。</p>
 <p>事实证明，这其实很容易。让我们现在就把我们所有的类型都变成泛型：</p>
@@ -160,8 +178,8 @@ struct Node&lt;T&gt; {
     next: Link&lt;T&gt;,
 }
 </code></pre>
-<p>你只要把所有的东西都变得更尖角一点，突然间你的代码就会变得很通用。当然，我们不
-能<em>就</em>这样做，否则编译器就会变得超级疯狂。</p>
+<p>你只要把所有的东西都加上两个尖角，你的代码就会突然间变得很通用。当然，我们不能
+<em>仅仅</em>这样做，否则编译器就会变得超级疯狂。</p>
 <pre><code class="language-text">&gt; cargo test
 
 error[E0107]: wrong number of type arguments: expected 1, found 0
@@ -177,10 +195,10 @@ error[E0107]: wrong number of type arguments: expected 1, found 0
    |               ^^^^ expected 1 type argument
 
 </code></pre>
-<p>问题很明显：我们在谈论这个<code>List</code>的事情，但那已经不是真的了。像 Option 和 Box 一样，
-我们现在总是要谈论 <code>List&lt;Something&gt;</code>。</p>
-<p>但是我们在所有这些暗示中使用的Something是什么？就像List一样，我们希望我们的实现能与
-<em>所有</em>的T一起工作。所以，就像List一样，让我们的<code>impls</code>变得尖尖的：</p>
+<p>问题很明显：我们一直在谈论这个<code>List</code>的事情，但那已经不是真的了。像 Option 和 Box 
+一样，我们现在必须要谈论 <code>List&lt;Something&gt;</code>。</p>
+<p>但是我们在所有这些impl中使用的Something是什么？就像List一样，我们希望我们的实现能与
+<em>所有</em>的T一起工作。所以，就像List一样，让我们的<code>impl</code>变得尖尖的：</p>
 <pre><code class="language-rust ignore">impl&lt;T&gt; List&lt;T&gt; {
     pub fn new() -&gt; Self {
         List { head: None }
@@ -258,13 +276,13 @@ test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured
 
             <nav class="nav-wide-wrapper" aria-label="Page navigation">
                 
-                    <a href="second-option.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                    <a rel="prev" href="second-option.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
                         <i class="fa fa-angle-left"></i>
                     </a>
                 
 
                 
-                    <a href="second-peek.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                    <a rel="next" href="second-peek.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
                         <i class="fa fa-angle-right"></i>
                     </a>
                 
@@ -274,6 +292,14 @@ test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured
 
         
 
+        
+
+        
+
+        
+        <script type="text/javascript">
+            window.playground_copyable = true;
+        </script>
         
 
         
