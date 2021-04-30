@@ -193,7 +193,7 @@
 <p>一切都在侧边栏中（在移动端可能会被折叠），但为了快速参考，这里是我们要做的：</p>
 <ol>
 <li><a href="first.html">一个不好的单链栈</a></li>
-<li><a href="second.html">一个OK的单链栈</a></li>
+<li><a href="second.html">一个可以的单链栈</a></li>
 <li><a href="third.html">一个持久的单链栈</a></li>
 <li><a href="fourth.html">一个不好的但安全的双端队列</a></li>
 <li><a href="fifth.html">一个不安全的单链队列</a></li>
@@ -248,7 +248,7 @@ Rust普遍优秀的编译器错误和文档，这对于成为一个高效的Rust
 甚至不是一个使用链表的论点。这是一个使用<em>任何东西</em>的论点。为什么要使用链表呢？使用
 链接的哈希图吧!</p>
 <p>如果性能不重要，那么应用数组的自然默认值<em>肯定</em>是可以的。</p>
-<h2 id="如果你有一个指针在那里他们有o1的分割-追加-插入-删除"><a class="header" href="#如果你有一个指针在那里他们有o1的分割-追加-插入-删除">如果你有一个指针在那里，他们有O(1)的分割-追加-插入-删除</a></h2>
+<h2 id="如果你有一个指针那么他们会有o1的分割-追加-插入-删除"><a class="header" href="#如果你有一个指针那么他们会有o1的分割-追加-插入-删除">如果你有一个指针，那么他们会有O(1)的分割-追加-插入-删除</a></h2>
 <p>没错! 不过正如<a href="https://www.youtube.com/watch?v=YQs6IC-vgmo">Bjarne Stroustrup</a>所指出的，如果获取指针所花费的时间与复制
 一个数组中所有元素所花费的时间完全相差无几的话，<em>这实际上并不重要</em>（这确实相当快）。</p>
 <p>除非你的工作负载是以拆分和合并成本为主要开销，否则其他每个操作由于缓存效应和代码复杂
@@ -1279,7 +1279,7 @@ pub mod second;
 <p>Link只是<code>Option&lt;Box&lt;Node&gt;&gt;</code>。现在，可以不用到处写<code>Option&lt;Box&lt;Node&gt;&gt;</code>了，
 真不错。而且与<code>pop</code>不同的是，我们并没有把它暴露给外部世界，所以也许这很好。
 然而Option有一些<em>非常好</em>的方法，我们一直在手动实现。我们<em>不要</em>这样做，而是用
-Options代替一切。首先，我们要做的是简单地使用Some和None重命名所有的东西：</p>
+Options代替一切。首先，我们简单地使用Some和None重命名所有的东西：</p>
 <pre><code class="language-rust ignore">use std::mem;
 
 pub struct List {
@@ -2507,8 +2507,8 @@ pub mod third;
 <p>这次没有复制--粘帖。这是一个净室操作。</p>
 <h1 id="布局"><a class="header" href="#布局">布局</a></h1>
 <p>好了，回到布局的画板上。</p>
-<p>持久列表最重要的一点是，你基本上可以没有成本地操作列表的尾部：</p>
-<p>例如，在持久性列表中，这并不是一个不常见的工作量：</p>
+<p>持久列表最重要的一点是，你可以完全没有成本地操作列表的尾部：</p>
+<p>例如，在持久列表中，这并不是一个不常见的工作情况：</p>
 <pre><code class="language-text">list1 = A -&gt; B -&gt; C -&gt; D
 list2 = tail(list1) = B -&gt; C -&gt; D
 list3 = push(list2, X) = X -&gt; B -&gt; C -&gt; D
@@ -2525,16 +2525,16 @@ list3 -&gt; X ---+
 <p>这对Boxes来说就是不行的，因为<code>B</code>的所有权是<em>共享</em>的。谁应该释放它？如果我放弃list2，
 它会释放B吗？对于盒子，我们当然希望如此。</p>
 <p>函数式语言--事实上几乎所有其他语言--都通过使用<em>垃圾回收</em>来解决这个问题。有了垃圾收集
-的魔力，只有在每个人都不再看它的时候，B才会被释放。万幸！</p>
+的魔力，只有在每个人都不再看B的时候，它才会被释放。万幸！</p>
 <p>Rust没有像这些语言那样的垃圾收集器。他们有<em>追踪</em>的GC，它将挖掘所有在运行时闲置的内
 存，并自动找出哪些是垃圾。相反，Rust现在有的只是<em>引用计数</em>。引用计数可以被认为是一个
-非常简单的GC。对于许多工作情况来说，它的吞吐量明显低于跟踪收集器，而且如果你设法建立
+非常简单的GC。对于许多工作情况来说，它的吞吐量明显低于跟踪收集器，而且如果你建立一个
 循环，它就会完全崩溃。但是，这就是我们所能得到的一切了。值得庆幸的是，对于我们的用例
-来说，我们永远不会遇到周期问题（请随时尝试向自己证明这一点 -- 我肯定不会）。</p>
+来说，我们永远不会遇到循环问题（请随时尝试向自己证明这一点 -- 我肯定不会）。</p>
 <p>那么，我们如何进行引用计数的垃圾收集呢？<code>Rc</code>! Rc就像Box一样，但我们可以复制它，而且
 它的内存<em>只有</em>在<em>所有</em>从它派生出来的Rc被丢弃时才会被释放。不幸的是，这种灵活性有一个
-严重的代价：我们只能对其内部进行共享引用。这意味着我们永远不能从我们的一个列表中获取
-数据，也不能对它们进行变异。</p>
+严重的代价：我们只能对其内部进行共享引用。这意味着我们永远不能从我们的一个列表中取出
+数据，也不能对它们进行改变。</p>
 <p>那么，我们的布局会是什么样子的呢？嗯，之前我们有：</p>
 <pre><code class="language-rust ignore">pub struct List&lt;T&gt; {
     head: Link&lt;T&gt;,
@@ -2574,7 +2574,7 @@ help: possible candidate is found in another module, you can import it into scop
   |
 </code></pre>
 <p>哦，该死，坏起来了。与我们用于可变列表的一切不同，Rc是如此蹩脚，以至于它甚至没有被
-隐含地导入到每一个Rust程序中。<em>真是个失败者。</em></p>
+隐式地导入到每一个Rust程序中。<em>真是个失败者。</em></p>
 <pre><code class="language-rust ignore">use std::rc::Rc;
 </code></pre>
 <pre><code class="language-text">cargo build
@@ -2599,30 +2599,30 @@ warning: field is never used: `next`
 11 |     next: Link&lt;T&gt;,
    |     ^^^^^^^^^^^^^
 </code></pre>
-<p>似乎是合法的。Rust的编写仍然是<em>完全</em>微不足道的。我打赌我们可以用Rc查找和替换Box，然后
-就可以了。</p>
+<p>似乎是合法的。Rust依然写起来是<em>完全</em>琐碎的。我打赌我们会在某一天可以用Rc查找和替
+换Box，然后就可以了。</p>
 <p>...</p>
 <p>不，不，我们不能。</p>
 <h1 id="基本"><a class="header" href="#基本">基本</a></h1>
 <p>我们现在已经知道了很多Rust的基础知识，所以我们可以再次做很多简单的事情。</p>
-<p>对于构造函数，我们又可以直接复制粘贴了：</p>
+<p>对于构造函数，我们又可以直接复制粘贴：</p>
 <pre><code class="language-rust ignore">impl&lt;T&gt; List&lt;T&gt; {
     pub fn new() -&gt; Self {
         List { head: None }
     }
 }
 </code></pre>
-<p><code>push</code>和<code>pop</code>已经没有实际意义了。相反，我们可以提供<code>append</code>和<code>tail</code>，它们提供的东
-西大致相同。</p>
+<p><code>push</code>和<code>pop</code>已经不太能表达含义了。我们可以提供<code>append</code>和<code>tail</code>来代替它们，它们提
+供的东西大致相同。</p>
 <p>让我们从append开始。它接受一个列表和一个元素，并返回一个列表。就像可变列表的情况一样，
 我们要做一个新的节点，它的<code>next</code>值是旧列表。唯一新奇的是如何获得下一个值，因为我们不
 允许改变任何东西。</p>
 <p>我们祈祷的答案就是Clone特性。几乎所有的类型都实现了克隆，它提供了一种通用的方法来获得
 &quot;像这样的另一个&quot;，而这个逻辑上是不相干的，只给了一个共享的引用。它就像C++中的复制构造
-函数，但它从未被隐式调用。</p>
-<p>特别是Rc使用Clone作为增加引用计数的方法。因此，与其移动一个Box到子列表中，不如直接克
-隆旧列表的头部。我们甚至不需要在头部进行匹配，因为Option暴露了一个Clone的实现，它所做
-的正是我们想要的事情。</p>
+函数，但它不会被隐式调用。</p>
+<p>特别地，Rc使用Clone作为增加引用计数的方法。因此，与其移动一个Box到子列表中，不如直接
+克隆旧列表的头部。我们甚至不需要在头部进行匹配，因为Option暴露了一个Clone的实现，它所
+做的正是我们想要的事情。</p>
 <p>好了，让我们试一试吧：</p>
 <pre><code class="language-rust ignore">pub fn append(&amp;self, elem: T) -&gt; List&lt;T&gt; {
     List { head: Some(Rc::new(Node {

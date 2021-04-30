@@ -165,24 +165,24 @@
                     <main>
                         <h1 id="基本"><a class="header" href="#基本">基本</a></h1>
 <p>我们现在已经知道了很多Rust的基础知识，所以我们可以再次做很多简单的事情。</p>
-<p>对于构造函数，我们又可以直接复制粘贴了：</p>
+<p>对于构造函数，我们又可以直接复制粘贴：</p>
 <pre><code class="language-rust ignore">impl&lt;T&gt; List&lt;T&gt; {
     pub fn new() -&gt; Self {
         List { head: None }
     }
 }
 </code></pre>
-<p><code>push</code>和<code>pop</code>已经没有实际意义了。相反，我们可以提供<code>append</code>和<code>tail</code>，它们提供的东
-西大致相同。</p>
+<p><code>push</code>和<code>pop</code>已经不太能表达含义了。我们可以提供<code>append</code>和<code>tail</code>来代替它们，它们提
+供的东西大致相同。</p>
 <p>让我们从append开始。它接受一个列表和一个元素，并返回一个列表。就像可变列表的情况一样，
 我们要做一个新的节点，它的<code>next</code>值是旧列表。唯一新奇的是如何获得下一个值，因为我们不
 允许改变任何东西。</p>
 <p>我们祈祷的答案就是Clone特性。几乎所有的类型都实现了克隆，它提供了一种通用的方法来获得
 &quot;像这样的另一个&quot;，而这个逻辑上是不相干的，只给了一个共享的引用。它就像C++中的复制构造
-函数，但它从未被隐式调用。</p>
-<p>特别是Rc使用Clone作为增加引用计数的方法。因此，与其移动一个Box到子列表中，不如直接克
-隆旧列表的头部。我们甚至不需要在头部进行匹配，因为Option暴露了一个Clone的实现，它所做
-的正是我们想要的事情。</p>
+函数，但它不会被隐式调用。</p>
+<p>特别地，Rc使用Clone作为增加引用计数的方法。因此，与其移动一个Box到子列表中，不如直接
+克隆旧列表的头部。我们甚至不需要在头部进行匹配，因为Option暴露了一个Clone的实现，它所
+做的正是我们想要的事情。</p>
 <p>好了，让我们试一试吧：</p>
 <pre><code class="language-rust ignore">pub fn append(&amp;self, elem: T) -&gt; List&lt;T&gt; {
     List { head: Some(Rc::new(Node {

@@ -173,7 +173,7 @@
 <p>Link只是<code>Option&lt;Box&lt;Node&gt;&gt;</code>。现在，可以不用到处写<code>Option&lt;Box&lt;Node&gt;&gt;</code>了，
 真不错。而且与<code>pop</code>不同的是，我们并没有把它暴露给外部世界，所以也许这很好。
 然而Option有一些<em>非常好</em>的方法，我们一直在手动实现。我们<em>不要</em>这样做，而是用
-Options代替一切。首先，我们要做的是简单地使用Some和None重命名所有的东西：</p>
+Options代替一切。首先，我们简单地使用Some和None重命名所有的东西：</p>
 <pre><code class="language-rust ignore">use std::mem;
 
 pub struct List {
